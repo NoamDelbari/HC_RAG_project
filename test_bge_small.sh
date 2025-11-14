@@ -11,9 +11,9 @@ echo "TESTING BGE MODEL (10 documents)"
 echo "=================================="
 echo ""
 
-# Run with conda run to ensure environment is active
+# Run test
 echo "Building database with 10 documents..."
-conda run -n hcrag python3 src/database/build_chunked_vector_db.py \
+python3 src/database/build_chunked_vector_db.py \
     --model bge \
     --tasks 1_2 \
     --max-docs 10 \
@@ -26,12 +26,12 @@ conda run -n hcrag python3 src/database/build_chunked_vector_db.py \
 # Verify mapping
 echo ""
 echo "Verifying mapping..."
-conda run -n hcrag python3 verify_mapping.py --db crag_chunked_bge_test
+python3 verify_mapping.py --db crag_chunked_bge_test
 
 # Run quick experiment
 echo ""
 echo "Running quick experiment..."
-conda run -n hcrag python3 src/tests/run_chunked_experiments.py \
+python3 src/tests/run_chunked_experiments.py \
     --db crag_chunked_bge_test \
     --max-queries 5
 

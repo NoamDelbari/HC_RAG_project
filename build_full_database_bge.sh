@@ -6,12 +6,6 @@
 
 set -e  # Exit on error
 
-# Activate conda environment (if running locally)
-if command -v conda &> /dev/null; then
-    eval "$(conda shell.bash hook)"
-    conda activate hcrag
-fi
-
 echo "=================================="
 echo "FULL DATABASE BUILD WITH BGE MODEL"
 echo "=================================="
