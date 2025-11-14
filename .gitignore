@@ -1,0 +1,5 @@
+*.faiss
+*.pkl
+datasets/crag/*.bz2
+__pycache__/
+*.pyc
