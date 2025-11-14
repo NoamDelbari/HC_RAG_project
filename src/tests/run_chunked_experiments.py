@@ -231,6 +231,18 @@ def main():
         print(f"Mode: Single experiment (k={args.k}, aggregation={args.aggregation})")
     print("="*80 + "\n")
 
+    # Load database first to get available document IDs
+    print("Loading database to check available documents...")
+    print("-" * 80)
+    import pickle
+    mapping_file = f"{args.db}.chunk_mapping.pkl"
+    with open(mapping_file, "rb") as f:
+        mappings = pickle.load(f)
+    
+    available_doc_ids = set(mappings['doc_to_chunks'].keys())
+    print(f"✓ Database contains {len(available_doc_ids)} documents")
+    print()
+    
     # Load queries
     print("Loading CRAG dataset...")
     print("-" * 80)
@@ -238,17 +250,33 @@ def main():
     queries, documents = loader.load_by_tasks(args.tasks)
     
     print(f"✓ Loaded {len(queries)} queries")
+    
+    # Filter queries to only those whose ground truth docs are in the database
+    print("\nFiltering queries to match database coverage...")
+    print("-" * 80)
+    
+    filtered_queries = []
+    for query in queries:
+        ground_truth_ids = extract_ground_truth_ids(query)
+        # Keep query if at least one ground truth doc is in the database
+        if ground_truth_ids & available_doc_ids:  # Set intersection
+            filtered_queries.append(query)
+    
+    print(f"✓ Kept {len(filtered_queries)}/{len(queries)} queries with ground truth in database")
+    print(f"  ({len(filtered_queries)/len(queries)*100:.1f}% coverage)")
+    
+    queries = filtered_queries
+    
+    if len(queries) == 0:
+        print("\n❌ ERROR: No queries match the documents in the database!")
+        print("   Database and dataset might be mismatched.")
+        return
+    
     print()
 
     # Initialize embedding model
     print("Initializing embedding model...")
     print("-" * 80)
-    
-    # Load model from the database metadata to ensure consistency
-    import pickle
-    mapping_file = f"{args.db}.chunk_mapping.pkl"
-    with open(mapping_file, "rb") as f:
-        mappings = pickle.load(f)
     
     chunker_config = mappings.get("chunker_config", {})
     print(f"Database chunker config: {chunker_config}")
