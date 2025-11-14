@@ -388,6 +388,7 @@ class RecursiveChunker(DocumentChunker):
                 )
                 for sub_chunk in sub_chunks:
                     sub_chunk.chunk_id = f"{doc_id}_chunk_{len(chunks)}"
+                    sub_chunk.parent_doc_id = doc_id  # Fix: Use original parent doc_id
                     sub_chunk.chunk_index = len(chunks)
                     chunks.append(sub_chunk)
                 continue
