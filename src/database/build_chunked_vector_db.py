@@ -50,8 +50,8 @@ def main():
         "--model",
         type=str,
         default="quality",
-        choices=["fast", "quality"],
-        help="Embedding model to use (default: quality)"
+        choices=["fast", "quality", "bge"],
+        help="Embedding model to use (default: quality, recommended: bge)"
     )
     parser.add_argument(
         "--chunker",
@@ -63,8 +63,8 @@ def main():
     parser.add_argument(
         "--chunk-size",
         type=int,
-        default=256,
-        help="Target chunk size in tokens (default: 256)"
+        default=384,
+        help="Target chunk size in tokens (default: 384, safe for all models)"
     )
     parser.add_argument(
         "--chunk-overlap",
@@ -148,6 +148,7 @@ def main():
 
     model_name = (
         EmbeddingModel.FAST_MODEL if args.model == "fast"
+        else EmbeddingModel.BGE_MODEL if args.model == "bge"
         else EmbeddingModel.QUALITY_MODEL
     )
     

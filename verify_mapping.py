@@ -1,15 +1,26 @@
 """
-Verify the fixed mapping is correct
+Verify the chunk-to-document mapping is correct
 """
 
 import pickle
+import argparse
+
+parser = argparse.ArgumentParser(description="Verify chunk-to-document mapping")
+parser.add_argument(
+    "--db",
+    type=str,
+    default="crag_chunked_vector_db",
+    help="Database path (default: crag_chunked_vector_db)"
+)
+args = parser.parse_args()
 
 print("="*80)
-print("VERIFYING FIXED MAPPING")
+print(f"VERIFYING MAPPING: {args.db}")
 print("="*80)
 
-# Load fixed mapping
-with open('crag_chunked_vector_db.chunk_mapping.pkl', 'rb') as f:
+# Load mapping
+mapping_file = f"{args.db}.chunk_mapping.pkl"
+with open(mapping_file, 'rb') as f:
     mappings = pickle.load(f)
 
 chunk_to_doc = mappings['chunk_to_doc']
@@ -94,12 +105,11 @@ print("="*80)
 
 if (not bad_parents and 
     all_chunks_from_doc_mapping == all_chunks_from_chunk_mapping and
-    not orphan_chunks and
-    len(doc_to_chunks) == 500):
+    not orphan_chunks):
     print("✅✅✅ MAPPING IS PERFECT! ✅✅✅")
-    print(f"✅ 500 unique documents")
-    print(f"✅ 435,030 chunks")
-    print(f"✅ Average 870 chunks/doc (full HTML!)")
+    print(f"✅ {len(doc_to_chunks)} unique documents")
+    print(f"✅ {len(chunk_to_doc)} chunks")
+    print(f"✅ Average {sum(chunk_count_per_doc.values()) / len(chunk_count_per_doc):.1f} chunks/doc")
     print(f"✅ No artifacts, no orphans, fully consistent")
     print("\n🚀 READY TO RUN EXPERIMENTS! 🚀")
 else:
