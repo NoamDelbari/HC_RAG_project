@@ -14,7 +14,6 @@ echo "This will:"
 echo "  - Load ALL 12,949 CRAG documents (Tasks 1&2)"
 echo "  - Chunk with recursive strategy (384 tokens, 50 overlap)"
 echo "  - Embed using BAAI/bge-base-en-v1.5"
-echo "  - Estimated: ~11M chunks, 6-8 hours on GPU"
 echo ""
 echo "Files created:"
 echo "  crag_chunked_bge_full.faiss"
@@ -33,7 +32,6 @@ fi
 
 echo ""
 echo "Building chunked vector database with BGE model..."
-echo "   This will take 6-8 hours on GPU..."
 echo ""
 
 python3 src/database/build_chunked_vector_db.py \
