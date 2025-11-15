@@ -349,6 +349,7 @@ def main():
             "chunk_to_doc": chunk_to_doc_mapping,
             "doc_to_chunks": doc_to_chunks_mapping,
             "chunk_count_per_doc": chunk_count_per_doc,
+            "model_name": model.get_model_name(),
             "chunker_config": {
                 "strategy": args.chunker,
                 "chunk_size": args.chunk_size,

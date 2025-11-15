@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-11-13T16:29:18.083072",
+  "config": {
+    "db_path": "crag_chunked_vector_db",
+    "tasks": [
+      "1_2"
+    ],
+    "max_queries": 100,
+    "chunker_config": {
+      "strategy": "recursive",
+      "chunk_size": 256,
+      "chunk_overlap": 50
+    }
+  },
+  "results": [
+    {
+      "aggregation": "max_score",
+      "k": 10,
+      "top_chunks": 100,
+      "n_queries": 100,
+      "retrieval_time": 0.28069019317626953,
+      "metrics": {
+        "recall": 0.132,
+        "precision": 0.066,
+        "ndcg": 0.11705310154372234,
+        "mrr": 0.1873571428571429,
+        "hit_rate": 0.42
+      }
+    }
+  ]
+}

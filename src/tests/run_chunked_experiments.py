@@ -281,9 +281,19 @@ def main():
     chunker_config = mappings.get("chunker_config", {})
     print(f"Database chunker config: {chunker_config}")
     
-    # Use quality model (same as what should be in the database)
-    model = EmbeddingModel(model_name=EmbeddingModel.QUALITY_MODEL)
-    print(f"✓ Model: {model.get_model_name()}")
+    # Detect model from database metadata (CRITICAL: must match database!)
+    db_model = mappings.get("model_name")
+    if db_model is None:
+        print("⚠️  WARNING: Database missing model_name metadata!")
+        print("   Defaulting to QUALITY_MODEL - this may cause poor results if database used different model.")
+        print("   Rebuild database with updated build script to save model_name.")
+        db_model = EmbeddingModel.QUALITY_MODEL
+    else:
+        print(f"✓ Database was built with: {db_model}")
+    
+    # Use same model as database
+    model = EmbeddingModel(model_name=db_model)
+    print(f"✓ Using model: {model.get_model_name()}")
     print()
 
     # Run experiments
