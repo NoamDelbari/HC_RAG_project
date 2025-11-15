@@ -33,16 +33,19 @@ class VectorDatabase:
     Supports fast k-nearest neighbor search using cosine similarity.
     """
 
-    def __init__(self, embedding_dim: int, index_type: str = "flat"):
+    def __init__(self, embedding_dim: int, index_type: str = "flat", embedding_model_name: Optional[str] = None):
         """
         Initialize vector database.
 
         Args:
             embedding_dim: Dimension of embeddings
             index_type: Type of FAISS index ("flat" for exact search, "ivf" for approximate)
+            embedding_model_name: Name of embedding model used (e.g., "all-MiniLM-L6-v2")
+                                 Stored for consistency checking when building null distributions
         """
         self.embedding_dim = embedding_dim
         self.index_type = index_type
+        self.embedding_model_name = embedding_model_name
 
         # Initialize FAISS index
         # IndexFlatIP = Inner Product (for normalized vectors, IP = cosine similarity)
@@ -56,6 +59,8 @@ class VectorDatabase:
         self.doc_metadata: List[Dict[str, Any]] = []
 
         logger.info(f"Initialized VectorDatabase with embedding_dim={embedding_dim}, index_type={index_type}")
+        if embedding_model_name:
+            logger.info(f"  Embedding model: {embedding_model_name}")
 
     def add_documents(
         self,
@@ -202,46 +207,78 @@ class VectorDatabase:
 
     def get_similarity_distribution(
         self,
+        query_embeddings: np.ndarray,
         n_samples: int = 10000,
         seed: int = 42
     ) -> np.ndarray:
         """
-        Sample similarity scores for null distribution (HC statistics).
+        Sample query-document similarity scores for null distribution (HC statistics).
 
-        Randomly samples pairs of documents and computes their similarity.
-        Used to build the null distribution for Higher Criticism thresholding.
+        Randomly samples (query, document) pairs and computes their similarity.
+        This represents the null hypothesis: query and document are unrelated.
+
+        CRITICAL: Uses query-document pairs (NOT document-document pairs).
+        This is essential for proper HC statistics in retrieval systems.
 
         Args:
-            n_samples: Number of random pairs to sample
+            query_embeddings: Query embeddings, shape (n_queries, embedding_dim)
+            n_samples: Number of random query-document pairs to sample
             seed: Random seed for reproducibility
 
         Returns:
-            Array of similarity scores
+            Array of similarity scores representing null distribution
+
+        Raises:
+            ValueError: If query_embeddings is empty or has wrong dimensions
         """
-        if len(self.doc_ids) < 2:
-            logger.warning("Not enough documents to sample pairs")
+        # Validate inputs
+        if len(self.doc_ids) == 0:
+            logger.warning("No documents in database")
             return np.array([])
+
+        if query_embeddings is None or len(query_embeddings) == 0:
+            raise ValueError("query_embeddings cannot be empty")
+
+        # Ensure query_embeddings is 2D
+        if query_embeddings.ndim == 1:
+            query_embeddings = query_embeddings.reshape(1, -1)
+
+        if query_embeddings.shape[1] != self.embedding_dim:
+            raise ValueError(
+                f"Embedding dimension mismatch: expected {self.embedding_dim}, "
+                f"got {query_embeddings.shape[1]}"
+            )
+
+        # Convert to float32 and normalize
+        query_embeddings = query_embeddings.astype(np.float32)
+        norms = np.linalg.norm(query_embeddings, axis=1, keepdims=True)
+        query_embeddings = query_embeddings / (norms + 1e-8)
 
         np.random.seed(seed)
 
-        # Get all embeddings from the index
-        embeddings = self.index.reconstruct_n(0, len(self.doc_ids))
+        # Get all document embeddings from the index
+        doc_embeddings = self.index.reconstruct_n(0, len(self.doc_ids))
 
-        # Sample random pairs
+        # Sample random query-document pairs
+        n_queries = len(query_embeddings)
         n_docs = len(self.doc_ids)
         similarities = []
 
+        logger.info(f"Sampling {n_samples} query-document pairs for null distribution...")
+        logger.info(f"  Available: {n_queries} queries, {n_docs} documents")
+
         for _ in range(n_samples):
-            # Sample two different documents
-            idx1, idx2 = np.random.choice(n_docs, size=2, replace=False)
+            # Sample random query and random document
+            query_idx = np.random.randint(0, n_queries)
+            doc_idx = np.random.randint(0, n_docs)
 
             # Compute cosine similarity (dot product of normalized vectors)
-            sim = np.dot(embeddings[idx1], embeddings[idx2])
+            sim = np.dot(query_embeddings[query_idx], doc_embeddings[doc_idx])
             similarities.append(sim)
 
         similarities = np.array(similarities)
-        logger.info(f"Sampled {n_samples} similarity scores for null distribution")
-        logger.info(f"  Min: {np.min(similarities):.4f}, Max: {np.max(similarities):.4f}, Mean: {np.mean(similarities):.4f}")
+        logger.info(f"✓ Sampled {n_samples} query-document similarity scores")
+        logger.info(f"  Min: {np.min(similarities):.4f}, Max: {np.max(similarities):.4f}, Mean: {np.mean(similarities):.4f}, Std: {np.std(similarities):.4f}")
 
         return similarities
 
