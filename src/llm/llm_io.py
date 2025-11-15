@@ -1,6 +1,7 @@
 from typing import List, Optional
 from dataclasses import dataclass
 
+# TODO: Convert RetrivalOutput to LLMRAGInput
 @dataclass
 class LLMRAGInput:
     """
@@ -11,6 +12,7 @@ class LLMRAGInput:
     documents: List[str]  # Retrieved documents as text
     metadata: Optional[dict] = None  # Optional additional info (e.g., source, date)
 
+# TODO: Improve token counting mechanism
 def format_docs(llm_rag_inputs: LLMRAGInput, max_tokens: int) -> str:
     """Format the retrieved documents into a single string within token limits."""
     formatted_docs = ""
@@ -26,5 +28,6 @@ def format_docs(llm_rag_inputs: LLMRAGInput, max_tokens: int) -> str:
 
     return formatted_docs.strip()
 
+# TODO: Implement better output cleaning
 def clean_output(raw_output: str) -> str:
     return raw_output.strip()

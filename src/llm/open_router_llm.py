@@ -5,6 +5,10 @@ from base_llm import BaseLLM
 
 load_dotenv()
 
+# TODO: Add .env and .env.example files with instructions
+# TODO: Handle missing API key error
+# TODO: Get API key
+# TODO: Check tokens limit per model
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL="https://openrouter.ai/api/v1"
 

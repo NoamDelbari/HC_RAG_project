@@ -82,6 +82,7 @@ class BaseLLM(ABC):
                 self.logger.error(f"Error generating answer: {e}")
             raise
 
+    # TODO: Implement batch processing if supported by the LLM backend, or parallelize calls
     async def batch_answers(self, llm_rag_inputs: List[LLMRAGInput]) -> List[str]:
         answers = []
         for llm_rag_input in llm_rag_inputs:
