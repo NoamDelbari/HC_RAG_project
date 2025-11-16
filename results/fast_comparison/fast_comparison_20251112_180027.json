@@ -1,0 +1,23 @@
+{
+  "experiment": "fast_query_model_comparison",
+  "note": "Uses pre-built document embeddings, only tests query embedding models",
+  "timestamp": "20251112_180027",
+  "n_queries": 5,
+  "k": 10,
+  "db_path": "src/database/crag_vector_db",
+  "db_embedding_dim": 768,
+  "results": [
+    {
+      "model_name": "QUALITY_MODEL",
+      "model_path": "sentence-transformers/all-mpnet-base-v2",
+      "status": "success",
+      "recall_at_k": 0.0,
+      "precision_at_k": 0.0,
+      "mrr": 0.0,
+      "ndcg_at_k": 0.0,
+      "map_at_k": 0.0,
+      "time_seconds": 1.1162970066070557,
+      "time_per_query_ms": 223.25940132141113
+    }
+  ]
+}

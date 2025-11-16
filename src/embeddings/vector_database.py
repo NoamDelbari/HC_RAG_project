@@ -5,6 +5,10 @@ High-performance vector database for document retrieval using FAISS.
 Supports fast similarity search and persistence.
 """
 
+# Workaround for faiss-cpu 1.12.0 bug with GPU classes
+import os
+os.environ['FAISS_NO_AVX2'] = '1'
+
 import faiss
 import numpy as np
 import pickle
