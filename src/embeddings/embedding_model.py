@@ -25,6 +25,7 @@ class EmbeddingModel:
     # Recommended models from phase1.MD
     FAST_MODEL = "sentence-transformers/all-MiniLM-L6-v2"  # 384 dim, fast
     QUALITY_MODEL = "sentence-transformers/all-mpnet-base-v2"  # 768 dim, better quality
+    BGE_MODEL = "BAAI/bge-base-en-v1.5"  # 768 dim, SOTA for retrieval (MTEB #1)
 
     def __init__(
         self,
