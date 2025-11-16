@@ -1,0 +1,34 @@
+{
+  "k": 5,
+  "n_queries": 100,
+  "n_labeled_queries": 100,
+  "n_unlabeled_queries": 0,
+  "all_queries": {
+    "recall_at_k": 0.13,
+    "precision_at_k": 0.13,
+    "mrr": 0.2823333333333333,
+    "ndcg_at_k": 0.14720713392844087,
+    "hit_rate": 0.41,
+    "map_at_k": 0.09383333333333332
+  },
+  "labeled_queries_only": {
+    "recall_at_k": 0.13,
+    "precision_at_k": 0.13,
+    "mrr": 0.2823333333333333,
+    "ndcg_at_k": 0.14720713392844087,
+    "hit_rate": 0.41,
+    "map_at_k": 0.09383333333333332
+  },
+  "coverage": {
+    "query_coverage": 1.0,
+    "catalog_coverage": 0.132
+  },
+  "retrieval_stats": {
+    "mean_k": 5.0,
+    "min_k": 5,
+    "max_k": 5
+  },
+  "quality_flags": {
+    "queries_with_duplicates": 0
+  }
+}
