@@ -1,7 +1,7 @@
 from typing import List, Optional
 from dataclasses import dataclass
 
-# TODO: Convert RetrivalOutput to LLMRAGInput
+# TODO: Convert RetrivalOutput to LLMRAGInput (missing query and text docs)
 @dataclass
 class LLMRAGInput:
     """
@@ -12,7 +12,9 @@ class LLMRAGInput:
     documents: List[str]  # Retrieved documents as text
     metadata: Optional[dict] = None  # Optional additional info (e.g., source, date)
 
-# TODO: Improve token counting mechanism
+# TODO: Improve token counting mechanism, 
+# TODO: Use chunking (embeddings' chunker can be reused here)
+# TODO: Consider the dataset's document structure: CRAG has HTML content
 def format_docs(llm_rag_inputs: LLMRAGInput, max_tokens: int) -> str:
     """Format the retrieved documents into a single string within token limits."""
     formatted_docs = ""
