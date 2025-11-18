@@ -78,11 +78,11 @@ This will create:
 **Option B: Build Your Own Database**
 
 ```bash
-# Build database from Tasks 1&2 with quality model
-python src/database/build_vector_db.py --model quality
+# Build database from Tasks 1&2 with quality model (full document mode)
+python src/database/build_vector_db.py --mode full --model quality
 
 # Or with fast model (384d embeddings)
-python src/database/build_vector_db.py --model fast
+python src/database/build_vector_db.py --mode full --model fast
 ```
 
 ### 2. Run Baseline Experiments
@@ -103,7 +103,8 @@ python src/tests/run_baseline_experiments.py
 
 ```bash
 # Build with BGE model (1,000 docs for testing)
-python src/database/build_chunked_vector_db.py \
+python src/database/build_vector_db.py \
+  --mode chunked \
   --model bge \
   --max-docs 1000 \
   --chunker recursive \
@@ -113,7 +114,8 @@ python src/database/build_chunked_vector_db.py \
   --batch-size 512
 
 # Or build with full dataset (12,949 docs)
-python src/database/build_chunked_vector_db.py \
+python src/database/build_vector_db.py \
+  --mode chunked \
   --model bge \
   --chunker recursive \
   --chunk-size 384 \
@@ -176,20 +178,95 @@ HC_RAG/
 
 ## Current Features
 
-✅ CRAG dataset loader (Tasks 1&2 and Task 3)  
-✅ GPU-accelerated embedding generation  
-✅ FAISS vector database with persistence  
-✅ **Pre-built vector database** (11,980 docs, mpnet-base-v2 768d embeddings)  
-✅ Baseline top-k retrieval  
-✅ **Chunked retrieval with BGE embeddings** (BAAI/bge-base-en-v1.5)  
-✅ **Document chunking strategies** (Fixed, Sentence, Recursive)  
-✅ **Chunk aggregation methods** (max_score, mean_score, sum_score)  
-✅ IR metrics evaluation (Recall@k, Precision@k, MRR, NDCG, MAP)  
+✅ CRAG dataset loader (Tasks 1&2 and Task 3)
+✅ GPU-accelerated embedding generation
+✅ FAISS vector database with persistence
+✅ **Unified database builder** (single script with full/chunked modes)
+✅ **Pre-built vector database** (11,980 docs, mpnet-base-v2 768d embeddings)
+✅ Baseline top-k retrieval
+✅ **Chunked retrieval with BGE embeddings** (BAAI/bge-base-en-v1.5)
+✅ **Document chunking strategies** (Fixed, Sentence, Recursive)
+✅ **Chunk aggregation methods** (max_score, mean_score, sum_score)
+✅ IR metrics evaluation (Recall@k, Precision@k, MRR, NDCG, MAP)
 ✅ **Embedding model auto-detection** (prevents model mismatch bugs)
 
 🚧 **In Progress:**
 - Higher Criticism statistic calculation
 - HC-based adaptive retrieval
+
+## Database Builder Modes
+
+The unified `build_vector_db.py` script supports two modes for building vector databases:
+
+### Full Document Mode (`--mode full`)
+Embeds entire documents without chunking. Best for documents within model limits.
+
+```bash
+# Default (fast model)
+python src/database/build_vector_db.py --mode full
+
+# With quality model
+python src/database/build_vector_db.py --mode full --model quality
+
+# With custom options
+python src/database/build_vector_db.py --mode full --model bge --max-docs 5000
+```
+
+**Features:**
+- Simple and fast
+- 7-step process
+- Default output: `crag_vector_db`
+
+### Chunked Document Mode (`--mode chunked`)
+Chunks documents before embedding. Handles long documents exceeding model limits.
+
+```bash
+# Default (quality model, recursive chunking)
+python src/database/build_vector_db.py --mode chunked
+
+# Advanced configuration
+python src/database/build_vector_db.py \
+  --mode chunked \
+  --model bge \
+  --chunker recursive \
+  --chunk-size 512 \
+  --chunk-overlap 100
+
+# Save chunks for later embedding
+python src/database/build_vector_db.py \
+  --mode chunked \
+  --save-chunks-only
+
+# Resume from saved chunks
+python src/database/build_vector_db.py \
+  --mode chunked \
+  --load-chunks crag_chunked_vector_db.chunks.pkl
+```
+
+**Features:**
+- Advanced 10-step process
+- Multiple chunking strategies (fixed, sentence, recursive)
+- Configurable chunk size and overlap
+- Save/load chunks for resumable builds
+- Default output: `crag_chunked_vector_db`
+
+**Available Options:**
+```
+--mode {full,chunked}           Required: Choose database mode
+--tasks {1_2,3}                 CRAG tasks to load (default: 1_2)
+--max-docs N                    Limit number of documents
+--model {fast,quality,bge}      Embedding model choice
+--output PATH                   Output path (auto-set by mode)
+--use-full-html                 Use full HTML instead of snippets
+--batch-size N                  Embedding batch size (auto-detect)
+
+Chunked mode only:
+--chunker {fixed,sentence,recursive}
+--chunk-size N                  Tokens per chunk (default: 384)
+--chunk-overlap N               Overlap in tokens (default: 50)
+--save-chunks-only             Only chunk and save
+--load-chunks PATH             Load pre-chunked data
+```
 
 ## Usage Examples
 
