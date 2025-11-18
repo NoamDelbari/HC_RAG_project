@@ -125,8 +125,17 @@ def test_vector_database_end_to_end():
     print("STEP 5: Sampling Null Distribution for Higher Criticism")
     print("-" * 80)
 
-    print("Sampling 10,000 random document pairs...")
-    null_similarities = db.get_similarity_distribution(n_samples=10000, seed=42)
+    # Generate query embeddings
+    print("Generating query embeddings for null distribution...")
+    query_texts = [q.query for q in queries]
+    query_embeddings = model.embed_documents(query_texts, show_progress=True)
+
+    print(f"Sampling 10,000 random query-document pairs...")
+    null_similarities = db.get_similarity_distribution(
+        query_embeddings=query_embeddings,
+        n_samples=10000,
+        seed=42
+    )
 
     print(f"✓ Null distribution statistics:")
     print(f"  Mean: {np.mean(null_similarities):.4f}")

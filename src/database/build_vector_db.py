@@ -139,7 +139,17 @@ def build_full_db(args):
     print("Step 5: Sampling null distribution for HC statistics...")
     print("-" * 80)
 
-    null_similarities = db.get_similarity_distribution(n_samples=10000, seed=42)
+    # Generate query embeddings
+    print(f"Embedding {len(queries)} queries for null distribution...")
+    query_texts = [q.query for q in queries]
+    query_embeddings = model.embed_documents(query_texts, show_progress=True)
+
+    # Sample null distribution from query-document pairs
+    null_similarities = db.get_similarity_distribution(
+        query_embeddings=query_embeddings,
+        n_samples=10000,
+        seed=42
+    )
 
     print(f"✓ Null distribution statistics:")
     print(f"  Mean: {null_similarities.mean():.4f}")
@@ -410,12 +420,26 @@ def build_chunked_db(args):
     print("Step 8: Sampling null distribution for HC statistics...")
     print("-" * 80)
 
-    null_similarities = db.get_similarity_distribution(n_samples=10000, seed=42)
+    if len(queries) > 0:
+        # Generate query embeddings
+        print(f"Embedding {len(queries)} queries for null distribution...")
+        query_texts = [q.query for q in queries]
+        query_embeddings = model.embed_documents(query_texts, show_progress=True)
 
-    print(f"✓ Null distribution statistics:")
-    print(f"  Mean: {null_similarities.mean():.4f}")
-    print(f"  Std: {null_similarities.std():.4f}")
-    print(f"  Min/Max: {null_similarities.min():.4f} / {null_similarities.max():.4f}")
+        # Sample null distribution from query-document pairs
+        null_similarities = db.get_similarity_distribution(
+            query_embeddings=query_embeddings,
+            n_samples=10000,
+            seed=42
+        )
+
+        print(f"✓ Null distribution statistics:")
+        print(f"  Mean: {null_similarities.mean():.4f}")
+        print(f"  Std: {null_similarities.std():.4f}")
+        print(f"  Min/Max: {null_similarities.min():.4f} / {null_similarities.max():.4f}")
+    else:
+        print("⚠ Skipping null distribution (no queries available)")
+        print("  Use --tasks to load queries, or skip with --load-chunks")
     print()
 
     # Step 9: Save database and mappings

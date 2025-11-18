@@ -418,7 +418,15 @@ def main():
 
     # Sample null distribution
     print("\nSampling null distribution...")
-    null_similarities = db.get_similarity_distribution(n_samples=1000)
+    # Create sample query embeddings
+    n_queries = 10
+    query_embeddings = np.random.randn(n_queries, embedding_dim).astype(np.float32)
+    query_embeddings = query_embeddings / np.linalg.norm(query_embeddings, axis=1, keepdims=True)
+
+    null_similarities = db.get_similarity_distribution(
+        query_embeddings=query_embeddings,
+        n_samples=1000
+    )
     print(f"Null distribution stats:")
     print(f"  Mean: {np.mean(null_similarities):.4f}")
     print(f"  Std: {np.std(null_similarities):.4f}")
