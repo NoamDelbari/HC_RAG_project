@@ -57,14 +57,18 @@ def run_hc_experiment(
     allow_empty: bool,
     max_candidates: int,
     queries: List,
-    vector_db: VectorDatabase,
+    db_path: str,
     embedding_model: EmbeddingModel,
     query_null_distributions: QueryNullDistributions,
     evaluator: RetrievalEvaluator,
+    aggregation: str = "max_score",
+    top_chunks_multiplier: int = 10,
     max_queries: int = None
 ) -> tuple:
     """
     Run HC experiment with specific parameters.
+
+    Supports both full document and chunked databases (auto-detected).
 
     Args:
         gamma: HC gamma parameter
@@ -72,10 +76,12 @@ def run_hc_experiment(
         allow_empty: Whether to allow empty results
         max_candidates: Maximum candidates to fetch
         queries: List of CRAG queries
-        vector_db: Loaded vector database
+        db_path: Path to vector database
         embedding_model: Embedding model for queries
         query_null_distributions: Per-query null distributions
         evaluator: RetrievalEvaluator instance
+        aggregation: Chunk aggregation strategy (for chunked DBs)
+        top_chunks_multiplier: Multiplier for max_candidates when retrieving chunks
         max_queries: Optional limit on number of queries
 
     Returns:
@@ -90,14 +96,17 @@ def run_hc_experiment(
         print(f"⚠ Limiting to {max_queries} queries for testing")
         queries = queries[:max_queries]
 
-    # Create retriever
-    retriever = HCRetrieval(
-        vector_db=vector_db,
+    # Create retriever (auto-detects if database is chunked)
+    retriever = HCRetrieval.from_database_path(
+        db_path=db_path,
         query_null_distributions=query_null_distributions,
         gamma=gamma,
         max_candidates=max_candidates,
         min_hc=min_hc,
-        allow_empty=allow_empty
+        allow_empty=allow_empty,
+        embedding_model=embedding_model,
+        aggregation=aggregation,
+        top_chunks_multiplier=top_chunks_multiplier
     )
 
     # Process queries

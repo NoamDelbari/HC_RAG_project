@@ -3,3 +3,6 @@
 datasets/crag/*.bz2
 __pycache__/
 *.pyc
+
+# Environment variables (contains API keys)
+.env

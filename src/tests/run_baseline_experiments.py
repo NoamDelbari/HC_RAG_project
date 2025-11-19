@@ -55,20 +55,26 @@ def extract_ground_truth_ids(query) -> Set[str]:
 def run_baseline_experiment(
     k: int,
     queries: List,
-    vector_db: VectorDatabase,
+    db_path: str,
     embedding_model: EmbeddingModel,
     evaluator: RetrievalEvaluator,
+    aggregation: str = "max_score",
+    top_chunks: int = None,
     max_queries: int = None
 ) -> tuple:
     """
     Run baseline experiment for a specific k value.
 
+    Supports both full document and chunked databases (auto-detected).
+
     Args:
         k: Number of documents to retrieve
         queries: List of CRAG queries
-        vector_db: Loaded vector database
+        db_path: Path to vector database
         embedding_model: Embedding model for queries
         evaluator: RetrievalEvaluator instance
+        aggregation: Chunk aggregation strategy (for chunked DBs)
+        top_chunks: Number of chunks to retrieve (for chunked DBs, default: k*10)
         max_queries: Optional limit on number of queries
 
     Returns:
@@ -82,8 +88,14 @@ def run_baseline_experiment(
         print(f"⚠ Limiting to {max_queries} queries for testing")
         queries = queries[:max_queries]
 
-    # Create retriever
-    retriever = BaselineRetrieval(vector_db=vector_db, k=k)
+    # Create retriever (auto-detects if database is chunked)
+    retriever = BaselineRetrieval.from_database_path(
+        db_path=db_path,
+        k=k,
+        embedding_model=embedding_model,
+        aggregation=aggregation,
+        top_chunks=top_chunks
+    )
 
     # Process queries
     print(f"Processing {len(queries)} queries...")
@@ -244,6 +256,19 @@ def main():
         default="src/database/crag_vector_db",
         help="Path to vector database (default: src/database/crag_vector_db)"
     )
+    parser.add_argument(
+        "--aggregation",
+        type=str,
+        default="max_score",
+        choices=["max_score", "mean_score", "sum_score"],
+        help="Chunk aggregation strategy for chunked DBs (default: max_score)"
+    )
+    parser.add_argument(
+        "--top-chunks",
+        type=int,
+        default=None,
+        help="Number of chunks to retrieve for chunked DBs (default: k*10)"
+    )
 
     args = parser.parse_args()
 
@@ -270,21 +295,9 @@ def main():
     print()
 
     # =========================================================================
-    # Step 2: Load Vector Database
+    # Step 2: Initialize Embedding Model
     # =========================================================================
-    print("Step 2: Loading vector database...")
-    print("-" * 80)
-
-    vector_db = VectorDatabase.load(args.db_path)
-
-    print(f"✓ Loaded database with {vector_db.get_num_documents()} documents")
-    print(f"✓ Embedding dimension: {vector_db.embedding_dim}")
-    print()
-
-    # =========================================================================
-    # Step 3: Initialize Embedding Model
-    # =========================================================================
-    print("Step 3: Initializing embedding model...")
+    print("Step 2: Initializing embedding model...")
     print("-" * 80)
 
     # Use quality model (same as used to build database)
@@ -296,18 +309,18 @@ def main():
     print()
 
     # =========================================================================
-    # Step 4: Initialize Evaluator
+    # Step 3: Initialize Evaluator
     # =========================================================================
-    print("Step 4: Initializing evaluator...")
+    print("Step 3: Initializing evaluator...")
     print("-" * 80)
 
     evaluator = RetrievalEvaluator()
     print()
 
     # =========================================================================
-    # Step 5: Run Experiments for Each k
+    # Step 4: Run Experiments for Each k
     # =========================================================================
-    print("Step 5: Running baseline experiments...")
+    print("Step 4: Running baseline experiments...")
     print("="*80)
 
     output_dir = Path(args.output_dir)
@@ -320,9 +333,11 @@ def main():
         retrieval_results, evaluation_results, aggregate_metrics = run_baseline_experiment(
             k=k,
             queries=queries,
-            vector_db=vector_db,
+            db_path=args.db_path,
             embedding_model=embedding_model,
             evaluator=evaluator,
+            aggregation=args.aggregation,
+            top_chunks=args.top_chunks,
             max_queries=args.max_queries
         )
 
@@ -340,7 +355,7 @@ def main():
     total_time = time.time() - start_time
 
     # =========================================================================
-    # Step 6: Create Comparison Table
+    # Step 5: Create Comparison Table
     # =========================================================================
     print("\n" + "="*80)
     print("RESULTS COMPARISON (Labeled Queries Only)")

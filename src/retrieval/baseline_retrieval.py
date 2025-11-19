@@ -3,19 +3,22 @@ Baseline Top-k Retrieval
 
 Simple top-k retrieval strategy that returns a fixed number of most similar documents.
 Serves as the baseline for comparison with HC-based adaptive retrieval.
+
+Supports both full document and chunked document retrieval with automatic aggregation.
 """
 
 import numpy as np
-from typing import List, Optional
+from typing import List, Optional, Dict
 from dataclasses import dataclass
-import logging
-
-import sys
 from pathlib import Path
+import logging
+import sys
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from embeddings.vector_database import VectorDatabase, SearchResult
 from embeddings.embedding_model import EmbeddingModel
+from retrieval.chunked_retrieval import ChunkedRetrievalMixin
 
 logger = logging.getLogger(__name__)
 
@@ -37,34 +40,109 @@ class RetrievalOutput:
     threshold: Optional[float] = None  # For HC: the adaptive threshold used
 
 
-class BaselineRetrieval:
+class BaselineRetrieval(ChunkedRetrievalMixin):
     """
     Baseline top-k retrieval strategy.
 
     Returns a fixed number (k) of most similar documents for each query.
     Simple and deterministic - serves as baseline for HC comparison.
+
+    Supports chunked retrieval: if chunk_to_doc_mapping is provided,
+    retrieves chunks and aggregates them to parent documents.
     """
 
     def __init__(
         self,
         vector_db: VectorDatabase,
         k: int = 10,
-        embedding_model: Optional[EmbeddingModel] = None
+        embedding_model: Optional[EmbeddingModel] = None,
+        chunk_to_doc_mapping: Optional[Dict[str, str]] = None,
+        aggregation: str = "max_score",
+        top_chunks: Optional[int] = None
     ):
         """
         Initialize baseline retriever.
 
         Args:
-            vector_db: Vector database containing indexed documents
+            vector_db: Vector database containing indexed documents or chunks
             k: Number of documents to retrieve per query
             embedding_model: Optional embedding model for query text → embedding
+            chunk_to_doc_mapping: Optional dict mapping chunk_id -> parent_doc_id
+                                 If provided, enables chunked retrieval mode
+            aggregation: Chunk score aggregation strategy: "max_score", "mean_score", or "sum_score"
+                        Only used when chunk_to_doc_mapping is provided
+            top_chunks: Number of chunks to retrieve before aggregation (default: k * 10)
+                       Only used when chunk_to_doc_mapping is provided
         """
         self.vector_db = vector_db
         self.k = k
         self.embedding_model = embedding_model
+        self.chunk_to_doc_mapping = chunk_to_doc_mapping
+        self.aggregation = aggregation
+
+        # Set top_chunks default based on k
+        if chunk_to_doc_mapping is not None:
+            self.top_chunks = top_chunks if top_chunks is not None else k * 10
+        else:
+            self.top_chunks = None
+
+        # Validate aggregation strategy
+        if chunk_to_doc_mapping is not None and aggregation not in ["max_score", "mean_score", "sum_score"]:
+            raise ValueError(f"Invalid aggregation: {aggregation}. Must be 'max_score', 'mean_score', or 'sum_score'")
 
         logger.info(f"BaselineRetrieval initialized with k={k}")
-        logger.info(f"  Vector DB contains {vector_db.get_num_documents()} documents")
+        logger.info(f"  Vector DB contains {vector_db.get_num_documents()} {'chunks' if chunk_to_doc_mapping else 'documents'}")
+        if chunk_to_doc_mapping:
+            logger.info(f"  Chunked mode: top_chunks={self.top_chunks}, aggregation={aggregation}")
+
+    @classmethod
+    def from_database_path(
+        cls,
+        db_path: str,
+        k: int = 10,
+        embedding_model: Optional[EmbeddingModel] = None,
+        aggregation: str = "max_score",
+        top_chunks: Optional[int] = None
+    ) -> "BaselineRetrieval":
+        """
+        Load retrieval system from database path.
+
+        Automatically detects if the database is chunked (has .chunk_mapping.pkl file)
+        and enables chunked retrieval mode accordingly.
+
+        Args:
+            db_path: Path to database (without extension)
+            k: Number of documents to retrieve
+            embedding_model: Optional embedding model
+            aggregation: Aggregation strategy for chunked mode
+            top_chunks: Number of chunks to retrieve in chunked mode
+
+        Returns:
+            BaselineRetrieval instance
+        """
+        # Load vector database
+        vector_db = VectorDatabase.load(db_path)
+
+        # Load chunk mapping (if exists)
+        chunk_to_doc_mapping = cls._load_chunk_mapping(db_path)
+
+        if chunk_to_doc_mapping is not None:
+            # Chunked database detected
+            logger.info(f"Loaded chunked database from {db_path}")
+            logger.info(f"  Chunks: {vector_db.get_num_documents()}")
+        else:
+            # Full document database
+            logger.info(f"Loaded full document database from {db_path}")
+            logger.info(f"  Documents: {vector_db.get_num_documents()}")
+
+        return cls(
+            vector_db=vector_db,
+            k=k,
+            embedding_model=embedding_model,
+            chunk_to_doc_mapping=chunk_to_doc_mapping,
+            aggregation=aggregation,
+            top_chunks=top_chunks
+        )
 
     def retrieve(
         self,
@@ -74,6 +152,9 @@ class BaselineRetrieval:
         """
         Retrieve top-k most similar documents for a query.
 
+        If chunk_to_doc_mapping is provided, retrieves chunks and aggregates to documents.
+        Otherwise, retrieves documents directly.
+
         Args:
             query_id: Unique query identifier
             query_embedding: Query embedding vector
@@ -81,19 +162,34 @@ class BaselineRetrieval:
         Returns:
             RetrievalOutput with retrieved documents and scores
         """
-        # Search using vector database
-        results = self.vector_db.search(query_embedding, k=self.k)
+        # Determine retrieval mode
+        if self.chunk_to_doc_mapping is not None:
+            # Chunked retrieval mode
+            # Step 1: Retrieve top chunks
+            chunk_results = self.vector_db.search(query_embedding, k=self.top_chunks)
 
-        # Convert to unified format
-        retrieved_ids = [r.doc_id for r in results]
-        retrieved_scores = [r.similarity for r in results]
+            # Step 2: Aggregate chunks to documents
+            retrieved_ids, retrieved_scores = self._aggregate_chunks_to_documents(
+                chunk_results, self.k
+            )
+
+            method = f"baseline_{self.aggregation}"
+        else:
+            # Full document retrieval mode
+            results = self.vector_db.search(query_embedding, k=self.k)
+
+            # Convert to unified format
+            retrieved_ids = [r.doc_id for r in results]
+            retrieved_scores = [r.similarity for r in results]
+
+            method = "baseline"
 
         return RetrievalOutput(
             query_id=query_id,
             retrieved_ids=retrieved_ids,
             retrieved_scores=retrieved_scores,
             k=len(retrieved_ids),
-            method="baseline",
+            method=method,
             threshold=None  # Baseline doesn't use threshold
         )
 

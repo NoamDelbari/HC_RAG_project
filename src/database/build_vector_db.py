@@ -3,11 +3,15 @@ Build CRAG Vector Database
 
 Unified script to build FAISS vector databases from CRAG documents.
 Supports both full-document and chunked document embedding modes.
+Supports both local models (GPU-accelerated) and API-based models (Gemini).
 
 Usage:
     # Full document mode (simple)
     python build_vector_db.py --mode full
     python build_vector_db.py --mode full --model quality
+
+    # With Google Gemini API (requires GEMINI_API_KEY in .env)
+    python build_vector_db.py --mode full --model gemini
 
     # Chunked document mode (advanced)
     python build_vector_db.py --mode chunked
@@ -29,7 +33,7 @@ import pickle
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from data.crag_loader import CRAGLoader
-from embeddings.embedding_model import EmbeddingModel
+from embeddings.embedding_model import EmbeddingModel, GeminiEmbeddingModel, create_embedding_model
 from embeddings.vector_database import VectorDatabase
 from embeddings.chunking import get_chunker, Chunk
 from typing import List, Dict
@@ -72,28 +76,42 @@ def build_full_db(args):
     print("Step 2: Initializing embedding model...")
     print("-" * 80)
 
+    # Map model shorthand to full model name
     model_name = (
         EmbeddingModel.FAST_MODEL if args.model == "fast"
         else EmbeddingModel.BGE_MODEL if args.model == "bge"
-        else EmbeddingModel.QUALITY_MODEL
+        else EmbeddingModel.GEMINI_MODEL if args.model == "gemini"
+        else EmbeddingModel.QUALITY_MODEL if args.model == "quality"
+        else args.model  # Use as-is if it's a full model name
     )
 
-    # Auto-detect optimal batch size for GPU if batch_size specified
+    # Auto-detect optimal batch size if not specified
     if args.batch_size:
         batch_size = args.batch_size
     else:
-        import torch
-        if torch.cuda.is_available():
-            batch_size = 512
-            print(f"🚀 GPU detected - using large batch size: {batch_size}")
+        # Check if it's an API-based model
+        if model_name.startswith("models/") or "gemini" in model_name.lower():
+            batch_size = 100  # Gemini default
         else:
-            batch_size = 32
+            import torch
+            if torch.cuda.is_available():
+                batch_size = 512
+                print(f"🚀 GPU detected - using large batch size: {batch_size}")
+            else:
+                batch_size = 32
 
-    model = EmbeddingModel(model_name=model_name, batch_size=batch_size)
+    # Create embedding model (factory function handles local vs API-based)
+    model = create_embedding_model(model_name=model_name, batch_size=batch_size)
 
     print(f"✓ Model: {model.get_model_name()}")
     print(f"✓ Embedding dimension: {model.get_embedding_dim()}")
-    print(f"✓ Device: {model.device}")
+
+    # Only print device for local models
+    if hasattr(model, 'device'):
+        print(f"✓ Device: {model.device}")
+    else:
+        print(f"✓ Type: API-based (Gemini)")
+
     print(f"✓ Batch size: {batch_size}")
     print()
 
@@ -238,30 +256,42 @@ def build_chunked_db(args):
     print("Step 2: Initializing embedding model...")
     print("-" * 80)
 
+    # Map model shorthand to full model name
     model_name = (
         EmbeddingModel.FAST_MODEL if args.model == "fast"
         else EmbeddingModel.BGE_MODEL if args.model == "bge"
-        else EmbeddingModel.QUALITY_MODEL
+        else EmbeddingModel.GEMINI_MODEL if args.model == "gemini"
+        else EmbeddingModel.QUALITY_MODEL if args.model == "quality"
+        else args.model  # Use as-is if it's a full model name
     )
 
-    # Auto-detect optimal batch size for GPU
+    # Auto-detect optimal batch size if not specified
     if args.batch_size:
         batch_size = args.batch_size
     else:
-        import torch
-        if torch.cuda.is_available():
-            # GPU: Use large batches
-            batch_size = 512
-            print(f"🚀 GPU detected - using large batch size: {batch_size}")
+        # Check if it's an API-based model
+        if model_name.startswith("models/") or "gemini" in model_name.lower():
+            batch_size = 100  # Gemini default
         else:
-            # CPU: Use smaller batches
-            batch_size = 32
+            import torch
+            if torch.cuda.is_available():
+                batch_size = 512
+                print(f"🚀 GPU detected - using large batch size: {batch_size}")
+            else:
+                batch_size = 32
 
-    model = EmbeddingModel(model_name=model_name, batch_size=batch_size)
+    # Create embedding model (factory function handles local vs API-based)
+    model = create_embedding_model(model_name=model_name, batch_size=batch_size)
 
     print(f"✓ Model: {model.get_model_name()}")
     print(f"✓ Embedding dimension: {model.get_embedding_dim()}")
-    print(f"✓ Device: {model.device}")
+
+    # Only print device for local models
+    if hasattr(model, 'device'):
+        print(f"✓ Device: {model.device}")
+    else:
+        print(f"✓ Type: API-based (Gemini)")
+
     print(f"✓ Batch size: {batch_size}")
     print()
 
@@ -542,8 +572,7 @@ Examples:
         "--model",
         type=str,
         default=None,
-        choices=["fast", "quality", "bge"],
-        help="Embedding model to use (default: 'fast' for full mode, 'quality' for chunked mode)"
+        help="Embedding model to use. Options: 'fast', 'quality', 'bge', 'gemini', or full model name (default: 'fast' for full mode, 'quality' for chunked mode)"
     )
     parser.add_argument(
         "--output",
