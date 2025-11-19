@@ -347,7 +347,14 @@ class VectorDatabase:
 
         # Restore metadata
         db.doc_ids = metadata["doc_ids"]
-        db.doc_metadata = metadata["doc_metadata"]
+
+        # Restore doc_metadata with backward compatibility
+        if "doc_metadata" in metadata:
+            db.doc_metadata = metadata["doc_metadata"]
+        else:
+            # Old databases didn't have doc_metadata - create empty metadata for each doc
+            db.doc_metadata = [{} for _ in db.doc_ids]
+            logger.info("  Note: Old database format detected, initialized empty doc_metadata")
 
         # Restore embedding_model_name if present (backward compatibility)
         db.embedding_model_name = metadata.get("embedding_model_name", None)
