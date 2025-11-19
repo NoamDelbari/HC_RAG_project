@@ -392,21 +392,9 @@ def main():
     print()
 
     # =========================================================================
-    # Step 2: Load Vector Database
+    # Step 2: Initialize Embedding Model
     # =========================================================================
-    print("Step 2: Loading vector database...")
-    print("-" * 80)
-
-    vector_db = VectorDatabase.load(args.db_path)
-
-    print(f"✓ Loaded database with {vector_db.get_num_documents()} documents")
-    print(f"✓ Embedding dimension: {vector_db.embedding_dim}")
-    print()
-
-    # =========================================================================
-    # Step 3: Initialize Embedding Model
-    # =========================================================================
-    print("Step 3: Initializing embedding model...")
+    print("Step 2: Initializing embedding model...")
     print("-" * 80)
 
     embedding_model = EmbeddingModel(model_name=EmbeddingModel.QUALITY_MODEL)
@@ -417,9 +405,9 @@ def main():
     print()
 
     # =========================================================================
-    # Step 4: Load Per-Query Null Distributions
+    # Step 3: Load Per-Query Null Distributions
     # =========================================================================
-    print("Step 4: Loading per-query null distributions...")
+    print("Step 3: Loading per-query null distributions...")
     print("-" * 80)
 
     if not args.query_null_dist_path:
@@ -446,18 +434,18 @@ def main():
     print()
 
     # =========================================================================
-    # Step 5: Initialize Evaluator
+    # Step 4: Initialize Evaluator
     # =========================================================================
-    print("Step 5: Initializing evaluator...")
+    print("Step 4: Initializing evaluator...")
     print("-" * 80)
 
     evaluator = RetrievalEvaluator()
     print()
 
     # =========================================================================
-    # Step 7: Run HC Experiments
+    # Step 5: Run HC Experiments
     # =========================================================================
-    print("Step 7: Running HC experiments...")
+    print("Step 5: Running HC experiments...")
     print("="*80)
 
     output_dir = Path(args.output_dir)
@@ -475,7 +463,7 @@ def main():
                 allow_empty=args.allow_empty,
                 max_candidates=args.max_candidates,
                 queries=queries,
-                vector_db=vector_db,
+                db_path=args.db_path,
                 embedding_model=embedding_model,
                 query_null_distributions=query_null_distributions,
                 evaluator=evaluator,
@@ -513,7 +501,7 @@ def main():
         return
 
     # =========================================================================
-    # Step 8: Create Comparison Table
+    # Step 6: Create Comparison Table
     # =========================================================================
     print("\n" + "="*80)
     print("HC EXPERIMENTS RESULTS COMPARISON (Labeled Queries Only)")
