@@ -21,7 +21,10 @@ pandas>=2.0.0
 # Utilities
 tqdm>=4.65.0
 pydantic>=2.0.0
-dotenv
+python-dotenv>=1.0.0
+
+# API-based embedding models
+google-generativeai>=0.3.0
 
 # Dev
 pytest>=7.4.0
