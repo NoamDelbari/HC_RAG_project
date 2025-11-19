@@ -1,8 +1,11 @@
 """
 Embedding Model Wrapper
 
-Provides a unified interface for generating embeddings using sentence transformers.
-Supports batched processing and GPU acceleration.
+Provides a unified interface for generating embeddings using:
+- Local models (sentence transformers) with GPU acceleration
+- API-based models (Google Gemini) via API calls
+
+Supports batched processing and handles API rate limiting.
 """
 
 import numpy as np
@@ -10,6 +13,13 @@ import torch
 from typing import List, Union, Optional
 from sentence_transformers import SentenceTransformer
 import logging
+import os
+from dotenv import load_dotenv
+import time
+from abc import ABC, abstractmethod
+
+# Load environment variables from .env file
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -22,10 +32,13 @@ class EmbeddingModel:
     Handles text embedding generation with batching and device management.
     """
 
-    # Recommended models from phase1.MD
+    # Recommended local models
     FAST_MODEL = "sentence-transformers/all-MiniLM-L6-v2"  # 384 dim, fast
     QUALITY_MODEL = "sentence-transformers/all-mpnet-base-v2"  # 768 dim, better quality
     BGE_MODEL = "BAAI/bge-base-en-v1.5"  # 768 dim, SOTA for retrieval (MTEB #1)
+
+    # API-based models
+    GEMINI_MODEL = "models/text-embedding-004"  # 768 dim, Google Gemini
 
     def __init__(
         self,
@@ -166,6 +179,245 @@ class EmbeddingModel:
         self.model = self.model.to(device)
         logger.info(f"Model moved to device: {device}")
         return self
+
+
+class GeminiEmbeddingModel:
+    """
+    Google Gemini API-based embedding model.
+
+    Uses Google's Generative AI API for generating embeddings.
+    Handles API rate limiting and batching automatically.
+    """
+
+    # Gemini embedding models
+    GEMINI_EMBEDDING_004 = "models/text-embedding-004"  # 768 dim, latest model
+    GEMINI_EMBEDDING_003 = "models/embedding-001"  # 768 dim (deprecated, use 004)
+
+    # Embedding dimensions for each model
+    EMBEDDING_DIMS = {
+        "models/text-embedding-004": 768,
+        "models/embedding-001": 768,
+    }
+
+    def __init__(
+        self,
+        model_name: str = GEMINI_EMBEDDING_004,
+        api_key: Optional[str] = None,
+        batch_size: int = 100,  # Gemini supports up to 100 texts per request
+        rate_limit_delay: float = 0.1,  # Delay between API calls (seconds)
+        task_type: str = "retrieval_document",  # or "retrieval_query"
+        normalize_embeddings: bool = True
+    ):
+        """
+        Initialize Gemini embedding model.
+
+        Args:
+            model_name: Gemini model identifier
+            api_key: Google API key (if None, reads from GEMINI_API_KEY env var)
+            batch_size: Number of texts to send per API request (max 100)
+            rate_limit_delay: Delay between API calls to avoid rate limiting
+            task_type: Type of embedding task ("retrieval_document" or "retrieval_query")
+            normalize_embeddings: Whether to L2-normalize embeddings
+        """
+        try:
+            import google.generativeai as genai
+        except ImportError:
+            raise ImportError(
+                "google-generativeai package not found. "
+                "Install it with: pip install google-generativeai"
+            )
+
+        self.model_name = model_name
+        self.batch_size = min(batch_size, 100)  # Gemini max is 100
+        self.rate_limit_delay = rate_limit_delay
+        self.task_type = task_type
+        self.normalize_embeddings = normalize_embeddings
+
+        # Get API key from parameter or environment variable
+        if api_key is None:
+            api_key = os.getenv("GEMINI_API_KEY")
+            if not api_key:
+                raise ValueError(
+                    "GEMINI_API_KEY not found. Please set it in your .env file or pass it as a parameter."
+                )
+
+        # Configure the API
+        genai.configure(api_key=api_key)
+
+        # Get embedding dimension
+        self.embedding_dim = self.EMBEDDING_DIMS.get(model_name, 768)
+
+        logger.info(f"✓ Gemini API configured")
+        logger.info(f"  Model: {model_name}")
+        logger.info(f"  Embedding dimension: {self.embedding_dim}")
+        logger.info(f"  Batch size: {self.batch_size}")
+        logger.info(f"  Task type: {task_type}")
+
+    def _embed_batch(self, texts: List[str], task_type: Optional[str] = None) -> np.ndarray:
+        """
+        Embed a batch of texts using Gemini API.
+
+        Args:
+            texts: List of texts to embed (max 100)
+            task_type: Override default task type for this batch
+
+        Returns:
+            Numpy array of embeddings
+        """
+        import google.generativeai as genai
+
+        if task_type is None:
+            task_type = self.task_type
+
+        try:
+            # Call Gemini API
+            result = genai.embed_content(
+                model=self.model_name,
+                content=texts,
+                task_type=task_type
+            )
+
+            # Extract embeddings
+            embeddings = np.array(result['embedding'])
+
+            # Handle single text case (API returns 1D array)
+            if embeddings.ndim == 1:
+                embeddings = embeddings.reshape(1, -1)
+
+            # Normalize if requested
+            if self.normalize_embeddings:
+                norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+                embeddings = embeddings / (norms + 1e-8)
+
+            return embeddings
+
+        except Exception as e:
+            logger.error(f"Error calling Gemini API: {e}")
+            raise
+
+    def embed(
+        self,
+        texts: Union[str, List[str]],
+        show_progress: bool = False,
+        task_type: Optional[str] = None
+    ) -> np.ndarray:
+        """
+        Generate embeddings for input texts.
+
+        Args:
+            texts: Single text string or list of text strings
+            show_progress: Whether to show progress bar
+            task_type: Override default task type ("retrieval_document" or "retrieval_query")
+
+        Returns:
+            Numpy array of embeddings with shape (n_texts, embedding_dim)
+        """
+        # Handle single string input
+        if isinstance(texts, str):
+            texts = [texts]
+
+        if not texts:
+            logger.warning("Empty text list provided")
+            return np.array([])
+
+        # Process in batches
+        all_embeddings = []
+
+        if show_progress:
+            from tqdm import tqdm
+            batches = tqdm(
+                range(0, len(texts), self.batch_size),
+                desc="Embedding batches"
+            )
+        else:
+            batches = range(0, len(texts), self.batch_size)
+
+        for i in batches:
+            batch_texts = texts[i:i + self.batch_size]
+
+            # Call API
+            batch_embeddings = self._embed_batch(batch_texts, task_type)
+            all_embeddings.append(batch_embeddings)
+
+            # Rate limiting delay (except for last batch)
+            if i + self.batch_size < len(texts):
+                time.sleep(self.rate_limit_delay)
+
+        # Concatenate all batches
+        embeddings = np.vstack(all_embeddings)
+
+        return embeddings
+
+    def embed_query(self, query: str) -> np.ndarray:
+        """
+        Generate embedding for a single query.
+
+        Args:
+            query: Query text
+
+        Returns:
+            Numpy array of shape (embedding_dim,)
+        """
+        embedding = self.embed([query], show_progress=False, task_type="retrieval_query")
+        return embedding[0]
+
+    def embed_documents(
+        self,
+        documents: List[str],
+        show_progress: bool = True
+    ) -> np.ndarray:
+        """
+        Generate embeddings for a list of documents.
+
+        Args:
+            documents: List of document texts
+            show_progress: Whether to show progress bar
+
+        Returns:
+            Numpy array of embeddings with shape (n_documents, embedding_dim)
+        """
+        return self.embed(documents, show_progress=show_progress, task_type="retrieval_document")
+
+    def get_embedding_dim(self) -> int:
+        """Get the embedding dimension of the model."""
+        return self.embedding_dim
+
+    def get_model_name(self) -> str:
+        """Get the model name."""
+        return self.model_name
+
+
+def create_embedding_model(
+    model_name: str,
+    batch_size: Optional[int] = None,
+    **kwargs
+) -> Union[EmbeddingModel, GeminiEmbeddingModel]:
+    """
+    Factory function to create the appropriate embedding model.
+
+    Args:
+        model_name: Model identifier (local model name or Gemini model)
+        batch_size: Batch size for encoding
+        **kwargs: Additional arguments passed to model constructor
+
+    Returns:
+        EmbeddingModel or GeminiEmbeddingModel instance
+    """
+    # Check if it's a Gemini model
+    if model_name.startswith("models/") or "gemini" in model_name.lower():
+        logger.info("Creating Gemini API-based embedding model")
+        if batch_size is None:
+            batch_size = 100  # Gemini default
+        return GeminiEmbeddingModel(model_name=model_name, batch_size=batch_size, **kwargs)
+    else:
+        logger.info("Creating local embedding model")
+        if batch_size is None:
+            # Auto-detect based on GPU availability
+            if torch.cuda.is_available():
+                batch_size = 512
+            else:
+                batch_size = 32
+        return EmbeddingModel(model_name=model_name, batch_size=batch_size, **kwargs)
 
 
 def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:

@@ -3,15 +3,17 @@ HC-based Adaptive Retrieval
 
 Adaptive retrieval strategy using Higher Criticism statistics to determine
 the optimal number of documents to retrieve for each query.
+
+Supports both full document and chunked document retrieval with automatic aggregation.
 """
 
 import numpy as np
-from typing import List, Optional
+from typing import List, Optional, Dict
 from dataclasses import dataclass
-import logging
-
-import sys
 from pathlib import Path
+import logging
+import sys
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from embeddings.vector_database import VectorDatabase, SearchResult
@@ -19,16 +21,20 @@ from embeddings.embedding_model import EmbeddingModel
 from hc.higher_criticism import HigherCriticism
 from hc.null_distribution import QueryNullDistributions
 from retrieval.baseline_retrieval import RetrievalOutput
+from retrieval.chunked_retrieval import ChunkedRetrievalMixin
 
 logger = logging.getLogger(__name__)
 
 
-class HCRetrieval:
+class HCRetrieval(ChunkedRetrievalMixin):
     """
     Higher Criticism based adaptive retrieval.
 
     Uses HC statistics to adaptively determine the number of relevant documents
     for each query, rather than using a fixed k.
+
+    Supports chunked retrieval: if chunk_to_doc_mapping is provided,
+    retrieves chunks and aggregates them to parent documents after HC filtering.
     """
 
     def __init__(
@@ -39,19 +45,27 @@ class HCRetrieval:
         max_candidates: int = 50,
         min_hc: float = 0.0,
         allow_empty: bool = True,
-        embedding_model: Optional[EmbeddingModel] = None
+        embedding_model: Optional[EmbeddingModel] = None,
+        chunk_to_doc_mapping: Optional[Dict[str, str]] = None,
+        aggregation: str = "max_score",
+        top_chunks_multiplier: int = 10
     ):
         """
         Initialize HC-based retriever.
 
         Args:
-            vector_db: Vector database containing indexed documents
+            vector_db: Vector database containing indexed documents or chunks
             query_null_distributions: Per-query null distributions
             gamma: Fraction of top scores to search for HC maximum (0 < gamma <= 1)
             max_candidates: Maximum number of candidates to fetch before HC filtering
             min_hc: Minimum HC statistic to accept any documents (0 = disabled)
             allow_empty: If True, can return empty set when HC < min_hc
             embedding_model: Optional embedding model for query text → embedding
+            chunk_to_doc_mapping: Optional dict mapping chunk_id -> parent_doc_id
+                                 If provided, enables chunked retrieval mode
+            aggregation: Chunk score aggregation strategy: "max_score", "mean_score", or "sum_score"
+            top_chunks_multiplier: Multiplier for max_candidates when retrieving chunks
+                                  (retrieves max_candidates * multiplier chunks)
         """
         self.vector_db = vector_db
         self.query_null_distributions = query_null_distributions
@@ -60,6 +74,9 @@ class HCRetrieval:
         self.min_hc = min_hc
         self.allow_empty = allow_empty
         self.embedding_model = embedding_model
+        self.chunk_to_doc_mapping = chunk_to_doc_mapping
+        self.aggregation = aggregation
+        self.top_chunks_multiplier = top_chunks_multiplier
 
         # Validate parameters
         if not (0 < gamma <= 1):
@@ -68,6 +85,8 @@ class HCRetrieval:
             raise ValueError(f"max_candidates must be >= 1, got {max_candidates}")
         if min_hc < 0:
             raise ValueError(f"min_hc must be >= 0, got {min_hc}")
+        if chunk_to_doc_mapping is not None and aggregation not in ["max_score", "mean_score", "sum_score"]:
+            raise ValueError(f"Invalid aggregation: {aggregation}. Must be 'max_score', 'mean_score', or 'sum_score'")
 
         logger.info(f"HCRetrieval initialized:")
         logger.info(f"  gamma={gamma}")
@@ -75,7 +94,70 @@ class HCRetrieval:
         logger.info(f"  min_hc={min_hc}")
         logger.info(f"  allow_empty={allow_empty}")
         logger.info(f"  Per-query null distributions: {len(query_null_distributions.distributions)} queries")
-        logger.info(f"  Vector DB contains {vector_db.get_num_documents()} documents")
+        logger.info(f"  Vector DB contains {vector_db.get_num_documents()} {'chunks' if chunk_to_doc_mapping else 'documents'}")
+        if chunk_to_doc_mapping:
+            logger.info(f"  Chunked mode: top_chunks={max_candidates * top_chunks_multiplier}, aggregation={aggregation}")
+
+    @classmethod
+    def from_database_path(
+        cls,
+        db_path: str,
+        query_null_distributions: QueryNullDistributions,
+        gamma: float = 0.1,
+        max_candidates: int = 50,
+        min_hc: float = 0.0,
+        allow_empty: bool = True,
+        embedding_model: Optional[EmbeddingModel] = None,
+        aggregation: str = "max_score",
+        top_chunks_multiplier: int = 10
+    ) -> "HCRetrieval":
+        """
+        Load HC retrieval system from database path.
+
+        Automatically detects if the database is chunked (has .chunk_mapping.pkl file)
+        and enables chunked retrieval mode accordingly.
+
+        Args:
+            db_path: Path to database (without extension)
+            query_null_distributions: Per-query null distributions
+            gamma: Fraction of top scores to search for HC maximum
+            max_candidates: Maximum number of candidates before HC filtering
+            min_hc: Minimum HC statistic threshold
+            allow_empty: Allow empty result sets
+            embedding_model: Optional embedding model
+            aggregation: Aggregation strategy for chunked mode
+            top_chunks_multiplier: Multiplier for retrieving chunks
+
+        Returns:
+            HCRetrieval instance
+        """
+        # Load vector database
+        vector_db = VectorDatabase.load(db_path)
+
+        # Load chunk mapping (if exists)
+        chunk_to_doc_mapping = cls._load_chunk_mapping(db_path)
+
+        if chunk_to_doc_mapping is not None:
+            # Chunked database detected
+            logger.info(f"Loaded chunked database from {db_path}")
+            logger.info(f"  Chunks: {vector_db.get_num_documents()}")
+        else:
+            # Full document database
+            logger.info(f"Loaded full document database from {db_path}")
+            logger.info(f"  Documents: {vector_db.get_num_documents()}")
+
+        return cls(
+            vector_db=vector_db,
+            query_null_distributions=query_null_distributions,
+            gamma=gamma,
+            max_candidates=max_candidates,
+            min_hc=min_hc,
+            allow_empty=allow_empty,
+            embedding_model=embedding_model,
+            chunk_to_doc_mapping=chunk_to_doc_mapping,
+            aggregation=aggregation,
+            top_chunks_multiplier=top_chunks_multiplier
+        )
 
     def retrieve(
         self,
@@ -85,6 +167,9 @@ class HCRetrieval:
         """
         Retrieve documents using HC-based adaptive thresholding.
 
+        If chunk_to_doc_mapping is provided, retrieves chunks, applies HC filtering,
+        then aggregates to documents. Otherwise, retrieves documents directly.
+
         Args:
             query_id: Unique query identifier
             query_embedding: Query embedding vector
@@ -92,10 +177,18 @@ class HCRetrieval:
         Returns:
             RetrievalOutput with adaptively selected documents and HC metadata
         """
-        # Step 1: Fetch max_candidates from vector DB
-        candidates = self.vector_db.search(query_embedding, k=self.max_candidates)
+        # Determine number of candidates to retrieve
+        if self.chunk_to_doc_mapping is not None:
+            # Chunked mode: retrieve more chunks
+            num_candidates = self.max_candidates * self.top_chunks_multiplier
+        else:
+            # Full document mode
+            num_candidates = self.max_candidates
 
-        # Handle case where DB has fewer than max_candidates documents
+        # Step 1: Fetch candidates from vector DB
+        candidates = self.vector_db.search(query_embedding, k=num_candidates)
+
+        # Handle case where DB has fewer candidates
         if len(candidates) == 0:
             logger.debug(f"Query {query_id}: No candidates found")
             return RetrievalOutput(
@@ -115,40 +208,56 @@ class HCRetrieval:
         hc_module = HigherCriticism(null_distribution=null_dist)
 
         # Step 3: Compute HC threshold using query-specific null distribution
-        result = hc_module.compute_hc_threshold(
+        hc_result = hc_module.compute_hc_threshold(
             similarities=candidate_scores,
             gamma=self.gamma,
             min_hc=self.min_hc,
             allow_empty=self.allow_empty
         )
 
-        # Step 3: Filter candidates by threshold
-        if result.k == 0 or np.isinf(result.threshold):
+        # Step 4: Filter candidates by HC threshold
+        if hc_result.k == 0 or np.isinf(hc_result.threshold):
             # Empty result (pure noise detected)
             logger.debug(
                 f"Query {query_id}: HC returned empty set "
-                f"(HC={result.hc_statistic:.3f}, threshold={result.threshold})"
+                f"(HC={hc_result.hc_statistic:.3f}, threshold={hc_result.threshold})"
             )
             retrieved_ids = []
             retrieved_scores = []
+            method = f"hc_{self.aggregation}" if self.chunk_to_doc_mapping else "hc"
         else:
             # Select top k candidates (already sorted by similarity)
-            selected_candidates = candidates[:result.k]
-            retrieved_ids = [c.doc_id for c in selected_candidates]
-            retrieved_scores = [c.similarity for c in selected_candidates]
+            selected_candidates = candidates[:hc_result.k]
 
-            logger.debug(
-                f"Query {query_id}: Retrieved {result.k} docs "
-                f"(HC={result.hc_statistic:.3f}, threshold={result.threshold:.3f})"
-            )
+            if self.chunk_to_doc_mapping is not None:
+                # Chunked mode: aggregate chunks to documents
+                retrieved_ids, retrieved_scores = self._aggregate_chunks_to_documents(
+                    selected_candidates, self.max_candidates
+                )
+                method = f"hc_{self.aggregation}"
+
+                logger.debug(
+                    f"Query {query_id}: Retrieved {hc_result.k} chunks -> {len(retrieved_ids)} docs "
+                    f"(HC={hc_result.hc_statistic:.3f}, threshold={hc_result.threshold:.3f})"
+                )
+            else:
+                # Full document mode: use filtered candidates directly
+                retrieved_ids = [c.doc_id for c in selected_candidates]
+                retrieved_scores = [c.similarity for c in selected_candidates]
+                method = "hc"
+
+                logger.debug(
+                    f"Query {query_id}: Retrieved {hc_result.k} docs "
+                    f"(HC={hc_result.hc_statistic:.3f}, threshold={hc_result.threshold:.3f})"
+                )
 
         return RetrievalOutput(
             query_id=query_id,
             retrieved_ids=retrieved_ids,
             retrieved_scores=retrieved_scores,
             k=len(retrieved_ids),
-            method="hc",
-            threshold=float(result.threshold)
+            method=method,
+            threshold=float(hc_result.threshold)
         )
 
     def retrieve_from_text(

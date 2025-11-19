@@ -37,6 +37,22 @@ conda install -c pytorch faiss-gpu
 # macOS: brew install p7zip
 ```
 
+### 2.1. (Optional) Setup Gemini API for Cloud-Based Embeddings
+
+If you want to use Google's Gemini API instead of local models:
+
+1. Get your API key from [Google AI Studio](https://ai.google.dev/)
+2. Create a `.env` file in the project root:
+   ```bash
+   cp .env.example .env
+   ```
+3. Add your API key to `.env`:
+   ```bash
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+
+**Note:** The `.env` file is git-ignored to protect your API key.
+
 ### 3. Download CRAG Dataset
 
 Download the CRAG benchmark dataset from [CRAG GitHub](https://github.com/facebookresearch/CRAG):
@@ -83,6 +99,9 @@ python src/database/build_vector_db.py --mode full --model quality
 
 # Or with fast model (384d embeddings)
 python src/database/build_vector_db.py --mode full --model fast
+
+# Or with Gemini API (no GPU required, needs GEMINI_API_KEY in .env)
+python src/database/build_vector_db.py --mode full --model gemini
 ```
 
 ### 2. Run Baseline Experiments
@@ -110,7 +129,7 @@ python src/database/build_vector_db.py \
   --chunker recursive \
   --chunk-size 384 \
   --chunk-overlap 50 \
-  --output crag_chunked_vector_db \
+  --output src/database/crag_chunked_vector_db \
   --batch-size 512
 
 # Or build with full dataset (12,949 docs)
@@ -120,7 +139,7 @@ python src/database/build_vector_db.py \
   --chunker recursive \
   --chunk-size 384 \
   --chunk-overlap 50 \
-  --output crag_chunked_bge_full
+  --output src/database/crag_chunked_bge_full
 ```
 
 **What this does:**
@@ -132,22 +151,24 @@ python src/database/build_vector_db.py \
 **Run Experiments:**
 
 ```bash
-# Single experiment with k=10
+# Single experiment with k=10 (uses default database: src/database/crag_chunked_vector_db)
 python src/tests/run_chunked_experiments.py \
-  --db crag_chunked_vector_db \
+  --k 10 \
+  --top-chunks 100 \
+  --aggregation max_score
+
+# Or specify a custom database path
+python src/tests/run_chunked_experiments.py \
+  --db src/database/crag_chunked_bge_full \
   --k 10 \
   --top-chunks 100 \
   --aggregation max_score
 
 # Compare different k values (5, 10, 15, 20)
-python src/tests/run_chunked_experiments.py \
-  --db crag_chunked_vector_db \
-  --compare-k
+python src/tests/run_chunked_experiments.py --compare-k
 
 # Compare aggregation strategies (max_score, mean_score, sum_score)
-python src/tests/run_chunked_experiments.py \
-  --db crag_chunked_vector_db \
-  --compare-aggregations
+python src/tests/run_chunked_experiments.py --compare-aggregations
 ```
 
 **Expected Results (BGE, 1K docs):**
@@ -240,7 +261,7 @@ python src/database/build_vector_db.py \
 # Resume from saved chunks
 python src/database/build_vector_db.py \
   --mode chunked \
-  --load-chunks crag_chunked_vector_db.chunks.pkl
+  --load-chunks src/database/crag_chunked_vector_db.chunks.pkl
 ```
 
 **Features:**
@@ -330,22 +351,22 @@ print(f"NDCG@3: {eval_result.ndcg_at_k:.3f}")
 ### Chunked Retrieval (Advanced)
 
 ```python
-from src.retrieval.chunked_retrieval import ChunkedRetrieval
+from src.retrieval.baseline_retrieval import BaselineRetrieval
 from src.embeddings.embedding_model import EmbeddingModel
 
 # Initialize embedding model
 model = EmbeddingModel(model_name="BAAI/bge-base-en-v1.5")
 
-# Load chunked retrieval system
-retriever = ChunkedRetrieval.from_database_path(
-    db_path="crag_chunked_vector_db",
+# Load chunked retrieval system (auto-detects if database is chunked)
+retriever = BaselineRetrieval.from_database_path(
+    db_path="src/database/crag_chunked_vector_db",
     k=10,  # Return top 10 documents
     top_chunks=100,  # Retrieve 100 chunks first
     aggregation="max_score",  # Use best chunk score per doc
     embedding_model=model
 )
 
-# Retrieve (automatically aggregates chunks to documents)
+# Retrieve (automatically aggregates chunks to documents if database is chunked)
 result = retriever.retrieve(query_id="q1", query_embedding=query_emb)
 print(f"Retrieved {len(result.retrieved_ids)} documents from chunks")
 ```
