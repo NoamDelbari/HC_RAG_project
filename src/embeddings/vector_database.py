@@ -306,7 +306,8 @@ class VectorDatabase:
             "doc_ids": self.doc_ids,
             "doc_metadata": self.doc_metadata,
             "embedding_dim": self.embedding_dim,
-            "index_type": self.index_type
+            "index_type": self.index_type,
+            "embedding_model_name": self.embedding_model_name
         }
 
         with open(metadata_path, "wb") as f:
@@ -334,10 +335,10 @@ class VectorDatabase:
         with open(metadata_path, "rb") as f:
             metadata = pickle.load(f)
 
-        # Create instance
+        # Create instance (with backward compatibility for old databases)
         db = cls(
             embedding_dim=metadata["embedding_dim"],
-            index_type=metadata["index_type"]
+            index_type=metadata.get("index_type", "flat")  # Default to "flat" for old databases
         )
 
         # Load FAISS index
@@ -348,9 +349,14 @@ class VectorDatabase:
         db.doc_ids = metadata["doc_ids"]
         db.doc_metadata = metadata["doc_metadata"]
 
+        # Restore embedding_model_name if present (backward compatibility)
+        db.embedding_model_name = metadata.get("embedding_model_name", None)
+
         logger.info(f"Loaded vector database from {path}")
         logger.info(f"  Documents: {len(db.doc_ids)}")
         logger.info(f"  Embedding dim: {db.embedding_dim}")
+        if db.embedding_model_name:
+            logger.info(f"  Embedding model: {db.embedding_model_name}")
 
         return db
 
