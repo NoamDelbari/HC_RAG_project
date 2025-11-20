@@ -97,11 +97,21 @@ def run_baseline_experiment(
         top_chunks=top_chunks
     )
 
+    # Print diagnostic info about database type
+    is_chunked = retriever.chunk_to_doc_mapping is not None
+    print(f"  Database type: {'Chunked' if is_chunked else 'Full document'}")
+    if is_chunked:
+        print(f"  Chunk aggregation: {aggregation}")
+        print(f"  Top chunks to retrieve: {retriever.top_chunks}")
+
     # Process queries
     print(f"Processing {len(queries)} queries...")
 
     retrieval_results = []
     evaluation_results = []
+
+    # Track whether we've shown debug info
+    shown_debug = False
 
     for query in tqdm(queries, desc=f"k={k}"):
         # Embed query
@@ -116,6 +126,16 @@ def run_baseline_experiment(
 
         # Get ground truth
         relevant_ids = extract_ground_truth_ids(query)
+
+        # Show debug info for first query
+        if not shown_debug:
+            print(f"\n  [DEBUG] First query diagnostics:")
+            print(f"    Query ID: {query.query_id}")
+            print(f"    Ground truth IDs (first 3): {list(relevant_ids)[:3]}")
+            print(f"    Retrieved IDs (first 3): {retrieval_output.retrieved_ids[:3]}")
+            matches = len(set(retrieval_output.retrieved_ids) & relevant_ids)
+            print(f"    Matches found: {matches}/{len(relevant_ids)}")
+            shown_debug = True
 
         # Evaluate
         eval_result = evaluator.evaluate_single(
