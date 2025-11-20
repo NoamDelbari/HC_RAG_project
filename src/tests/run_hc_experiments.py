@@ -344,7 +344,7 @@ def main():
     parser.add_argument(
         "--db-path",
         type=str,
-        default="src/database/crag_vector_db",
+        default="src\database\crag_chunked_vector_db",
         help="Path to vector database (default: src/database/crag_vector_db)"
     )
     parser.add_argument(
