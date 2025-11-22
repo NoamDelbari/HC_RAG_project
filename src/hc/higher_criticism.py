@@ -51,10 +51,10 @@ class HigherCriticism:
             null_distribution: Pre-computed null distribution (optional)
         """
         self.null_distribution = null_distribution
-        logger.info("HigherCriticism module initialized")
+        # logger.info("HigherCriticism module initialized")
 
         if null_distribution is not None:
-            logger.info(f"  Loaded null distribution: {null_distribution}")
+            # logger.info(f"  Loaded null distribution: {null_distribution}")
 
     # =========================================================================
     # Higher Criticism Statistic Calculation
