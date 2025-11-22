@@ -17,11 +17,11 @@ def main():
     parser.add_argument("--dataset-path", type=str,
                         default="datasets/crag/crag_task_1_and_2_dev_v4.jsonl.bz2")
     parser.add_argument("--vector-db-path", type=str,
-                        default="src/database/crag_vector_db")
+                        default="src/database/crag_snippet_chunked_vector_db")
     parser.add_argument("--embedding-model", type=str,
-                        default="sentence-transformers/all-mpnet-base-v2")
+                        default="BAAI/bge-base-en-v1.5")
     parser.add_argument("--output-path", type=str,
-                        default="data/null_distributions/crag_per_query_null.pkl")
+                        default="data/null_distributions/crag_snippet_chunk_per_query_null.pkl")
     parser.add_argument("--negatives-per-query", type=int, default=1000)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--max-queries", type=int, default=None)
