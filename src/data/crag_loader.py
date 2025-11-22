@@ -8,6 +8,7 @@ Supports both .jsonl.bz2 and .tar.bz2 formats.
 import bz2
 import json
 import tarfile
+import hashlib
 from pathlib import Path
 from typing import Dict, List, Optional, Iterator
 from dataclasses import dataclass
@@ -15,6 +16,27 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def create_doc_id_from_result(result: Dict) -> str:
+    """
+    Create a unique document ID by hashing the URL or content.
+
+    Args:
+        result: Dictionary containing document data (page_url, page_snippet, page_name)
+
+    Returns:
+        MD5 hash string as document ID
+    """
+    doc_url = result.get("page_url", "")
+
+    if doc_url:
+        # Hash URL to create consistent doc_id
+        return hashlib.md5(doc_url.encode('utf-8')).hexdigest()
+    else:
+        # Fallback: hash content if no URL
+        content = str(result.get("page_snippet", "")) + str(result.get("page_name", ""))
+        return hashlib.md5(content.encode('utf-8')).hexdigest()
 
 
 @dataclass
@@ -189,8 +211,8 @@ class CRAGLoader:
                 continue
 
             for idx, result in enumerate(query.search_results):
-                # Create unique document ID
-                doc_id = f"{query.query_id}_doc_{idx}"
+                # Create unique document ID by hashing the URL
+                doc_id = create_doc_id_from_result(result)
 
                 if doc_id in doc_ids_seen:
                     continue

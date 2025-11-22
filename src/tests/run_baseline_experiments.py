@@ -33,20 +33,29 @@ def extract_ground_truth_ids(query) -> Set[str]:
     Extract ground truth relevant document IDs from query.
 
     In CRAG, each query has search_results which are the relevant documents.
-    Document IDs are created using enumeration index: {query_id}_doc_{idx}
+    Document IDs are created by hashing the page URL.
 
     Args:
         query: CRAGQuery object
 
     Returns:
-        Set of relevant document IDs
+        Set of relevant document IDs (hashed URLs)
     """
+    import hashlib
     relevant_ids = set()
 
-    # Document IDs are created using enumeration index
-    for idx, search_result in enumerate(query.search_results):
-        # Document ID format: {query_id}_doc_{index}
-        doc_id = f"{query.query_id}_doc_{idx}"
+    # Document IDs are created by hashing URLs (matches database indexing)
+    for search_result in query.search_results:
+        doc_url = search_result.get("page_url", "")
+
+        if doc_url:
+            # Hash URL to create consistent doc_id
+            doc_id = hashlib.md5(doc_url.encode('utf-8')).hexdigest()
+        else:
+            # Fallback: hash content if no URL
+            content = str(search_result.get("page_snippet", "")) + str(search_result.get("page_name", ""))
+            doc_id = hashlib.md5(content.encode('utf-8')).hexdigest()
+
         relevant_ids.add(doc_id)
 
     return relevant_ids
@@ -273,7 +282,7 @@ def main():
     parser.add_argument(
         "--db-path",
         type=str,
-        default="src\database\crag_chunked_vector_db",
+        default="src\database\crag_snippet_chunked_vector_db",
         help="Path to vector database (default: src/database/crag_vector_db)"
     )
     parser.add_argument(
@@ -321,7 +330,7 @@ def main():
     print("-" * 80)
 
     # Use quality model (same as used to build database)
-    embedding_model = EmbeddingModel(model_name=EmbeddingModel.QUALITY_MODEL)
+    embedding_model = EmbeddingModel(model_name=EmbeddingModel.BGE_MODEL)
 
     print(f"✓ Model: {embedding_model.get_model_name()}")
     print(f"✓ Embedding dimension: {embedding_model.get_embedding_dim()}")

@@ -178,9 +178,15 @@ def test_vector_database_end_to_end():
         print(f"  {'-'*74}")
 
         ground_truth_ids = []
+        import hashlib
         for idx, search_result in enumerate(query.search_results):
-            # Construct the doc_id that was used when adding to database
-            gt_doc_id = f"{query.query_id}_doc_{idx}"
+            # Construct the doc_id by hashing URL (matches database indexing)
+            doc_url = search_result.get("page_url", "")
+            if doc_url:
+                gt_doc_id = hashlib.md5(doc_url.encode('utf-8')).hexdigest()
+            else:
+                content = str(search_result.get("page_snippet", "")) + str(search_result.get("page_name", ""))
+                gt_doc_id = hashlib.md5(content.encode('utf-8')).hexdigest()
             ground_truth_ids.append(gt_doc_id)
 
             # Check if this document is in our database

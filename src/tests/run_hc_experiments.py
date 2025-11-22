@@ -33,21 +33,32 @@ def extract_ground_truth_ids(query) -> Set[str]:
     """
     Extract ground truth relevant document IDs from query.
 
-    CRAG dataset stores documents with IDs formatted as {query_id}_doc_{idx}
-    where idx is the enumeration index of search_results.
+    Document IDs are created by hashing the page URL to ensure
+    consistent identification across queries.
 
     Args:
         query: CRAGQuery object
 
     Returns:
-        Set of relevant document IDs
+        Set of relevant document IDs (hashed URLs)
     """
-    # For CRAG, ground truth IDs are constructed from search_results
-    # This matches the document IDs created during vector DB indexing
+    import hashlib
     relevant_ids = set()
-    for idx, search_result in enumerate(query.search_results):
-        doc_id = f"{query.query_id}_doc_{idx}"
+
+    # Document IDs are created by hashing URLs (matches database indexing)
+    for search_result in query.search_results:
+        doc_url = search_result.get("page_url", "")
+
+        if doc_url:
+            # Hash URL to create consistent doc_id
+            doc_id = hashlib.md5(doc_url.encode('utf-8')).hexdigest()
+        else:
+            # Fallback: hash content if no URL
+            content = str(search_result.get("page_snippet", "")) + str(search_result.get("page_name", ""))
+            doc_id = hashlib.md5(content.encode('utf-8')).hexdigest()
+
         relevant_ids.add(doc_id)
+
     return relevant_ids
 
 
@@ -63,7 +74,8 @@ def run_hc_experiment(
     evaluator: RetrievalEvaluator,
     aggregation: str = "max_score",
     top_chunks_multiplier: int = 10,
-    max_queries: int = None
+    max_queries: int = None,
+    max_k: int = None
 ) -> tuple:
     """
     Run HC experiment with specific parameters.
@@ -83,12 +95,13 @@ def run_hc_experiment(
         aggregation: Chunk aggregation strategy (for chunked DBs)
         top_chunks_multiplier: Multiplier for max_candidates when retrieving chunks
         max_queries: Optional limit on number of queries
+        max_k: Maximum number of documents to return (None = unlimited, use HC threshold only)
 
     Returns:
         Tuple of (retrieval_results, evaluation_results, aggregate_metrics)
     """
     print(f"\nRunning HC experiment:")
-    print(f"  gamma={gamma}, min_hc={min_hc}, allow_empty={allow_empty}, max_candidates={max_candidates}")
+    print(f"  gamma={gamma}, min_hc={min_hc}, allow_empty={allow_empty}, max_candidates={max_candidates}, max_k={max_k if max_k else 'unlimited'}")
     print("-" * 80)
 
     # Limit queries if requested
@@ -106,7 +119,8 @@ def run_hc_experiment(
         allow_empty=allow_empty,
         embedding_model=embedding_model,
         aggregation=aggregation,
-        top_chunks_multiplier=top_chunks_multiplier
+        top_chunks_multiplier=top_chunks_multiplier,
+        max_k=max_k
     )
 
     # Process queries
@@ -148,6 +162,7 @@ def run_hc_experiment(
                 "min_hc": min_hc,
                 "allow_empty": allow_empty,
                 "max_candidates": max_candidates,
+                "max_k": max_k,
                 "threshold": retrieval_output.threshold
             }
         )
@@ -179,7 +194,8 @@ def save_hc_results(
     retrieval_results: List,
     evaluation_results: List,
     aggregate_metrics,
-    output_dir: Path
+    output_dir: Path,
+    max_k: int = None
 ):
     """
     Save HC experiment results to disk.
@@ -193,11 +209,13 @@ def save_hc_results(
         evaluation_results: List of RetrievalResult objects
         aggregate_metrics: AggregateMetrics object
         output_dir: Directory to save results
+        max_k: Maximum documents to return (None = unlimited)
     """
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Create filename
-    config_str = f"gamma{gamma:.2f}_minHC{min_hc:.1f}_maxCand{max_candidates}"
+    max_k_str = f"_maxK{max_k}" if max_k else ""
+    config_str = f"gamma{gamma:.2f}_minHC{min_hc:.1f}_maxCand{max_candidates}{max_k_str}"
     if not allow_empty:
         config_str += "_noEmpty"
 
@@ -209,6 +227,7 @@ def save_hc_results(
             "gamma": gamma,
             "min_hc": min_hc,
             "max_candidates": max_candidates,
+            "max_k": max_k,
             "allow_empty": allow_empty,
             "k": retrieval.k,
             "threshold": retrieval.threshold,
@@ -243,6 +262,7 @@ def save_hc_results(
             "gamma": gamma,
             "min_hc": min_hc,
             "max_candidates": max_candidates,
+            "max_k": max_k,
             "allow_empty": allow_empty
         },
         "n_queries": aggregate_metrics.n_queries,
@@ -344,14 +364,34 @@ def main():
     parser.add_argument(
         "--db-path",
         type=str,
-        default="src\database\crag_chunked_vector_db",
-        help="Path to vector database (default: src/database/crag_vector_db)"
+        default="src/database/crag_snippet_chunked_vector_db",
+        help="Path to vector database (default: src/database/crag_snippet_chunked_vector_db)"
     )
     parser.add_argument(
         "--query-null-dist-path",
         type=str,
         default=None,
         help="Path to pre-computed per-query null distributions (REQUIRED)"
+    )
+    parser.add_argument(
+        "--aggregation",
+        type=str,
+        default="max_score",
+        choices=["max_score", "mean_score", "sum_score"],
+        help="Chunk aggregation strategy for chunked DBs (default: max_score)"
+    )
+    parser.add_argument(
+        "--top-chunks-multiplier",
+        type=int,
+        default=10,
+        help="Multiplier for max_candidates when retrieving chunks (default: 10)"
+    )
+    parser.add_argument(
+        "--max-k-values",
+        nargs="+",
+        type=int,
+        default=[5, 10, 15, 20],
+        help="Maximum documents to return for each config (default: 5 10 15 20)"
     )
 
     args = parser.parse_args()
@@ -368,6 +408,7 @@ def main():
     print(f"Per-query null distributions: {args.query_null_dist_path}")
     print(f"Gamma values: {args.gamma_values}")
     print(f"Min HC values: {args.min_hc_values}")
+    print(f"Max k values: {args.max_k_values}")
     print(f"Max candidates: {args.max_candidates}")
     print(f"Allow empty: {args.allow_empty}")
     print(f"Max queries: {args.max_queries if args.max_queries else 'All'}")
@@ -384,7 +425,8 @@ def main():
     print("Step 1: Loading CRAG queries...")
     print("-" * 80)
 
-    loader = CRAGLoader(use_full_html=True)
+    # Use snippets (not full HTML) to match the snippet-based database
+    loader = CRAGLoader(use_full_html=False)
     queries, documents = loader.load_by_tasks(["1_2"])
 
     print(f"✓ Loaded {len(queries)} queries")
@@ -397,7 +439,8 @@ def main():
     print("Step 2: Initializing embedding model...")
     print("-" * 80)
 
-    embedding_model = EmbeddingModel(model_name=EmbeddingModel.QUALITY_MODEL)
+    # Use BGE model to match the snippet-based chunked database
+    embedding_model = EmbeddingModel(model_name=EmbeddingModel.BGE_MODEL)
 
     print(f"✓ Model: {embedding_model.get_model_name()}")
     print(f"✓ Embedding dimension: {embedding_model.get_embedding_dim()}")
@@ -455,43 +498,49 @@ def main():
 
     for gamma in args.gamma_values:
         for min_hc in args.min_hc_values:
-            config_key = f"gamma_{gamma}_minHC_{min_hc}"
+            for max_k in args.max_k_values:
+                config_key = f"gamma_{gamma}_minHC_{min_hc}_maxK_{max_k}"
 
-            retrieval_results, evaluation_results, aggregate_metrics = run_hc_experiment(
-                gamma=gamma,
-                min_hc=min_hc,
-                allow_empty=args.allow_empty,
-                max_candidates=args.max_candidates,
-                queries=queries,
-                db_path=args.db_path,
-                embedding_model=embedding_model,
-                query_null_distributions=query_null_distributions,
-                evaluator=evaluator,
-                max_queries=args.max_queries
-            )
+                retrieval_results, evaluation_results, aggregate_metrics = run_hc_experiment(
+                    gamma=gamma,
+                    min_hc=min_hc,
+                    allow_empty=args.allow_empty,
+                    max_candidates=args.max_candidates,
+                    queries=queries,
+                    db_path=args.db_path,
+                    embedding_model=embedding_model,
+                    query_null_distributions=query_null_distributions,
+                    evaluator=evaluator,
+                    aggregation=args.aggregation,
+                    top_chunks_multiplier=args.top_chunks_multiplier,
+                    max_queries=args.max_queries,
+                    max_k=max_k
+                )
 
-            # Save results
-            save_hc_results(
-                gamma=gamma,
-                min_hc=min_hc,
-                allow_empty=args.allow_empty,
-                max_candidates=args.max_candidates,
-                retrieval_results=retrieval_results,
-                evaluation_results=evaluation_results,
-                aggregate_metrics=aggregate_metrics,
-                output_dir=output_dir
-            )
+                # Save results
+                save_hc_results(
+                    gamma=gamma,
+                    min_hc=min_hc,
+                    allow_empty=args.allow_empty,
+                    max_candidates=args.max_candidates,
+                    retrieval_results=retrieval_results,
+                    evaluation_results=evaluation_results,
+                    aggregate_metrics=aggregate_metrics,
+                    output_dir=output_dir,
+                    max_k=max_k
+                )
 
-            all_results[config_key] = {
-                "gamma": gamma,
-                "min_hc": min_hc,
-                "metrics": aggregate_metrics,
-                "retrieval_stats": {
-                    "mean_k": float(np.mean([r.k for r in retrieval_results])),
-                    "median_k": float(np.median([r.k for r in retrieval_results])),
-                    "n_empty": int(np.sum([r.k == 0 for r in retrieval_results]))
+                all_results[config_key] = {
+                    "gamma": gamma,
+                    "min_hc": min_hc,
+                    "max_k": max_k,
+                    "metrics": aggregate_metrics,
+                    "retrieval_stats": {
+                        "mean_k": float(np.mean([r.k for r in retrieval_results])),
+                        "median_k": float(np.median([r.k for r in retrieval_results])),
+                        "n_empty": int(np.sum([r.k == 0 for r in retrieval_results]))
+                    }
                 }
-            }
 
     total_time = time.time() - start_time
 
@@ -507,18 +556,20 @@ def main():
     print("HC EXPERIMENTS RESULTS COMPARISON (Labeled Queries Only)")
     print("="*80)
 
-    print(f"\n{'Gamma':<8} {'Min HC':<10} {'Avg k':<10} {'Recall@k':<12} {'Precision@k':<15} {'MRR':<10} {'NDCG@k':<10}")
-    print("-" * 80)
+    print(f"\n{'Gamma':<8} {'Min HC':<10} {'Max k':<8} {'Avg k':<10} {'Recall@k':<12} {'Precision@k':<15} {'MRR':<10} {'NDCG@k':<10}")
+    print("-" * 90)
 
     for config_key, result in all_results.items():
         gamma = result["gamma"]
         min_hc = result["min_hc"]
+        max_k = result["max_k"]
         metrics = result["metrics"]
         avg_k = result["retrieval_stats"]["mean_k"]
 
         print(
             f"{gamma:<8.2f} "
             f"{min_hc:<10.1f} "
+            f"{max_k:<8} "
             f"{avg_k:<10.2f} "
             f"{metrics.mean_recall_at_k_labeled:<12.3f} "
             f"{metrics.mean_precision_at_k_labeled:<15.3f} "
@@ -536,6 +587,7 @@ def main():
             {
                 "gamma": result["gamma"],
                 "min_hc": result["min_hc"],
+                "max_k": result["max_k"],
                 "max_candidates": args.max_candidates,
                 "allow_empty": args.allow_empty,
                 "retrieval_stats": result["retrieval_stats"],

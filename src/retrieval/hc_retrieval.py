@@ -48,7 +48,8 @@ class HCRetrieval(ChunkedRetrievalMixin):
         embedding_model: Optional[EmbeddingModel] = None,
         chunk_to_doc_mapping: Optional[Dict[str, str]] = None,
         aggregation: str = "max_score",
-        top_chunks_multiplier: int = 10
+        top_chunks_multiplier: int = 10,
+        max_k: Optional[int] = None
     ):
         """
         Initialize HC-based retriever.
@@ -66,6 +67,8 @@ class HCRetrieval(ChunkedRetrievalMixin):
             aggregation: Chunk score aggregation strategy: "max_score", "mean_score", or "sum_score"
             top_chunks_multiplier: Multiplier for max_candidates when retrieving chunks
                                   (retrieves max_candidates * multiplier chunks)
+            max_k: Maximum number of documents to return (None = no limit, use HC threshold only)
+                   Returns min(HC_threshold_k, max_k) documents
         """
         self.vector_db = vector_db
         self.query_null_distributions = query_null_distributions
@@ -77,6 +80,7 @@ class HCRetrieval(ChunkedRetrievalMixin):
         self.chunk_to_doc_mapping = chunk_to_doc_mapping
         self.aggregation = aggregation
         self.top_chunks_multiplier = top_chunks_multiplier
+        self.max_k = max_k
 
         # Validate parameters
         if not (0 < gamma <= 1):
@@ -87,12 +91,15 @@ class HCRetrieval(ChunkedRetrievalMixin):
             raise ValueError(f"min_hc must be >= 0, got {min_hc}")
         if chunk_to_doc_mapping is not None and aggregation not in ["max_score", "mean_score", "sum_score"]:
             raise ValueError(f"Invalid aggregation: {aggregation}. Must be 'max_score', 'mean_score', or 'sum_score'")
+        if max_k is not None and max_k < 1:
+            raise ValueError(f"max_k must be >= 1 or None, got {max_k}")
 
         logger.info(f"HCRetrieval initialized:")
         logger.info(f"  gamma={gamma}")
         logger.info(f"  max_candidates={max_candidates}")
         logger.info(f"  min_hc={min_hc}")
         logger.info(f"  allow_empty={allow_empty}")
+        logger.info(f"  max_k={max_k if max_k else 'unlimited'}")
         logger.info(f"  Per-query null distributions: {len(query_null_distributions.distributions)} queries")
         logger.info(f"  Vector DB contains {vector_db.get_num_documents()} {'chunks' if chunk_to_doc_mapping else 'documents'}")
         if chunk_to_doc_mapping:
@@ -109,7 +116,8 @@ class HCRetrieval(ChunkedRetrievalMixin):
         allow_empty: bool = True,
         embedding_model: Optional[EmbeddingModel] = None,
         aggregation: str = "max_score",
-        top_chunks_multiplier: int = 10
+        top_chunks_multiplier: int = 10,
+        max_k: Optional[int] = None
     ) -> "HCRetrieval":
         """
         Load HC retrieval system from database path.
@@ -127,6 +135,7 @@ class HCRetrieval(ChunkedRetrievalMixin):
             embedding_model: Optional embedding model
             aggregation: Aggregation strategy for chunked mode
             top_chunks_multiplier: Multiplier for retrieving chunks
+            max_k: Maximum number of documents to return (None = unlimited)
 
         Returns:
             HCRetrieval instance
@@ -156,7 +165,8 @@ class HCRetrieval(ChunkedRetrievalMixin):
             embedding_model=embedding_model,
             chunk_to_doc_mapping=chunk_to_doc_mapping,
             aggregation=aggregation,
-            top_chunks_multiplier=top_chunks_multiplier
+            top_chunks_multiplier=top_chunks_multiplier,
+            max_k=max_k
         )
 
     def retrieve(
@@ -226,19 +236,26 @@ class HCRetrieval(ChunkedRetrievalMixin):
             retrieved_scores = []
             method = f"hc_{self.aggregation}" if self.chunk_to_doc_mapping else "hc"
         else:
+            # Apply max_k cap: return min(hc_k, max_k) candidates
+            effective_k = hc_result.k
+            if self.max_k is not None:
+                effective_k = min(hc_result.k, self.max_k)
+
             # Select top k candidates (already sorted by similarity)
-            selected_candidates = candidates[:hc_result.k]
+            selected_candidates = candidates[:effective_k]
 
             if self.chunk_to_doc_mapping is not None:
                 # Chunked mode: aggregate chunks to documents
+                # Use max_k as limit if set, otherwise use max_candidates
+                doc_limit = self.max_k if self.max_k else self.max_candidates
                 retrieved_ids, retrieved_scores = self._aggregate_chunks_to_documents(
-                    selected_candidates, self.max_candidates
+                    selected_candidates, doc_limit
                 )
                 method = f"hc_{self.aggregation}"
 
                 logger.debug(
-                    f"Query {query_id}: Retrieved {hc_result.k} chunks -> {len(retrieved_ids)} docs "
-                    f"(HC={hc_result.hc_statistic:.3f}, threshold={hc_result.threshold:.3f})"
+                    f"Query {query_id}: Retrieved {hc_result.k} chunks (capped to {effective_k}) -> {len(retrieved_ids)} docs "
+                    f"(HC={hc_result.hc_statistic:.3f}, threshold={hc_result.threshold:.3f}, max_k={self.max_k})"
                 )
             else:
                 # Full document mode: use filtered candidates directly
@@ -247,9 +264,14 @@ class HCRetrieval(ChunkedRetrievalMixin):
                 method = "hc"
 
                 logger.debug(
-                    f"Query {query_id}: Retrieved {hc_result.k} docs "
-                    f"(HC={hc_result.hc_statistic:.3f}, threshold={hc_result.threshold:.3f})"
+                    f"Query {query_id}: Retrieved {effective_k} docs (HC selected {hc_result.k}) "
+                    f"(HC={hc_result.hc_statistic:.3f}, threshold={hc_result.threshold:.3f}, max_k={self.max_k})"
                 )
+
+        # Final cap on returned documents (applies to both chunked and non-chunked)
+        if self.max_k is not None and len(retrieved_ids) > self.max_k:
+            retrieved_ids = retrieved_ids[:self.max_k]
+            retrieved_scores = retrieved_scores[:self.max_k]
 
         return RetrievalOutput(
             query_id=query_id,
@@ -324,7 +346,8 @@ class HCRetrieval(ChunkedRetrievalMixin):
             'gamma': self.gamma,
             'max_candidates': self.max_candidates,
             'min_hc': self.min_hc,
-            'allow_empty': self.allow_empty
+            'allow_empty': self.allow_empty,
+            'max_k': self.max_k
         }
 
 
