@@ -1,0 +1,391 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "LLM prompt templates for cross-entity query generation",
+    "phase": "B.4",
+    "purpose": "Design prompts that reliably generate high-quality, diverse queries matching template specifications"
+  },
+
+  "prompt_architecture": {
+    "description": "Modular prompt structure with interchangeable blocks",
+    "blocks": [
+      "system_context",
+      "cluster_context",
+      "template_specification",
+      "diversity_instructions",
+      "difficulty_modifier",
+      "output_format"
+    ],
+    "assembly_order": "Blocks are concatenated in listed order to form complete prompt"
+  },
+
+  "system_context": {
+    "role": "You are a specialized benchmark query generator for information retrieval evaluation.",
+    "purpose": "Your task is to create natural language queries that test retrieval systems' ability to find and aggregate information across multiple documents.",
+    "quality_expectations": [
+      "Generate queries that sound natural - like questions a curious person would actually ask",
+      "Ensure queries are factually grounded in the provided entity information",
+      "Create queries that require information from multiple passages to answer completely",
+      "Achieve the specified difficulty level through appropriate word choice and phrasing"
+    ],
+    "constraints": [
+      "Do not invent facts not present in the provided entity data",
+      "Do not create queries that are unanswerable from the entity set",
+      "Do not generate overly similar queries within the same session",
+      "Follow the specified template pattern while maintaining natural phrasing"
+    ]
+  },
+
+  "cluster_context_template": {
+    "structure": {
+      "cluster_id": "{cluster_id}",
+      "cluster_type": "{cluster_type}",
+      "binding_property": "{binding_property_description}",
+      "entity_count": "{count}",
+      "entities": [
+        {
+          "qid": "{entity_qid}",
+          "label": "{entity_label}",
+          "description": "{entity_description}",
+          "key_facts": "{relevant_facts_list}"
+        }
+      ]
+    },
+    "instructions": "The cluster context provides all entities and their metadata. Use this information to ground your queries in verifiable facts."
+  },
+
+  "cluster_type_prompts": {
+    "categorical": {
+      "context_emphasis": "This is a CATEGORICAL cluster - entities share a common type and constraining properties.",
+      "binding_description": "All entities in this cluster are {entity_type} that {constraint_description}.",
+      "query_focus_suggestions": [
+        "Focus on the shared categorical property that binds these entities",
+        "Consider what attributes (founding dates, locations, sizes) might be interesting to enumerate",
+        "Think about what comparisons or aggregations would be meaningful for this category"
+      ],
+      "good_angles": [
+        "Complete enumeration of the category",
+        "Attribute collection across all members",
+        "Aggregation statistics (average, total, range)",
+        "Comparison of members by some attribute"
+      ],
+      "avoid": [
+        "Focusing on a single entity when the cluster is about the group",
+        "Asking about attributes not present in the provided data"
+      ]
+    },
+
+    "creative_ensemble": {
+      "context_emphasis": "This is a CREATIVE ENSEMBLE cluster - entities are connected through participation in a shared creative work.",
+      "binding_description": "All entities in this cluster are {role_type} who participated in {work_title}.",
+      "query_focus_suggestions": [
+        "The creative work serves as the anchor binding these people together",
+        "Consider biographical cross-references (where they studied, other works)",
+        "Career comparisons and trajectories are natural query angles"
+      ],
+      "good_angles": [
+        "Enumeration of cast/crew members",
+        "Biographical attributes of the ensemble",
+        "Other works by ensemble members",
+        "Career achievements of the group"
+      ],
+      "avoid": [
+        "Asking about plot details rather than people",
+        "Confusing roles (director vs actor)"
+      ]
+    },
+
+    "award_recognition": {
+      "context_emphasis": "This is an AWARD/RECOGNITION cluster - entities share receipt of a specific honor.",
+      "binding_description": "All entities received {award_name} during {time_period}.",
+      "query_focus_suggestions": [
+        "The award is the primary binding element",
+        "Temporal aspects (specific year or range) can be emphasized",
+        "Consider what recipients have in common beyond the award"
+      ],
+      "good_angles": [
+        "Recipient enumeration for a specific award/year",
+        "Institutional affiliations of laureates",
+        "Comparative analysis across time periods",
+        "Common backgrounds or trajectories"
+      ],
+      "avoid": [
+        "Confusing different award categories",
+        "Asking about nomination vs winning when data only shows winners"
+      ]
+    },
+
+    "organizational": {
+      "context_emphasis": "This is an ORGANIZATIONAL cluster - entities share affiliation with a specific institution.",
+      "binding_description": "All entities are {role_type} affiliated with {organization}.",
+      "query_focus_suggestions": [
+        "The organization is the anchor connecting these people",
+        "Consider outcomes and achievements of members",
+        "Think about the organization's influence through its members"
+      ],
+      "good_angles": [
+        "Member enumeration",
+        "Achievements of members",
+        "Companies/works founded by members",
+        "Impact on a field through members"
+      ],
+      "avoid": [
+        "Focusing on the organization itself rather than its members",
+        "Confusing current vs former membership when unspecified"
+      ]
+    },
+
+    "event_temporal": {
+      "context_emphasis": "This is an EVENT-TEMPORAL cluster - entities are connected through time-bounded events.",
+      "binding_description": "All entities participated in or were affected by events during {time_period}.",
+      "query_focus_suggestions": [
+        "The temporal boundary is key to defining the cluster",
+        "Consider the sequence and causality of events",
+        "Participants and their roles are natural query targets"
+      ],
+      "good_angles": [
+        "Event enumeration within time bounds",
+        "Key participants in events",
+        "Causes and consequences of events",
+        "Comparisons across time periods"
+      ],
+      "avoid": [
+        "Ignoring the temporal constraint",
+        "Asking about events outside the specified period"
+      ]
+    },
+
+    "geographic_spatial": {
+      "context_emphasis": "This is a GEOGRAPHIC-SPATIAL cluster - entities share location within a defined region.",
+      "binding_description": "All entities are located in or associated with {geographic_region}.",
+      "query_focus_suggestions": [
+        "The geographic boundary defines the cluster",
+        "Consider what distinguishes entities within the region",
+        "Comparisons with other regions can be interesting"
+      ],
+      "good_angles": [
+        "Location enumeration within region",
+        "Attributes of entities in the region",
+        "Regional comparisons",
+        "Spatial relationships and distances"
+      ],
+      "avoid": [
+        "Using ambiguous regional boundaries",
+        "Asking about locations outside the defined region"
+      ]
+    },
+
+    "relational": {
+      "context_emphasis": "This is a RELATIONAL cluster - entities are connected through direct relationships to an anchor entity.",
+      "binding_description": "All entities have a {relationship_type} relationship with {anchor_entity}.",
+      "query_focus_suggestions": [
+        "The anchor entity is central to understanding the cluster",
+        "Consider what the related entities have achieved",
+        "Extended network (second-order relations) can be explored"
+      ],
+      "good_angles": [
+        "Direct relation enumeration",
+        "Attributes of related entities",
+        "Achievements of related entities",
+        "Extended network exploration"
+      ],
+      "avoid": [
+        "Confusing the anchor with cluster members",
+        "Asking about entities not related to the anchor"
+      ]
+    }
+  },
+
+  "difficulty_modifiers": {
+    "easy": {
+      "instruction": "Generate an EASY difficulty query with the following characteristics:",
+      "requirements": [
+        "Use entity names EXACTLY as they appear in the provided data",
+        "Frame the query as a direct, simple question (who/what/when/where)",
+        "The answer should be immediately findable in passage lead paragraphs",
+        "Use common, straightforward vocabulary"
+      ],
+      "phrasing_guidance": [
+        "Start with 'Who', 'What', 'List', 'Name', or similar direct question words",
+        "Include the exact entity/work/award names without paraphrasing",
+        "Ask for a single type of information (names OR dates OR locations)"
+      ],
+      "example_patterns": [
+        "Who are the [exact_role] in [exact_title]?",
+        "What [entity_type] received the [exact_award_name] in [year]?",
+        "List the [exact_type] in [exact_region]."
+      ],
+      "avoid": [
+        "Paraphrasing proper names",
+        "Using indirect descriptions",
+        "Requiring multiple inference steps"
+      ]
+    },
+
+    "medium": {
+      "instruction": "Generate a MEDIUM difficulty query with the following characteristics:",
+      "requirements": [
+        "Replace at least one entity name with a descriptive reference",
+        "Require combining two pieces of information to answer",
+        "Use some paraphrased or synonym terms",
+        "Query should require reading beyond headlines/lead paragraphs"
+      ],
+      "phrasing_guidance": [
+        "Use descriptive references like 'the director of [work]' instead of the name",
+        "Ask for derived information (nationality of X, alma mater of Y)",
+        "Combine identification with attribute lookup"
+      ],
+      "example_patterns": [
+        "What nationalities do the cast of [descriptive_work_reference] have?",
+        "Which universities are the [time_reference] [award_paraphrase] recipients affiliated with?",
+        "What companies have [descriptive_org_reference] members founded?"
+      ],
+      "avoid": [
+        "Using all direct entity names",
+        "Making queries trivially easy to answer from headlines"
+      ]
+    },
+
+    "hard": {
+      "instruction": "Generate a HARD difficulty query with the following characteristics:",
+      "requirements": [
+        "Use only indirect or implicit entity references",
+        "Require synthesizing information across multiple passages",
+        "Employ domain terminology not directly present in typical passages",
+        "Frame as comparison, aggregation, analysis, or multi-step reasoning"
+      ],
+      "phrasing_guidance": [
+        "Describe entities through complex attribute combinations",
+        "Use evaluative or figurative language ('acclaimed', 'pioneering', 'influential')",
+        "Ask questions requiring fan-out (for each X, what Y?) or aggregation",
+        "Reference time periods or categories indirectly"
+      ],
+      "example_patterns": [
+        "How do the research institutions of scientists honored by [indirect_award_reference] compare across [dimension]?",
+        "What other acclaimed [work_type] have the ensemble of the [year] [indirect_work_description] appeared in?",
+        "What patterns emerge in the career trajectories of [indirect_org_reference] alumni?"
+      ],
+      "avoid": [
+        "Using any direct proper names",
+        "Making the query answerable from a single passage"
+      ]
+    }
+  },
+
+  "diversity_instructions": {
+    "base": "Generate diverse queries by varying your approach across these dimensions:",
+    "dimensions": {
+      "phrasing_variation": {
+        "instruction": "Use different question structures across queries",
+        "examples": [
+          "'List all X' → 'What are the X?' → 'Name the X' → 'Which X...?'",
+          "'Who received' → 'Who won' → 'Who was awarded' → 'Recipients of'"
+        ]
+      },
+      "focus_variation": {
+        "instruction": "Target different aspects of entities across queries",
+        "rotation": [
+          "Round 1: Focus on temporal attributes (dates, ages, durations)",
+          "Round 2: Focus on relationships (collaborators, affiliations)",
+          "Round 3: Focus on achievements (awards, works, discoveries)",
+          "Round 4: Focus on comparisons (between members, with other groups)"
+        ]
+      },
+      "scope_variation": {
+        "instruction": "Vary the scope of expected answers",
+        "examples": [
+          "Complete enumeration: 'List all X'",
+          "Selective: 'What are the major X' or 'Who are the notable X'",
+          "Subset: 'Name some X' or 'Give examples of X'"
+        ]
+      }
+    },
+    "anti_repetition": {
+      "instruction": "Avoid repeating patterns from previous queries in this session",
+      "previous_queries_context": "You will be shown previously generated queries. Do NOT use the same opening phrases, focus areas, or structural patterns."
+    }
+  },
+
+  "output_format": {
+    "structure": {
+      "query": {
+        "type": "string",
+        "description": "The generated natural language query",
+        "requirements": ["Must end with question mark", "15-50 words typical length"]
+      },
+      "expected_answer_type": {
+        "type": "enum",
+        "values": ["list", "count", "comparison", "aggregation", "narrative"],
+        "description": "What type of answer this query expects"
+      },
+      "entity_coverage": {
+        "type": "array",
+        "description": "List of entity QIDs that this query addresses",
+        "requirements": ["Must include at least 50% of cluster entities for high-K queries"]
+      },
+      "difficulty_justification": {
+        "type": "object",
+        "fields": {
+          "lexical_overlap_strategy": "How you achieved target lexical overlap",
+          "reasoning_hops": "Number and description of reasoning steps required",
+          "indirection_explanation": "How entities are referenced (direct/descriptive/implicit)"
+        }
+      },
+      "answerable_from_passages": {
+        "type": "boolean",
+        "description": "Self-assessment: can this query be fully answered from the entity passages?"
+      },
+      "notes": {
+        "type": "string",
+        "description": "Any additional notes about the query or potential issues",
+        "optional": true
+      }
+    },
+    "example_output": {
+      "query": "What nationalities do the lead actors in Nolan's 2010 psychological thriller have?",
+      "expected_answer_type": "list",
+      "entity_coverage": ["Q134773", "Q188018", "Q232163"],
+      "difficulty_justification": {
+        "lexical_overlap_strategy": "Used 'Nolan's 2010 psychological thriller' instead of 'Inception' to reduce overlap",
+        "reasoning_hops": 2,
+        "indirection_explanation": "Work referenced descriptively, actors referenced by role ('lead actors')"
+      },
+      "answerable_from_passages": true
+    }
+  },
+
+  "complete_prompt_template": {
+    "description": "Template showing how blocks assemble into complete prompt",
+    "template": "{{system_context}}\n\n---\n\n## Cluster Information\n\n{{cluster_context}}\n\n---\n\n## Cluster Type Guidance\n\n{{cluster_type_prompt}}\n\n---\n\n## Query Requirements\n\nTemplate Pattern: {{template_pattern}}\nTarget K: {{target_k}}\n\n{{difficulty_modifier}}\n\n---\n\n## Diversity Requirements\n\n{{diversity_instructions}}\n\n{{previous_queries_if_any}}\n\n---\n\n## Output Format\n\nProvide your response as JSON with the following structure:\n\n{{output_format_spec}}\n\n---\n\nGenerate a high-quality query following all the above specifications."
+  },
+
+  "generation_parameters": {
+    "recommended_temperature": {
+      "base": 0.7,
+      "increase_for_diversity": 0.9,
+      "note": "Higher temperature for later queries in a session to encourage variety"
+    },
+    "max_tokens": 500,
+    "retry_on_parse_failure": {
+      "max_retries": 3,
+      "modify_prompt": "Add explicit instruction: 'Ensure your response is valid JSON'"
+    }
+  },
+
+  "validation_rules": {
+    "query_validation": [
+      {"rule": "ends_with_question_mark", "action": "reject_if_false"},
+      {"rule": "length_in_range_15_60_words", "action": "warn_if_false"},
+      {"rule": "no_invented_entity_names", "action": "reject_if_false"},
+      {"rule": "achieves_difficulty_targets", "action": "flag_for_review_if_false"}
+    ],
+    "coverage_validation": [
+      {"rule": "entity_coverage_at_least_50_percent", "action": "warn_if_false"},
+      {"rule": "all_covered_entities_exist_in_cluster", "action": "reject_if_false"}
+    ],
+    "difficulty_validation": [
+      {"rule": "justification_addresses_all_dimensions", "action": "warn_if_false"},
+      {"rule": "reasoning_hops_matches_difficulty", "action": "flag_for_review_if_false"}
+    ]
+  }
+}

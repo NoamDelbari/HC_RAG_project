@@ -1,0 +1,787 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Query template library for cross-entity QA generation",
+    "phase": "B.2",
+    "purpose": "Define parameterized query templates for each cluster type x difficulty combination"
+  },
+
+  "template_structure": {
+    "description": "Standard structure for all query templates",
+    "required_fields": {
+      "template_id": "Unique identifier (format: {cluster_type}_{difficulty}_{variant})",
+      "cluster_type": "Compatible cluster type from cluster_types.json",
+      "difficulty": "easy | medium | hard",
+      "k_range": {"min": "Minimum target K", "max": "Maximum target K"},
+      "pattern": "Natural language pattern with {placeholder} slots",
+      "slots": "Object mapping each placeholder to its definition",
+      "answer_spec": {
+        "type": "list | count | comparison | aggregation | narrative",
+        "aggregation_method": "How to combine entity answers",
+        "completeness_criteria": "What constitutes a complete answer"
+      },
+      "difficulty_params": {
+        "lexical_overlap_target": "0.0-1.0 scale",
+        "reasoning_hops": "Number of inference steps",
+        "indirection_level": "direct | descriptive | implicit"
+      },
+      "validation": {
+        "sparql_pattern": "Template SPARQL for ground truth verification",
+        "answerability_criteria": "Conditions for valid query",
+        "failure_modes": "List of common issues to check"
+      }
+    }
+  },
+
+  "templates": {
+    "categorical": {
+      "easy": [
+        {
+          "template_id": "categorical_easy_enumeration",
+          "cluster_type": "categorical",
+          "difficulty": "easy",
+          "k_range": {"min": 5, "max": 20},
+          "pattern": "List all {entity_type_plural} that {constraint_description}.",
+          "slots": {
+            "entity_type_plural": "Plural form of entity type (e.g., 'countries', 'companies', 'scientists')",
+            "constraint_description": "Description of the constraint (e.g., 'have hosted the Summer Olympics')"
+          },
+          "alternative_phrasings": [
+            "What are all the {entity_type_plural} that {constraint_description}?",
+            "Name the {entity_type_plural} that {constraint_description}.",
+            "Which {entity_type_plural} {constraint_description}?"
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "complete_enumeration",
+            "completeness_criteria": "All entities matching constraint must be included"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.7, 0.8],
+            "reasoning_hops": 1,
+            "indirection_level": "direct"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?entity WHERE { ?entity wdt:P31 wd:{entity_type} . ?entity {constraint_property} {constraint_value} . }",
+            "answerability_criteria": "Entity type and constraint appear in Wikipedia passages",
+            "failure_modes": ["constraint_too_vague", "entity_type_mismatch", "incomplete_wikidata"]
+          }
+        }
+      ],
+      "medium": [
+        {
+          "template_id": "categorical_medium_attribute",
+          "cluster_type": "categorical",
+          "difficulty": "medium",
+          "k_range": {"min": 5, "max": 15},
+          "pattern": "What are the {attribute_plural} of {entity_type_plural} that {constraint_description}?",
+          "slots": {
+            "attribute_plural": "Attribute to collect (e.g., 'founding dates', 'populations', 'headquarters')",
+            "entity_type_plural": "Plural form of entity type",
+            "constraint_description": "Description of the constraint"
+          },
+          "alternative_phrasings": [
+            "For each {entity_type} that {constraint_description}, what is their {attribute}?",
+            "Find the {attribute_plural} for all {entity_type_plural} that {constraint_description}."
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "entity_attribute_pairs",
+            "completeness_criteria": "Each entity should have its attribute value listed"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.4, 0.5],
+            "reasoning_hops": 2,
+            "indirection_level": "descriptive"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?entity ?attribute WHERE { ?entity wdt:P31 wd:{entity_type} . ?entity {constraint_property} {constraint_value} . ?entity {attribute_property} ?attribute . }",
+            "answerability_criteria": "Attribute values must be present in entity Wikipedia passages",
+            "failure_modes": ["attribute_not_in_passage", "partial_coverage", "ambiguous_attribute"]
+          }
+        }
+      ],
+      "hard": [
+        {
+          "template_id": "categorical_hard_aggregation",
+          "cluster_type": "categorical",
+          "difficulty": "hard",
+          "k_range": {"min": 5, "max": 15},
+          "pattern": "What is the {aggregation} {attribute} among {indirect_description}?",
+          "slots": {
+            "aggregation": "Aggregation function (e.g., 'average', 'total', 'highest', 'lowest')",
+            "attribute": "Attribute to aggregate (e.g., 'GDP', 'population', 'revenue')",
+            "indirect_description": "Indirect reference to entity set (e.g., 'the world's largest economies')"
+          },
+          "alternative_phrasings": [
+            "Calculate the {aggregation} {attribute} for {indirect_description}.",
+            "Among {indirect_description}, what is the {aggregation} {attribute}?"
+          ],
+          "answer_spec": {
+            "type": "aggregation",
+            "aggregation_method": "compute_aggregate",
+            "completeness_criteria": "All relevant entities must be included in computation"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.2, 0.3],
+            "reasoning_hops": 3,
+            "indirection_level": "implicit"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ({agg_function}(?value) AS ?result) WHERE { ?entity wdt:P31 wd:{entity_type} . ?entity {constraint_property} {constraint_value} . ?entity {attribute_property} ?value . }",
+            "answerability_criteria": "All values needed for aggregation must be extractable",
+            "failure_modes": ["missing_values", "implicit_reference_unclear", "aggregation_undefined"]
+          }
+        }
+      ]
+    },
+
+    "creative_ensemble": {
+      "easy": [
+        {
+          "template_id": "creative_ensemble_easy_cast",
+          "cluster_type": "creative_ensemble",
+          "difficulty": "easy",
+          "k_range": {"min": 5, "max": 30},
+          "pattern": "Who are the {role_plural} in {work_title}?",
+          "slots": {
+            "role_plural": "Role type (e.g., 'main cast members', 'actors', 'performers')",
+            "work_title": "Title of creative work (e.g., 'The Godfather', 'Abbey Road')"
+          },
+          "alternative_phrasings": [
+            "List the {role_plural} of {work_title}.",
+            "Name all the {role_plural} who appeared in {work_title}.",
+            "Which {role_plural} were featured in {work_title}?"
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "complete_enumeration",
+            "completeness_criteria": "All persons with specified role should be listed"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.7, 0.9],
+            "reasoning_hops": 1,
+            "indirection_level": "direct"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?person WHERE { wd:{work_qid} wdt:P161 ?person . }",
+            "answerability_criteria": "Work title appears in passages about cast members",
+            "failure_modes": ["work_not_found", "incomplete_cast_data", "role_ambiguity"]
+          }
+        }
+      ],
+      "medium": [
+        {
+          "template_id": "creative_ensemble_medium_crossref",
+          "cluster_type": "creative_ensemble",
+          "difficulty": "medium",
+          "k_range": {"min": 5, "max": 20},
+          "pattern": "What {attribute_plural} do the {role_plural} of {work_title} have?",
+          "slots": {
+            "attribute_plural": "Attribute to collect (e.g., 'nationalities', 'birth years', 'alma maters')",
+            "role_plural": "Role type",
+            "work_title": "Title of creative work"
+          },
+          "alternative_phrasings": [
+            "What are the {attribute_plural} of {role_plural} in {work_title}?",
+            "For the {role_plural} of {work_title}, list their {attribute_plural}."
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "entity_attribute_pairs",
+            "completeness_criteria": "Each ensemble member should have attribute listed"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.4, 0.6],
+            "reasoning_hops": 2,
+            "indirection_level": "descriptive"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?person ?attr WHERE { wd:{work_qid} wdt:P161 ?person . ?person {attr_property} ?attr . }",
+            "answerability_criteria": "Attributes must appear in biographical sections",
+            "failure_modes": ["attribute_not_in_bio", "incomplete_ensemble", "attribute_missing"]
+          }
+        }
+      ],
+      "hard": [
+        {
+          "template_id": "creative_ensemble_hard_fanout",
+          "cluster_type": "creative_ensemble",
+          "difficulty": "hard",
+          "k_range": {"min": 5, "max": 15},
+          "pattern": "For each {role} in {work_title}, what other {work_type_plural} have they {participation_verb}?",
+          "slots": {
+            "role": "Role type (singular, e.g., 'lead actor', 'main performer')",
+            "work_title": "Title of creative work",
+            "work_type_plural": "Type of related works (e.g., 'films', 'albums', 'TV series')",
+            "participation_verb": "Participation (e.g., 'starred in', 'directed', 'produced')"
+          },
+          "alternative_phrasings": [
+            "What are the other {work_type_plural} that each {role} from {work_title} has {participation_verb}?",
+            "List the {work_type_plural} by each {role} in {work_title}."
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "nested_entity_lists",
+            "completeness_criteria": "Each ensemble member should have related works listed"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.2, 0.4],
+            "reasoning_hops": 3,
+            "indirection_level": "implicit"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?person ?otherWork WHERE { wd:{work_qid} wdt:P161 ?person . ?otherWork wdt:P161 ?person . FILTER(?otherWork != wd:{work_qid}) }",
+            "answerability_criteria": "Filmography/discography must appear in passages",
+            "failure_modes": ["incomplete_filmography", "work_type_mismatch", "too_many_results"]
+          }
+        }
+      ]
+    },
+
+    "award_recognition": {
+      "easy": [
+        {
+          "template_id": "award_recognition_easy_recipients",
+          "cluster_type": "award_recognition",
+          "difficulty": "easy",
+          "k_range": {"min": 3, "max": 15},
+          "pattern": "Who received the {award_name} in {time_period}?",
+          "slots": {
+            "award_name": "Name of award (e.g., 'Nobel Prize in Physics', 'Academy Award for Best Picture')",
+            "time_period": "Year or range (e.g., '2021', '2010-2020')"
+          },
+          "alternative_phrasings": [
+            "List the {award_name} winners from {time_period}.",
+            "Who won the {award_name} during {time_period}?",
+            "Name all {award_name} recipients in {time_period}."
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "complete_enumeration",
+            "completeness_criteria": "All recipients in time period must be listed"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.7, 0.9],
+            "reasoning_hops": 1,
+            "indirection_level": "direct"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?person WHERE { ?person wdt:P166 wd:{award_qid} . ?person p:P166 ?stmt . ?stmt pq:P585 ?date . FILTER(YEAR(?date) >= {year_start} && YEAR(?date) <= {year_end}) }",
+            "answerability_criteria": "Award name and year appear in recipient passages",
+            "failure_modes": ["missing_year_qualifier", "award_variant_mismatch", "incomplete_recipient_list"]
+          }
+        }
+      ],
+      "medium": [
+        {
+          "template_id": "award_recognition_medium_attributes",
+          "cluster_type": "award_recognition",
+          "difficulty": "medium",
+          "k_range": {"min": 3, "max": 12},
+          "pattern": "What {attribute_plural} do {award_name} recipients from {time_period} have?",
+          "slots": {
+            "attribute_plural": "Attribute (e.g., 'universities', 'nationalities', 'research areas')",
+            "award_name": "Name of award",
+            "time_period": "Year or range"
+          },
+          "alternative_phrasings": [
+            "Which {attribute_plural} are associated with {award_name} winners from {time_period}?",
+            "For {award_name} recipients in {time_period}, what are their {attribute_plural}?"
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "entity_attribute_pairs",
+            "completeness_criteria": "Attribute for each recipient should be listed"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.4, 0.5],
+            "reasoning_hops": 2,
+            "indirection_level": "descriptive"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?person ?attr WHERE { ?person wdt:P166 wd:{award_qid} . ?person p:P166 ?stmt . ?stmt pq:P585 ?date . ?person {attr_property} ?attr . FILTER(YEAR(?date) >= {year_start}) }",
+            "answerability_criteria": "Attributes must be in biographical sections",
+            "failure_modes": ["attribute_not_mentioned", "institutional_name_variations", "partial_coverage"]
+          }
+        }
+      ],
+      "hard": [
+        {
+          "template_id": "award_recognition_hard_comparative",
+          "cluster_type": "award_recognition",
+          "difficulty": "hard",
+          "k_range": {"min": 5, "max": 15},
+          "pattern": "How do the {attribute_plural} of {award_name} winners compare across {dimension}?",
+          "slots": {
+            "attribute_plural": "Attribute to compare (e.g., 'research fields', 'career trajectories')",
+            "award_name": "Name of award",
+            "dimension": "Comparison dimension (e.g., 'decades', 'countries', 'disciplines')"
+          },
+          "alternative_phrasings": [
+            "What patterns exist in the {attribute_plural} of {award_name} recipients by {dimension}?",
+            "Compare the {attribute_plural} of {award_name} winners across different {dimension}."
+          ],
+          "answer_spec": {
+            "type": "comparison",
+            "aggregation_method": "dimensional_comparison",
+            "completeness_criteria": "Comparison must cover multiple groups along dimension"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.2, 0.3],
+            "reasoning_hops": 4,
+            "indirection_level": "implicit"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?person ?attr ?dimension WHERE { ?person wdt:P166 wd:{award_qid} . ?person {attr_property} ?attr . ?person {dimension_property} ?dimension . }",
+            "answerability_criteria": "Sufficient data points for meaningful comparison",
+            "failure_modes": ["insufficient_data_points", "dimension_not_comparable", "analysis_too_complex"]
+          }
+        }
+      ]
+    },
+
+    "organizational": {
+      "easy": [
+        {
+          "template_id": "organizational_easy_members",
+          "cluster_type": "organizational",
+          "difficulty": "easy",
+          "k_range": {"min": 5, "max": 30},
+          "pattern": "Who are the {role_plural} at {organization}?",
+          "slots": {
+            "role_plural": "Role type (e.g., 'faculty members', 'partners', 'board members')",
+            "organization": "Organization name (e.g., 'MIT', 'Goldman Sachs')"
+          },
+          "alternative_phrasings": [
+            "List the {role_plural} of {organization}.",
+            "Name the {role_plural} associated with {organization}.",
+            "Who works as {role_plural} for {organization}?"
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "complete_enumeration",
+            "completeness_criteria": "All persons with specified role should be listed"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.6, 0.8],
+            "reasoning_hops": 1,
+            "indirection_level": "direct"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?person WHERE { ?person wdt:P108 wd:{org_qid} . }",
+            "answerability_criteria": "Organization name appears in member biographies",
+            "failure_modes": ["organization_name_variant", "role_definition_unclear", "temporal_ambiguity"]
+          }
+        }
+      ],
+      "medium": [
+        {
+          "template_id": "organizational_medium_outcomes",
+          "cluster_type": "organizational",
+          "difficulty": "medium",
+          "k_range": {"min": 5, "max": 20},
+          "pattern": "What {outcome_plural} have {role_plural} from {organization} achieved?",
+          "slots": {
+            "outcome_plural": "Outcome type (e.g., 'companies founded', 'awards won', 'discoveries')",
+            "role_plural": "Role type",
+            "organization": "Organization name"
+          },
+          "alternative_phrasings": [
+            "Which {outcome_plural} are associated with {role_plural} from {organization}?",
+            "List the {outcome_plural} by {organization} {role_plural}."
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "entity_outcome_pairs",
+            "completeness_criteria": "Major outcomes for each member should be included"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.3, 0.5],
+            "reasoning_hops": 2,
+            "indirection_level": "descriptive"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?person ?outcome WHERE { ?person wdt:P108 wd:{org_qid} . ?person {outcome_property} ?outcome . }",
+            "answerability_criteria": "Outcomes must be mentioned in member passages",
+            "failure_modes": ["outcome_not_documented", "attribution_unclear", "temporal_mismatch"]
+          }
+        }
+      ],
+      "hard": [
+        {
+          "template_id": "organizational_hard_influence",
+          "cluster_type": "organizational",
+          "difficulty": "hard",
+          "k_range": {"min": 5, "max": 15},
+          "pattern": "How has {organization} influenced {domain} through its {role_plural}?",
+          "slots": {
+            "organization": "Organization name",
+            "domain": "Field or domain (e.g., 'computing', 'physics', 'finance')",
+            "role_plural": "Role type"
+          },
+          "alternative_phrasings": [
+            "What impact have {organization}'s {role_plural} had on {domain}?",
+            "Trace the influence of {organization} on {domain} via its {role_plural}."
+          ],
+          "answer_spec": {
+            "type": "narrative",
+            "aggregation_method": "evidence_synthesis",
+            "completeness_criteria": "Multiple evidence points from different members"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.1, 0.3],
+            "reasoning_hops": 4,
+            "indirection_level": "implicit"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?person ?contribution WHERE { ?person wdt:P108 wd:{org_qid} . ?person wdt:P101 wd:{domain_qid} . }",
+            "answerability_criteria": "Domain contributions documented in passages",
+            "failure_modes": ["influence_too_abstract", "insufficient_evidence", "domain_scope_unclear"]
+          }
+        }
+      ]
+    },
+
+    "event_temporal": {
+      "easy": [
+        {
+          "template_id": "event_temporal_easy_events",
+          "cluster_type": "event_temporal",
+          "difficulty": "easy",
+          "k_range": {"min": 5, "max": 25},
+          "pattern": "What {event_type_plural} occurred in {time_period}?",
+          "slots": {
+            "event_type_plural": "Type of events (e.g., 'major tech acquisitions', 'Olympic gold medals')",
+            "time_period": "Time specification (e.g., '2020', 'Q1 2021', 'the 1990s')"
+          },
+          "alternative_phrasings": [
+            "List the {event_type_plural} from {time_period}.",
+            "Which {event_type_plural} happened during {time_period}?",
+            "Name all {event_type_plural} in {time_period}."
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "complete_enumeration",
+            "completeness_criteria": "All events of specified type in period"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.6, 0.8],
+            "reasoning_hops": 1,
+            "indirection_level": "direct"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?event WHERE { ?event wdt:P31 wd:{event_type} . ?event wdt:P585 ?date . FILTER(YEAR(?date) >= {year_start}) }",
+            "answerability_criteria": "Events and dates appear in relevant passages",
+            "failure_modes": ["event_type_ambiguous", "temporal_boundary_unclear", "incomplete_event_list"]
+          }
+        }
+      ],
+      "medium": [
+        {
+          "template_id": "event_temporal_medium_participants",
+          "cluster_type": "event_temporal",
+          "difficulty": "medium",
+          "k_range": {"min": 5, "max": 20},
+          "pattern": "Who were the key {participant_type_plural} in {event_type_plural} during {time_period}?",
+          "slots": {
+            "participant_type_plural": "Participant type (e.g., 'figures', 'athletes', 'negotiators')",
+            "event_type_plural": "Event type",
+            "time_period": "Time specification"
+          },
+          "alternative_phrasings": [
+            "List the main {participant_type_plural} involved in {event_type_plural} in {time_period}.",
+            "Which {participant_type_plural} played key roles in {event_type_plural} during {time_period}?"
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "person_role_pairs",
+            "completeness_criteria": "Key participants with their roles identified"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.3, 0.5],
+            "reasoning_hops": 2,
+            "indirection_level": "descriptive"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?person ?event WHERE { ?person wdt:P1344 ?event . ?event wdt:P31 wd:{event_type} . ?event wdt:P585 ?date . }",
+            "answerability_criteria": "Participants documented with event context",
+            "failure_modes": ["role_not_specified", "key_participant_undefined", "event_scope_unclear"]
+          }
+        }
+      ],
+      "hard": [
+        {
+          "template_id": "event_temporal_hard_causal",
+          "cluster_type": "event_temporal",
+          "difficulty": "hard",
+          "k_range": {"min": 5, "max": 15},
+          "pattern": "What {event_type_plural} led to and resulted from {specific_event}?",
+          "slots": {
+            "event_type_plural": "Type of related events",
+            "specific_event": "Specific event name (e.g., 'Brexit', 'the 2008 financial crisis')"
+          },
+          "alternative_phrasings": [
+            "Trace the causes and consequences of {specific_event} in terms of {event_type_plural}.",
+            "What {event_type_plural} are causally linked to {specific_event}?"
+          ],
+          "answer_spec": {
+            "type": "narrative",
+            "aggregation_method": "causal_chain",
+            "completeness_criteria": "Both causes and effects identified with evidence"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.1, 0.3],
+            "reasoning_hops": 4,
+            "indirection_level": "implicit"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?event ?relation WHERE { { ?event wdt:P1542 wd:{event_qid} } UNION { wd:{event_qid} wdt:P1542 ?event } }",
+            "answerability_criteria": "Causal relationships documented in passages",
+            "failure_modes": ["causality_not_explicit", "chain_too_long", "event_interpretation_varies"]
+          }
+        }
+      ]
+    },
+
+    "geographic_spatial": {
+      "easy": [
+        {
+          "template_id": "geographic_spatial_easy_location",
+          "cluster_type": "geographic_spatial",
+          "difficulty": "easy",
+          "k_range": {"min": 5, "max": 25},
+          "pattern": "What {entity_type_plural} are located in {geographic_region}?",
+          "slots": {
+            "entity_type_plural": "Entity type (e.g., 'national parks', 'universities', 'UNESCO sites')",
+            "geographic_region": "Region (e.g., 'the American Southwest', 'Japan', 'California')"
+          },
+          "alternative_phrasings": [
+            "List the {entity_type_plural} in {geographic_region}.",
+            "Which {entity_type_plural} can be found in {geographic_region}?",
+            "Name all {entity_type_plural} located within {geographic_region}."
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "complete_enumeration",
+            "completeness_criteria": "All entities of type in region"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.6, 0.8],
+            "reasoning_hops": 1,
+            "indirection_level": "direct"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?entity WHERE { ?entity wdt:P31 wd:{entity_type} . ?entity wdt:P131*/wdt:P17 wd:{region_qid} . }",
+            "answerability_criteria": "Location appears in entity passages",
+            "failure_modes": ["region_boundary_ambiguous", "entity_type_mismatch", "location_not_explicit"]
+          }
+        }
+      ],
+      "medium": [
+        {
+          "template_id": "geographic_spatial_medium_comparison",
+          "cluster_type": "geographic_spatial",
+          "difficulty": "medium",
+          "k_range": {"min": 5, "max": 15},
+          "pattern": "How do {entity_type_plural} in {region_1} compare to those in {region_2} in terms of {attribute}?",
+          "slots": {
+            "entity_type_plural": "Entity type",
+            "region_1": "First region",
+            "region_2": "Second region",
+            "attribute": "Comparison attribute (e.g., 'size', 'founding date', 'population')"
+          },
+          "alternative_phrasings": [
+            "Compare the {attribute} of {entity_type_plural} between {region_1} and {region_2}.",
+            "What differences exist in {attribute} for {entity_type_plural} in {region_1} vs {region_2}?"
+          ],
+          "answer_spec": {
+            "type": "comparison",
+            "aggregation_method": "regional_comparison",
+            "completeness_criteria": "Entities from both regions with attribute values"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.3, 0.5],
+            "reasoning_hops": 2,
+            "indirection_level": "descriptive"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?entity ?region ?attr WHERE { ?entity wdt:P31 wd:{entity_type} . { ?entity wdt:P17 wd:{region1} BIND('{region1}' AS ?region) } UNION { ?entity wdt:P17 wd:{region2} BIND('{region2}' AS ?region) } ?entity {attr_property} ?attr . }",
+            "answerability_criteria": "Attribute values available for comparison",
+            "failure_modes": ["incomparable_attributes", "unbalanced_coverage", "attribute_not_in_passages"]
+          }
+        }
+      ],
+      "hard": [
+        {
+          "template_id": "geographic_spatial_hard_spatial",
+          "cluster_type": "geographic_spatial",
+          "difficulty": "hard",
+          "k_range": {"min": 5, "max": 12},
+          "pattern": "What {entity_type_plural} are within {distance_or_relationship} of {anchor_location} and share {attribute}?",
+          "slots": {
+            "entity_type_plural": "Entity type",
+            "distance_or_relationship": "Spatial constraint (e.g., '500km', 'the same region as')",
+            "anchor_location": "Reference location",
+            "attribute": "Shared attribute (e.g., 'populations over 1 million')"
+          },
+          "alternative_phrasings": [
+            "List {entity_type_plural} near {anchor_location} with {attribute}.",
+            "Which {entity_type_plural} {distance_or_relationship} {anchor_location} have {attribute}?"
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "filtered_enumeration",
+            "completeness_criteria": "All entities meeting spatial and attribute criteria"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.1, 0.3],
+            "reasoning_hops": 3,
+            "indirection_level": "implicit"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?entity WHERE { ?entity wdt:P31 wd:{entity_type} . ?entity wdt:P625 ?coords . SERVICE wikibase:around { ... } ?entity {attr_property} ?attrValue . FILTER(?attrValue {attr_constraint}) }",
+            "answerability_criteria": "Spatial and attribute info in passages",
+            "failure_modes": ["distance_not_verifiable", "attribute_threshold_unclear", "spatial_info_missing"]
+          }
+        }
+      ]
+    },
+
+    "relational": {
+      "easy": [
+        {
+          "template_id": "relational_easy_direct",
+          "cluster_type": "relational",
+          "difficulty": "easy",
+          "k_range": {"min": 3, "max": 15},
+          "pattern": "What {entity_type_plural} did {anchor_entity} {relationship_verb}?",
+          "slots": {
+            "entity_type_plural": "Entity type (e.g., 'companies', 'films', 'books')",
+            "anchor_entity": "Person or organization name",
+            "relationship_verb": "Relationship (e.g., 'found', 'direct', 'write')"
+          },
+          "alternative_phrasings": [
+            "List the {entity_type_plural} that {anchor_entity} {relationship_verb}.",
+            "Which {entity_type_plural} were {relationship_verb_past} by {anchor_entity}?",
+            "Name all {entity_type_plural} associated with {anchor_entity} as {relationship_role}."
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "complete_enumeration",
+            "completeness_criteria": "All entities with specified relationship"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.7, 0.9],
+            "reasoning_hops": 1,
+            "indirection_level": "direct"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?entity WHERE { ?entity {relationship_property} wd:{anchor_qid} . }",
+            "answerability_criteria": "Anchor entity and relationship appear in passages",
+            "failure_modes": ["anchor_name_variant", "relationship_incomplete", "entity_type_mismatch"]
+          }
+        }
+      ],
+      "medium": [
+        {
+          "template_id": "relational_medium_attributes",
+          "cluster_type": "relational",
+          "difficulty": "medium",
+          "k_range": {"min": 3, "max": 12},
+          "pattern": "What are the {attribute_plural} of {entity_type_plural} that {anchor_entity} {relationship_verb}?",
+          "slots": {
+            "attribute_plural": "Attribute (e.g., 'valuations', 'release dates', 'genres')",
+            "entity_type_plural": "Entity type",
+            "anchor_entity": "Person or organization",
+            "relationship_verb": "Relationship"
+          },
+          "alternative_phrasings": [
+            "List the {attribute_plural} for {entity_type_plural} {relationship_verb_past} by {anchor_entity}.",
+            "What {attribute_plural} do {anchor_entity}'s {entity_type_plural} have?"
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "entity_attribute_pairs",
+            "completeness_criteria": "Attribute for each related entity"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.3, 0.5],
+            "reasoning_hops": 2,
+            "indirection_level": "descriptive"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?entity ?attr WHERE { ?entity {relationship_property} wd:{anchor_qid} . ?entity {attr_property} ?attr . }",
+            "answerability_criteria": "Attributes documented in related entity passages",
+            "failure_modes": ["attribute_not_available", "partial_coverage", "attribute_type_mismatch"]
+          }
+        }
+      ],
+      "hard": [
+        {
+          "template_id": "relational_hard_extended",
+          "cluster_type": "relational",
+          "difficulty": "hard",
+          "k_range": {"min": 3, "max": 10},
+          "pattern": "Who are the {secondary_relation_plural} of {entity_type_plural} that {anchor_entity} {relationship_verb}?",
+          "slots": {
+            "secondary_relation_plural": "Second-order relation (e.g., 'co-founders', 'other directors', 'collaborators')",
+            "entity_type_plural": "Entity type",
+            "anchor_entity": "Person or organization",
+            "relationship_verb": "Primary relationship"
+          },
+          "alternative_phrasings": [
+            "List {secondary_relation_plural} from {entity_type_plural} connected to {anchor_entity}.",
+            "Who else is involved with {entity_type_plural} that {anchor_entity} {relationship_verb}?"
+          ],
+          "answer_spec": {
+            "type": "list",
+            "aggregation_method": "extended_network",
+            "completeness_criteria": "Second-order relations identified for each entity"
+          },
+          "difficulty_params": {
+            "lexical_overlap_target": [0.1, 0.3],
+            "reasoning_hops": 3,
+            "indirection_level": "implicit"
+          },
+          "validation": {
+            "sparql_pattern": "SELECT ?person ?entity WHERE { ?entity {relationship_property} wd:{anchor_qid} . ?entity {secondary_property} ?person . FILTER(?person != wd:{anchor_qid}) }",
+            "answerability_criteria": "Secondary relations documented in passages",
+            "failure_modes": ["secondary_relation_missing", "network_too_sparse", "attribution_unclear"]
+          }
+        }
+      ]
+    }
+  },
+
+  "slot_value_guidelines": {
+    "entity_type_plural": {
+      "description": "Use natural plural forms matching Wikipedia article titles",
+      "examples": ["countries", "companies", "films", "scientists", "universities"]
+    },
+    "constraint_description": {
+      "description": "Natural language description matching Wikidata property-value pairs",
+      "examples": ["have hosted the Summer Olympics", "are members of the EU", "were founded before 1900"]
+    },
+    "attribute_plural": {
+      "description": "Attributes that appear in Wikipedia articles",
+      "examples": ["founding dates", "populations", "headquarters locations", "nationalities"]
+    },
+    "time_period": {
+      "description": "Specific years, ranges, or natural time expressions",
+      "examples": ["2021", "2010-2020", "the 1990s", "the 21st century"]
+    },
+    "work_title": {
+      "description": "Exact title of creative work as appears in Wikipedia",
+      "examples": ["The Godfather", "Inception", "Abbey Road"]
+    },
+    "organization": {
+      "description": "Organization name as appears in Wikipedia",
+      "examples": ["MIT", "Goldman Sachs", "Google", "the United Nations"]
+    },
+    "geographic_region": {
+      "description": "Named geographic area with clear boundaries",
+      "examples": ["California", "Japan", "the European Union", "Southeast Asia"]
+    }
+  }
+}

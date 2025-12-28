@@ -1,0 +1,304 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Property viability criteria for cross-entity cluster formation",
+    "purpose": "Define thresholds and rules for selecting Wikidata properties that form well-bounded clusters"
+  },
+
+  "cardinality_criteria": {
+    "description": "Rules for acceptable cluster sizes based on entity count",
+    "absolute_bounds": {
+      "minimum_entities": 3,
+      "maximum_entities": 100,
+      "rationale": "Below 3 entities lacks cluster utility; above 100 becomes unwieldy for variable-K queries"
+    },
+    "optimal_ranges": {
+      "small_cluster": {
+        "range": [3, 10],
+        "description": "Exhaustive enumeration possible",
+        "target_k_values": [3, 5, 7, 10],
+        "query_suitability": ["complete_enumeration", "comprehensive_comparison"]
+      },
+      "medium_cluster": {
+        "range": [11, 30],
+        "description": "Partial enumeration with filtering",
+        "target_k_values": [5, 7, 10, 15],
+        "query_suitability": ["filtered_enumeration", "attribute_aggregation", "subset_comparison"]
+      },
+      "large_cluster": {
+        "range": [31, 100],
+        "description": "Representative sampling required",
+        "target_k_values": [10, 15, 20],
+        "query_suitability": ["statistical_queries", "extreme_finding", "pattern_identification"]
+      }
+    },
+    "constraint_adjustment_rules": {
+      "description": "How to adjust constraints when cluster size is out of range",
+      "too_large": [
+        "Add temporal constraint (decade/year)",
+        "Add geographic constraint (country/region)",
+        "Add categorical constraint (subtype)",
+        "Add threshold constraint (top N by metric)"
+      ],
+      "too_small": [
+        "Relax temporal constraint (expand date range)",
+        "Relax geographic constraint (country -> continent)",
+        "Use broader category (subtype -> parent type)",
+        "Combine related properties"
+      ]
+    }
+  },
+
+  "wikipedia_coverage_criteria": {
+    "description": "Requirements for Wikipedia article availability and quality",
+    "minimum_coverage_threshold": {
+      "percentage": 80,
+      "rationale": "At least 80% of cluster entities must have English Wikipedia articles"
+    },
+    "article_quality_requirements": {
+      "minimum_length_chars": 2000,
+      "minimum_sections": 2,
+      "rationale": "Articles need sufficient content for meaningful passage extraction"
+    },
+    "passage_extraction_targets": {
+      "minimum_passages_per_entity": 3,
+      "target_passages_per_entity": 8,
+      "maximum_passages_per_entity": 20,
+      "passage_length_range": [200, 1000]
+    },
+    "coverage_scoring": {
+      "full_coverage": {
+        "threshold": 95,
+        "score": 1.0,
+        "description": "Nearly all entities have quality Wikipedia articles"
+      },
+      "high_coverage": {
+        "threshold": 85,
+        "score": 0.8,
+        "description": "Most entities have quality Wikipedia articles"
+      },
+      "acceptable_coverage": {
+        "threshold": 75,
+        "score": 0.6,
+        "description": "Majority of entities have Wikipedia articles"
+      },
+      "marginal_coverage": {
+        "threshold": 60,
+        "score": 0.3,
+        "description": "Significant gaps in Wikipedia coverage"
+      },
+      "insufficient_coverage": {
+        "threshold": 0,
+        "score": 0.0,
+        "description": "Too many entities lack Wikipedia articles"
+      }
+    }
+  },
+
+  "temporal_stability_criteria": {
+    "description": "How stable property values are over time, affecting query temporal anchoring",
+    "stability_classes": {
+      "permanent": {
+        "description": "Property values never change once set",
+        "examples": ["birthplace", "birth date", "country of citizenship at birth", "Nobel Prize year"],
+        "temporal_anchoring": "none_required",
+        "score": 1.0
+      },
+      "epoch_stable": {
+        "description": "Property values stable within defined historical periods",
+        "examples": ["capital city", "head of state", "Olympic host city"],
+        "temporal_anchoring": "period_specification",
+        "score": 0.8
+      },
+      "slowly_changing": {
+        "description": "Property values change but remain stable for years",
+        "examples": ["employer", "team membership", "CEO of company"],
+        "temporal_anchoring": "as_of_date",
+        "score": 0.6
+      },
+      "frequently_changing": {
+        "description": "Property values change often (monthly/yearly)",
+        "examples": ["stock price", "population", "current ranking"],
+        "temporal_anchoring": "precise_date_required",
+        "score": 0.3
+      },
+      "volatile": {
+        "description": "Property values change unpredictably or continuously",
+        "examples": ["current location", "social media followers"],
+        "temporal_anchoring": "avoid_or_snapshot",
+        "score": 0.1
+      }
+    },
+    "cluster_stability_rules": {
+      "description": "Rules for cluster membership stability",
+      "static_membership": {
+        "description": "Cluster members never change (e.g., Nobel winners in a specific year)",
+        "suitability": "ideal",
+        "score": 1.0
+      },
+      "additive_only": {
+        "description": "New members can be added but existing members never leave",
+        "suitability": "good",
+        "score": 0.8
+      },
+      "bounded_churn": {
+        "description": "Membership changes but within predictable bounds",
+        "suitability": "acceptable",
+        "score": 0.5
+      },
+      "high_churn": {
+        "description": "Membership changes frequently",
+        "suitability": "problematic",
+        "score": 0.2
+      }
+    }
+  },
+
+  "query_naturalness_criteria": {
+    "description": "How naturally questions can be formed about the property/cluster",
+    "question_patterns": {
+      "enumeration": {
+        "template": "Who/What are all the [entities] that [property condition]?",
+        "example": "Who are all the Nobel Prize winners in Physics from 2010-2020?",
+        "naturalness_indicators": ["bounded set", "clear membership criteria", "interesting to enumerate"]
+      },
+      "attribute_collection": {
+        "template": "What are the [attributes] of all [entities] in [cluster]?",
+        "example": "What are the birth countries of all actors in The Godfather?",
+        "naturalness_indicators": ["shared context", "comparable attributes", "aggregatable"]
+      },
+      "comparison": {
+        "template": "How do [entities] compare in terms of [attribute]?",
+        "example": "How do EU countries compare in terms of GDP per capita?",
+        "naturalness_indicators": ["same type entities", "quantifiable attributes", "meaningful comparison"]
+      },
+      "aggregation": {
+        "template": "What is the [aggregate] of [attribute] across [cluster]?",
+        "example": "What is the total population of Scandinavian countries?",
+        "naturalness_indicators": ["numeric attributes", "logical grouping", "meaningful aggregate"]
+      },
+      "subset_identification": {
+        "template": "Which [entities] in [cluster] have [specific property]?",
+        "example": "Which Fortune 500 companies are headquartered in California?",
+        "naturalness_indicators": ["filterable criteria", "interesting subset", "non-trivial answer"]
+      }
+    },
+    "naturalness_scoring": {
+      "highly_natural": {
+        "score": 1.0,
+        "criteria": [
+          "Questions feel like something a human would actually ask",
+          "Clear real-world motivation for the query",
+          "Answer provides genuine insight or utility"
+        ]
+      },
+      "moderately_natural": {
+        "score": 0.7,
+        "criteria": [
+          "Questions are reasonable but somewhat contrived",
+          "Would appear in educational or research contexts",
+          "Answer is informative but not urgently needed"
+        ]
+      },
+      "weakly_natural": {
+        "score": 0.4,
+        "criteria": [
+          "Questions feel artificial or forced",
+          "Limited real-world motivation",
+          "Answer is technically correct but not particularly useful"
+        ]
+      },
+      "unnatural": {
+        "score": 0.1,
+        "criteria": [
+          "Questions seem arbitrary or nonsensical",
+          "No clear motivation for asking",
+          "Answer provides no meaningful insight"
+        ]
+      }
+    }
+  },
+
+  "composite_viability_score": {
+    "description": "How to combine individual criteria into overall viability score",
+    "weights": {
+      "cardinality": 0.25,
+      "wikipedia_coverage": 0.30,
+      "temporal_stability": 0.20,
+      "query_naturalness": 0.25
+    },
+    "thresholds": {
+      "highly_viable": {
+        "minimum_score": 0.8,
+        "recommendation": "Priority inclusion in dataset"
+      },
+      "viable": {
+        "minimum_score": 0.6,
+        "recommendation": "Include with minor adjustments"
+      },
+      "marginally_viable": {
+        "minimum_score": 0.4,
+        "recommendation": "Include only if needed for coverage"
+      },
+      "not_viable": {
+        "minimum_score": 0.0,
+        "recommendation": "Exclude from dataset"
+      }
+    },
+    "calculation": "weighted_sum(cardinality_score, coverage_score, stability_score, naturalness_score)"
+  },
+
+  "property_exclusion_rules": {
+    "description": "Properties that should be excluded regardless of scores",
+    "automatic_exclusions": [
+      {
+        "rule": "deprecated_properties",
+        "description": "Properties marked as deprecated in Wikidata"
+      },
+      {
+        "rule": "external_identifiers",
+        "description": "Properties that are just IDs in external databases (VIAF, ISNI, etc.)"
+      },
+      {
+        "rule": "media_properties",
+        "description": "Properties pointing to images, audio, or video files"
+      },
+      {
+        "rule": "internal_wikidata",
+        "description": "Properties for Wikidata internal use (constraint violations, etc.)"
+      },
+      {
+        "rule": "url_properties",
+        "description": "Properties containing only URLs"
+      }
+    ],
+    "conditional_exclusions": [
+      {
+        "rule": "low_usage",
+        "condition": "fewer than 1000 entities have this property",
+        "exception": "unless specifically curated for niche domains"
+      },
+      {
+        "rule": "ambiguous_semantics",
+        "condition": "property meaning varies significantly across entity types",
+        "exception": "unless filtered to single entity type"
+      }
+    ]
+  },
+
+  "sparql_validation_queries": {
+    "description": "SPARQL query templates for validating viability criteria",
+    "cardinality_check": {
+      "template": "SELECT (COUNT(DISTINCT ?entity) AS ?count) WHERE { ?entity wdt:P31 wd:$TYPE . ?entity wdt:$PROPERTY ?value . $CONSTRAINTS }",
+      "purpose": "Count entities matching property constraints"
+    },
+    "wikipedia_coverage_check": {
+      "template": "SELECT (COUNT(DISTINCT ?entity) AS ?with_wiki) WHERE { ?entity wdt:P31 wd:$TYPE . ?entity wdt:$PROPERTY ?value . ?article schema:about ?entity . ?article schema:isPartOf <https://en.wikipedia.org/> . $CONSTRAINTS }",
+      "purpose": "Count entities with English Wikipedia articles"
+    },
+    "temporal_distribution_check": {
+      "template": "SELECT ?year (COUNT(DISTINCT ?entity) AS ?count) WHERE { ?entity wdt:P31 wd:$TYPE . ?entity wdt:$PROPERTY ?value . ?entity wdt:$TIME_PROP ?time . BIND(YEAR(?time) AS ?year) } GROUP BY ?year ORDER BY ?year",
+      "purpose": "Check temporal distribution of entities"
+    }
+  }
+}

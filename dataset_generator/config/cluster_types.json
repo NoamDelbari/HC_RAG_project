@@ -1,0 +1,365 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Wikidata property categories for cross-entity cluster formation",
+    "purpose": "Define property taxonomies that create bounded entity clusters suitable for variable-K queries"
+  },
+
+  "cluster_types": {
+    "categorical": {
+      "description": "Entities sharing a common instance-of type plus constraining properties",
+      "typical_k_range": [5, 20],
+      "query_strengths": ["enumeration", "attribute_collection", "aggregation"],
+      "binding_pattern": "P31 (instance of) + filter properties",
+      "primary_properties": {
+        "P31": {
+          "label": "instance of",
+          "role": "type_filter",
+          "description": "Defines entity type (human, city, company, etc.)"
+        },
+        "P17": {
+          "label": "country",
+          "role": "geographic_constraint",
+          "description": "Filters by country"
+        },
+        "P27": {
+          "label": "country of citizenship",
+          "role": "nationality_constraint",
+          "description": "Filters people by nationality"
+        },
+        "P106": {
+          "label": "occupation",
+          "role": "occupation_constraint",
+          "description": "Filters people by profession"
+        },
+        "P101": {
+          "label": "field of work",
+          "role": "field_constraint",
+          "description": "Filters by academic/professional field"
+        }
+      },
+      "example_clusters": [
+        "European countries with population > 50 million",
+        "Female physicists from Germany",
+        "Fortune 500 companies headquartered in California"
+      ],
+      "constraint_types": ["geographic", "temporal", "threshold", "categorical"]
+    },
+
+    "creative_ensemble": {
+      "description": "Entities connected through participation in a shared creative work",
+      "typical_k_range": [5, 30],
+      "query_strengths": ["enumeration", "biographical_cross_reference", "career_comparison"],
+      "binding_pattern": "Creative work participation properties",
+      "primary_properties": {
+        "P161": {
+          "label": "cast member",
+          "role": "participation",
+          "description": "Actors in a film/TV show",
+          "inverse": "P1283 (filmography)"
+        },
+        "P175": {
+          "label": "performer",
+          "role": "participation",
+          "description": "Musicians on an album or at an event"
+        },
+        "P57": {
+          "label": "director",
+          "role": "creative_lead",
+          "description": "Director of a film"
+        },
+        "P86": {
+          "label": "composer",
+          "role": "creative_lead",
+          "description": "Composer of a musical work"
+        },
+        "P162": {
+          "label": "producer",
+          "role": "production",
+          "description": "Producer of a work"
+        },
+        "P58": {
+          "label": "screenwriter",
+          "role": "creative_lead",
+          "description": "Writer of a screenplay"
+        },
+        "P50": {
+          "label": "author",
+          "role": "creative_lead",
+          "description": "Author of a written work"
+        }
+      },
+      "anchor_entity_types": [
+        "Q11424 (film)",
+        "Q5398426 (television series)",
+        "Q482994 (album)",
+        "Q7725634 (literary work)"
+      ],
+      "example_clusters": [
+        "Cast of Inception",
+        "Musicians who performed at Woodstock",
+        "Writers for The Simpsons"
+      ],
+      "constraint_types": ["role_filter", "billing_order"]
+    },
+
+    "award_recognition": {
+      "description": "Entities sharing receipt of a specific award, optionally constrained by time",
+      "typical_k_range": [3, 15],
+      "query_strengths": ["laureate_enumeration", "achievement_comparison", "institutional_analysis"],
+      "binding_pattern": "P166 (award received) with temporal qualifiers",
+      "primary_properties": {
+        "P166": {
+          "label": "award received",
+          "role": "award_binding",
+          "description": "Award or honor received by entity",
+          "qualifiers": ["P585 (point in time)", "P580 (start time)"]
+        },
+        "P1411": {
+          "label": "nominated for",
+          "role": "nomination_binding",
+          "description": "Award nomination (broader than winners)"
+        }
+      },
+      "notable_awards": {
+        "Q7191": "Nobel Prize",
+        "Q19020": "Academy Award",
+        "Q41254": "Grammy Award",
+        "Q102427": "Pulitzer Prize",
+        "Q80061": "Turing Award",
+        "Q28835": "Fields Medal",
+        "Q35637": "Booker Prize",
+        "Q170509": "Emmy Award"
+      },
+      "example_clusters": [
+        "Nobel Prize in Physics winners 2010-2020",
+        "Academy Award Best Picture nominees 2019",
+        "Pulitzer Prize winners for Fiction"
+      ],
+      "constraint_types": ["temporal", "award_category", "award_year"]
+    },
+
+    "organizational": {
+      "description": "Entities sharing affiliation with a specific institution",
+      "typical_k_range": [5, 50],
+      "query_strengths": ["member_enumeration", "career_trajectory", "institutional_comparison"],
+      "binding_pattern": "Affiliation properties (employer, educated at, member of)",
+      "primary_properties": {
+        "P108": {
+          "label": "employer",
+          "role": "employment",
+          "description": "Organization that employs the person",
+          "qualifiers": ["P580 (start time)", "P582 (end time)", "P512 (academic degree)"]
+        },
+        "P69": {
+          "label": "educated at",
+          "role": "education",
+          "description": "Educational institution attended"
+        },
+        "P463": {
+          "label": "member of",
+          "role": "membership",
+          "description": "Organization membership"
+        },
+        "P102": {
+          "label": "member of political party",
+          "role": "political_affiliation",
+          "description": "Political party membership"
+        },
+        "P54": {
+          "label": "member of sports team",
+          "role": "team_membership",
+          "description": "Sports team affiliation"
+        }
+      },
+      "anchor_entity_types": [
+        "Q3918 (university)",
+        "Q4830453 (business enterprise)",
+        "Q7278 (political party)",
+        "Q476028 (sports team)"
+      ],
+      "example_clusters": [
+        "MIT faculty in Physics department",
+        "Former Goldman Sachs partners",
+        "Members of the French Academy"
+      ],
+      "constraint_types": ["temporal", "role_filter", "department"]
+    },
+
+    "event_temporal": {
+      "description": "Entities connected through participation in time-bounded events",
+      "typical_k_range": [5, 30],
+      "query_strengths": ["event_enumeration", "participant_details", "causal_chain"],
+      "binding_pattern": "Temporal properties with event type filters",
+      "primary_properties": {
+        "P585": {
+          "label": "point in time",
+          "role": "temporal_anchor",
+          "description": "Specific date of event"
+        },
+        "P580": {
+          "label": "start time",
+          "role": "temporal_start",
+          "description": "When something began"
+        },
+        "P582": {
+          "label": "end time",
+          "role": "temporal_end",
+          "description": "When something ended"
+        },
+        "P1344": {
+          "label": "participant in",
+          "role": "event_participation",
+          "description": "Event the entity participated in"
+        },
+        "P793": {
+          "label": "significant event",
+          "role": "event_association",
+          "description": "Significant event in entity's history"
+        }
+      },
+      "event_types": {
+        "Q82955": "politician (for elections)",
+        "Q5389": "Summer Olympics",
+        "Q9448": "Winter Olympics",
+        "Q1412891": "stock market crash",
+        "Q178561": "battle"
+      },
+      "example_clusters": [
+        "Companies that IPO'd in Q1 2021",
+        "Athletes at Tokyo 2020 Olympics",
+        "Political leaders who took office in 2020"
+      ],
+      "constraint_types": ["temporal_range", "event_type", "outcome_filter"]
+    },
+
+    "geographic_spatial": {
+      "description": "Entities sharing location within a defined geographic boundary",
+      "typical_k_range": [5, 25],
+      "query_strengths": ["location_enumeration", "regional_comparison", "spatial_analysis"],
+      "binding_pattern": "Location properties with geographic filters",
+      "primary_properties": {
+        "P131": {
+          "label": "located in administrative entity",
+          "role": "administrative_location",
+          "description": "Administrative region containing the entity"
+        },
+        "P17": {
+          "label": "country",
+          "role": "country_location",
+          "description": "Country where entity is located"
+        },
+        "P625": {
+          "label": "coordinate location",
+          "role": "spatial_coordinates",
+          "description": "Geographic coordinates"
+        },
+        "P30": {
+          "label": "continent",
+          "role": "continental_location",
+          "description": "Continent where entity is located"
+        },
+        "P36": {
+          "label": "capital",
+          "role": "capital_relationship",
+          "description": "Capital city relationship"
+        }
+      },
+      "geographic_scopes": {
+        "Q5107": "continent",
+        "Q6256": "country",
+        "Q10864048": "first-level administrative region",
+        "Q515": "city"
+      },
+      "example_clusters": [
+        "National parks in California",
+        "Capital cities of EU member states",
+        "UNESCO World Heritage sites in Japan"
+      ],
+      "constraint_types": ["boundary", "distance", "administrative_level"]
+    },
+
+    "relational": {
+      "description": "Entities connected through direct relationships to a single anchor entity",
+      "typical_k_range": [3, 15],
+      "query_strengths": ["portfolio_enumeration", "influence_mapping", "legacy_analysis"],
+      "binding_pattern": "Direct relationship to anchor entity",
+      "primary_properties": {
+        "P112": {
+          "label": "founded by",
+          "role": "founder_relationship",
+          "description": "Person who founded organization"
+        },
+        "P169": {
+          "label": "chief executive officer",
+          "role": "leadership",
+          "description": "CEO of organization"
+        },
+        "P22": {
+          "label": "father",
+          "role": "family",
+          "description": "Father of person"
+        },
+        "P25": {
+          "label": "mother",
+          "role": "family",
+          "description": "Mother of person"
+        },
+        "P40": {
+          "label": "child",
+          "role": "family",
+          "description": "Child of person"
+        },
+        "P26": {
+          "label": "spouse",
+          "role": "family",
+          "description": "Spouse of person"
+        },
+        "P184": {
+          "label": "doctoral advisor",
+          "role": "academic_lineage",
+          "description": "PhD supervisor"
+        },
+        "P185": {
+          "label": "doctoral student",
+          "role": "academic_lineage",
+          "description": "PhD students supervised"
+        }
+      },
+      "example_clusters": [
+        "Companies founded by Elon Musk",
+        "Films directed by Christopher Nolan",
+        "Doctoral students of Richard Feynman"
+      ],
+      "constraint_types": ["relationship_type", "temporal", "role_filter"]
+    }
+  },
+
+  "property_priority_rules": {
+    "description": "Rules for assigning clusters to types when multiple types apply",
+    "priority_order": [
+      "creative_ensemble",
+      "award_recognition",
+      "organizational",
+      "event_temporal",
+      "geographic_spatial",
+      "relational",
+      "categorical"
+    ],
+    "notes": "Assign based on primary binding relationship; categorical is the default"
+  },
+
+  "target_distribution": {
+    "description": "Target percentage of queries per cluster type in final dataset",
+    "total_queries": 280,
+    "distribution": {
+      "categorical": {"percentage": 20, "target_count": 56},
+      "creative_ensemble": {"percentage": 15, "target_count": 42},
+      "award_recognition": {"percentage": 15, "target_count": 42},
+      "organizational": {"percentage": 15, "target_count": 42},
+      "event_temporal": {"percentage": 15, "target_count": 42},
+      "geographic_spatial": {"percentage": 10, "target_count": 28},
+      "relational": {"percentage": 10, "target_count": 28}
+    }
+  }
+}

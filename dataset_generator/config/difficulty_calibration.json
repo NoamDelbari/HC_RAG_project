@@ -1,0 +1,412 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Difficulty calibration framework for cross-entity QA queries",
+    "phase": "B.3",
+    "purpose": "Establish precise criteria and mechanisms for achieving target difficulty levels"
+  },
+
+  "difficulty_dimensions": {
+    "description": "Three orthogonal dimensions that together determine query difficulty",
+
+    "lexical_overlap": {
+      "definition": "Surface-level word overlap between the query and relevant passages",
+      "measurement": "Jaccard similarity or BLEU score after stopword removal",
+      "scale": [0.0, 1.0],
+      "levels": {
+        "high": {
+          "range": [0.6, 1.0],
+          "description": "Query uses same terms that appear in passages",
+          "example": {
+            "query": "When was Barack Obama born?",
+            "passage_match": "Barack Obama was born in Honolulu, Hawaii, on August 4, 1961"
+          }
+        },
+        "medium": {
+          "range": [0.3, 0.6],
+          "description": "Query uses related terms or partial matches",
+          "example": {
+            "query": "When was the 44th President born?",
+            "passage_match": "Barack Obama, the 44th President, was born in 1961"
+          }
+        },
+        "low": {
+          "range": [0.0, 0.3],
+          "description": "Query uses semantically related but lexically distinct terms",
+          "example": {
+            "query": "When was the first African American president born?",
+            "passage_match": "Obama made history as the first Black president. He was born..."
+          }
+        }
+      },
+      "computation_method": {
+        "preprocessing": ["lowercase", "remove_stopwords", "lemmatize"],
+        "formula": "jaccard(query_tokens, passage_tokens)",
+        "aggregate_for_query": "mean across all relevant passages"
+      }
+    },
+
+    "reasoning_hops": {
+      "definition": "Number of inference steps required to connect query to answer",
+      "scale": [1, 5],
+      "levels": {
+        "one_hop": {
+          "count": 1,
+          "description": "Direct fact lookup",
+          "pattern": "Query asks for attribute X of entity Y; passage states 'Y's X is Z'",
+          "example": {
+            "query": "Who directed Inception?",
+            "passage": "Inception is a 2010 film directed by Christopher Nolan",
+            "reasoning": "Direct extraction: director = Christopher Nolan"
+          }
+        },
+        "two_hop": {
+          "count": 2,
+          "description": "Bridge inference through intermediate concept",
+          "pattern": "Query → Intermediate fact → Answer",
+          "example": {
+            "query": "What university did the director of Inception attend?",
+            "passage_1": "Inception was directed by Christopher Nolan",
+            "passage_2": "Nolan studied English literature at University College London",
+            "reasoning": "Hop 1: director = Nolan; Hop 2: Nolan's university = UCL"
+          }
+        },
+        "three_plus_hop": {
+          "count": [3, 5],
+          "description": "Chain inference across multiple facts/passages",
+          "pattern": "Query → Fact1 → Fact2 → ... → Answer",
+          "example": {
+            "query": "What awards have films by the British director known for nonlinear narratives won?",
+            "reasoning_chain": [
+              "British director with nonlinear narratives → Nolan",
+              "Films by Nolan → Inception, Dunkirk, Memento...",
+              "Awards for each film → compile list"
+            ]
+          }
+        }
+      },
+      "annotation_guidelines": {
+        "count_as_hop": [
+          "Entity resolution (description to name)",
+          "Attribute lookup",
+          "Relationship traversal",
+          "Set enumeration",
+          "Aggregation computation"
+        ],
+        "do_not_count": [
+          "Simple coreference resolution",
+          "Synonym recognition",
+          "Reading continuation within same sentence"
+        ]
+      }
+    },
+
+    "indirection_level": {
+      "definition": "How directly entities are referenced in the query",
+      "levels": {
+        "direct": {
+          "description": "Entities named explicitly by their canonical name",
+          "patterns": [
+            "Use full proper name",
+            "Use Wikipedia article title",
+            "Use common abbreviation (MIT, NASA)"
+          ],
+          "examples": [
+            "What films did Christopher Nolan direct?",
+            "List the Nobel Prize winners in Physics from 2020",
+            "Who are the cast members of The Godfather?"
+          ]
+        },
+        "descriptive": {
+          "description": "Entities described by distinguishing properties",
+          "patterns": [
+            "Use role or title",
+            "Use relationship to known entity",
+            "Use temporal/spatial description"
+          ],
+          "examples": [
+            "What films did the director of Inception make?",
+            "Who received the top physics prize in the year of COVID?",
+            "Who were the lead actors in Coppola's mafia epic?"
+          ]
+        },
+        "implicit": {
+          "description": "Entities implied by context or complex descriptions",
+          "patterns": [
+            "Use category membership requiring inference",
+            "Use multiple indirect attributes",
+            "Use analogies or comparisons"
+          ],
+          "examples": [
+            "What films did the British auteur known for mind-bending plots direct?",
+            "Who were honored by the Swedish academy for subatomic discoveries recently?",
+            "Who starred in the trilogy that redefined superhero cinema?"
+          ]
+        }
+      },
+      "measurement": {
+        "method": "count named entities vs descriptive phrases",
+        "named_entity_ratio": "named_entities / (named_entities + descriptive_references)"
+      }
+    }
+  },
+
+  "difficulty_levels": {
+    "easy": {
+      "lexical_overlap": {"target": [0.6, 0.8], "minimum": 0.5},
+      "reasoning_hops": {"target": 1, "maximum": 1},
+      "indirection_level": "direct",
+      "target_retrieval_success": {
+        "bm25_recall_at_10": [0.85, 0.95],
+        "description": "Basic retrieval should find relevant passages easily"
+      },
+      "characteristics": [
+        "Entity names appear exactly in query and passages",
+        "Single fact lookup required",
+        "Answer is explicitly stated in passage",
+        "Common question patterns (who/what/when/where)"
+      ],
+      "example": {
+        "query": "Who are the main actors in Inception?",
+        "relevant_passage": "Inception stars Leonardo DiCaprio, Joseph Gordon-Levitt, Ellen Page...",
+        "analysis": {
+          "lexical_overlap": 0.75,
+          "reasoning_hops": 1,
+          "indirection": "direct"
+        }
+      }
+    },
+
+    "medium": {
+      "lexical_overlap": {"target": [0.3, 0.5], "range": [0.25, 0.6]},
+      "reasoning_hops": {"target": 2, "range": [2, 2]},
+      "indirection_level": "descriptive",
+      "target_retrieval_success": {
+        "bm25_recall_at_10": [0.60, 0.80],
+        "description": "Retrieval requires some semantic matching"
+      },
+      "characteristics": [
+        "Entity references paraphrased or described",
+        "Answers require reading beyond lead paragraph",
+        "Some inference to connect query to passage",
+        "Combining information from multiple parts of passage"
+      ],
+      "example": {
+        "query": "What nationalities are the lead actors of Nolan's dream heist film?",
+        "relevant_passage": "Inception (2010) features DiCaprio (American), Tom Hardy (British)...",
+        "analysis": {
+          "lexical_overlap": 0.42,
+          "reasoning_hops": 2,
+          "indirection": "descriptive"
+        }
+      }
+    },
+
+    "hard": {
+      "lexical_overlap": {"target": [0.1, 0.3], "maximum": 0.35},
+      "reasoning_hops": {"target": [3, 4], "minimum": 3},
+      "indirection_level": "implicit",
+      "target_retrieval_success": {
+        "bm25_recall_at_10": [0.40, 0.60],
+        "description": "Retrieval requires advanced semantic understanding"
+      },
+      "characteristics": [
+        "Entities referenced indirectly requiring inference",
+        "Information synthesized across multiple passages",
+        "Domain-specific terminology not directly in passages",
+        "Questions framed as comparisons, aggregations, or analyses"
+      ],
+      "example": {
+        "query": "What other acclaimed science fiction films have the ensemble of the 2010 mind-bending thriller appeared in?",
+        "reasoning_required": [
+          "2010 mind-bending thriller → Inception",
+          "Ensemble of Inception → DiCaprio, Hardy, Page, etc.",
+          "For each: their other sci-fi films",
+          "Filter for 'acclaimed'"
+        ],
+        "analysis": {
+          "lexical_overlap": 0.18,
+          "reasoning_hops": 4,
+          "indirection": "implicit"
+        }
+      }
+    }
+  },
+
+  "achievement_strategies": {
+    "for_easy_queries": {
+      "lexical_overlap_techniques": [
+        "Use entity names exactly as they appear in Wikipedia article titles",
+        "Include distinctive terms that appear prominently in lead sections",
+        "Use common synonyms that Wikipedia articles also use",
+        "Mirror the phrasing patterns found in infoboxes"
+      ],
+      "reasoning_reduction": [
+        "Ask for single facts that appear in lead paragraphs",
+        "Target information in structured sections (Awards, Cast, Members)",
+        "Avoid requiring cross-paragraph inference",
+        "Frame as direct lookup (who/what/when/where)"
+      ],
+      "direct_reference_patterns": [
+        "Use full proper names: 'Christopher Nolan' not 'the director'",
+        "Use official titles: 'Nobel Prize in Physics' not 'top physics honor'",
+        "Use exact work titles: 'Inception' not 'the dream heist movie'"
+      ]
+    },
+
+    "for_medium_queries": {
+      "lexical_reduction_techniques": [
+        "Replace entity names with role descriptions",
+        "Use temporal/spatial descriptions instead of names",
+        "Paraphrase key terms using synonyms not in passages",
+        "Reference entities through relationships"
+      ],
+      "two_hop_patterns": [
+        "Ask for attribute of entity described by role",
+        "Request information requiring section navigation",
+        "Combine entity identification with attribute lookup",
+        "Use descriptive references requiring resolution"
+      ],
+      "descriptive_reference_patterns": [
+        "'the director of [known work]' instead of director name",
+        "'recipients of [award] in [year]' requiring date matching",
+        "'companies founded by [person]' requiring relationship traversal"
+      ]
+    },
+
+    "for_hard_queries": {
+      "lexical_minimization": [
+        "Use abstract category descriptions",
+        "Employ domain jargon not directly in passages",
+        "Reference entities through complex attribute combinations",
+        "Use figurative or evaluative language"
+      ],
+      "multi_hop_construction": [
+        "Chain: describe entity → identify → get attribute → aggregate",
+        "Fan-out: identify set → enumerate members → collect attributes for each",
+        "Comparison: identify two sets → get attributes → compare",
+        "Temporal: describe period → identify events → get participants → analyze"
+      ],
+      "implicit_reference_patterns": [
+        "'the British auteur known for nonlinear narratives'",
+        "'the tech giants of Silicon Valley'",
+        "'laureates honored for their work on the building blocks of matter'",
+        "'the ensemble that brought the caped crusader to screens'"
+      ]
+    }
+  },
+
+  "verification_protocol": {
+    "automated_checks": {
+      "lexical_overlap_computation": {
+        "method": "tokenize → remove stopwords → compute Jaccard similarity",
+        "implementation": "Use NLTK or spaCy for tokenization and stopword removal",
+        "threshold_check": "Compare computed overlap against difficulty targets"
+      },
+      "bm25_retrieval_test": {
+        "method": "Run BM25 retrieval → check rank of relevant passages",
+        "metrics": ["recall@10", "MRR", "rank of first relevant passage"],
+        "expected_ranges": {
+          "easy": {"recall@10": ">0.8", "first_relevant_rank": "<5"},
+          "medium": {"recall@10": "0.5-0.8", "first_relevant_rank": "5-15"},
+          "hard": {"recall@10": "<0.6", "first_relevant_rank": ">10"}
+        }
+      },
+      "embedding_similarity_test": {
+        "method": "Compute embedding similarity between query and passages",
+        "model": "sentence-transformers/all-MiniLM-L6-v2",
+        "use": "Secondary validation of semantic matching difficulty"
+      }
+    },
+
+    "manual_verification_sample": {
+      "sample_size": "10% of generated queries, minimum 30",
+      "annotator_count": 2,
+      "tasks": [
+        "Attempt to answer query without retrieval access",
+        "Rate subjective difficulty on 1-5 scale",
+        "Identify reasoning steps required",
+        "Flag any issues with answerability"
+      ],
+      "inter_annotator_agreement": {
+        "target_kappa": 0.7,
+        "resolution": "Third annotator for disagreements"
+      }
+    },
+
+    "difficulty_alignment_criteria": {
+      "accept": "All three dimensions align with target difficulty level",
+      "reassign": "Two dimensions align, one differs by one level",
+      "reject": "Two or more dimensions differ significantly from target"
+    }
+  },
+
+  "calibration_examples": {
+    "easy": [
+      {
+        "cluster_type": "creative_ensemble",
+        "query": "Who are the main cast members of Inception?",
+        "dimensions": {
+          "lexical_overlap": 0.78,
+          "reasoning_hops": 1,
+          "indirection": "direct"
+        },
+        "status": "valid_easy"
+      },
+      {
+        "cluster_type": "award_recognition",
+        "query": "Who received the Nobel Prize in Physics in 2020?",
+        "dimensions": {
+          "lexical_overlap": 0.82,
+          "reasoning_hops": 1,
+          "indirection": "direct"
+        },
+        "status": "valid_easy"
+      }
+    ],
+    "medium": [
+      {
+        "cluster_type": "creative_ensemble",
+        "query": "What nationalities do the lead actors in Nolan's dream heist film have?",
+        "dimensions": {
+          "lexical_overlap": 0.41,
+          "reasoning_hops": 2,
+          "indirection": "descriptive"
+        },
+        "status": "valid_medium"
+      },
+      {
+        "cluster_type": "organizational",
+        "query": "What companies have faculty members from the top Massachusetts tech school founded?",
+        "dimensions": {
+          "lexical_overlap": 0.38,
+          "reasoning_hops": 2,
+          "indirection": "descriptive"
+        },
+        "status": "valid_medium"
+      }
+    ],
+    "hard": [
+      {
+        "cluster_type": "creative_ensemble",
+        "query": "What acclaimed science fiction films have the ensemble of the 2010 psychological thriller directed by the British auteur of nonlinear narratives appeared in?",
+        "dimensions": {
+          "lexical_overlap": 0.15,
+          "reasoning_hops": 4,
+          "indirection": "implicit"
+        },
+        "status": "valid_hard"
+      },
+      {
+        "cluster_type": "award_recognition",
+        "query": "How do the research institutions of scientists honored by the Swedish academy for discoveries about black holes compare across continents?",
+        "dimensions": {
+          "lexical_overlap": 0.22,
+          "reasoning_hops": 3,
+          "indirection": "implicit"
+        },
+        "status": "valid_hard"
+      }
+    ]
+  }
+}
