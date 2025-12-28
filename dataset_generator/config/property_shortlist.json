@@ -1,0 +1,589 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Curated shortlist of high-potential Wikidata properties for cross-entity cluster formation",
+    "total_properties": 28,
+    "selection_criteria": "Based on cardinality control, Wikipedia coverage, temporal stability, and query naturalness"
+  },
+
+  "properties": [
+    {
+      "pid": "P166",
+      "label": "award received",
+      "cluster_type": "award_recognition",
+      "viability_scores": {
+        "cardinality": 0.9,
+        "wikipedia_coverage": 0.95,
+        "temporal_stability": 1.0,
+        "query_naturalness": 1.0,
+        "composite": 0.96
+      },
+      "typical_constraints": ["award_type", "year", "category"],
+      "example_clusters": [
+        {"description": "Nobel Prize in Physics winners 2015-2024", "estimated_k": 10},
+        {"description": "Academy Award Best Actor winners 2000-2020", "estimated_k": 21},
+        {"description": "Turing Award recipients", "estimated_k": 75}
+      ],
+      "anchor_values": ["Q7191 (Nobel Prize)", "Q19020 (Academy Award)", "Q80061 (Turing Award)", "Q102427 (Pulitzer Prize)"],
+      "notes": "Excellent stability - awards are permanent. High Wikipedia coverage for laureates."
+    },
+    {
+      "pid": "P161",
+      "label": "cast member",
+      "cluster_type": "creative_ensemble",
+      "viability_scores": {
+        "cardinality": 0.85,
+        "wikipedia_coverage": 0.9,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.95,
+        "composite": 0.92
+      },
+      "typical_constraints": ["film_type", "billing_order"],
+      "example_clusters": [
+        {"description": "Cast of The Godfather", "estimated_k": 15},
+        {"description": "Cast of Avengers: Endgame", "estimated_k": 25},
+        {"description": "Main cast of Friends (TV series)", "estimated_k": 6}
+      ],
+      "anchor_values": ["specific film QIDs", "specific TV series QIDs"],
+      "notes": "Use inverse property from film to get all cast. Filter by billing for manageable sizes."
+    },
+    {
+      "pid": "P54",
+      "label": "member of sports team",
+      "cluster_type": "organizational",
+      "viability_scores": {
+        "cardinality": 0.8,
+        "wikipedia_coverage": 0.85,
+        "temporal_stability": 0.6,
+        "query_naturalness": 0.9,
+        "composite": 0.79
+      },
+      "typical_constraints": ["season", "position", "active_period"],
+      "example_clusters": [
+        {"description": "1992 USA Olympic Basketball Dream Team", "estimated_k": 12},
+        {"description": "Manchester United squad 2022-23 season", "estimated_k": 25},
+        {"description": "New York Yankees World Series roster 1998", "estimated_k": 25}
+      ],
+      "anchor_values": ["Q131371 (FC Barcelona)", "Q9616 (New York Yankees)", "Q18741 (1992 Dream Team)"],
+      "notes": "Requires temporal qualification. Historical rosters are stable; current rosters change."
+    },
+    {
+      "pid": "P69",
+      "label": "educated at",
+      "cluster_type": "organizational",
+      "viability_scores": {
+        "cardinality": 0.7,
+        "wikipedia_coverage": 0.8,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.85,
+        "composite": 0.83
+      },
+      "typical_constraints": ["degree_type", "graduation_year", "field", "notable_achievement"],
+      "example_clusters": [
+        {"description": "Nobel laureates educated at Cambridge", "estimated_k": 30},
+        {"description": "US Presidents who attended Yale", "estimated_k": 5},
+        {"description": "Tech founders from Stanford CS", "estimated_k": 20}
+      ],
+      "anchor_values": ["Q35794 (Cambridge)", "Q49088 (Columbia)", "Q41506 (Stanford)"],
+      "notes": "Best when combined with achievement filter to bound cluster size."
+    },
+    {
+      "pid": "P108",
+      "label": "employer",
+      "cluster_type": "organizational",
+      "viability_scores": {
+        "cardinality": 0.75,
+        "wikipedia_coverage": 0.75,
+        "temporal_stability": 0.5,
+        "query_naturalness": 0.85,
+        "composite": 0.72
+      },
+      "typical_constraints": ["time_period", "position", "department"],
+      "example_clusters": [
+        {"description": "Bell Labs researchers who won Nobel Prize", "estimated_k": 15},
+        {"description": "NASA astronauts who walked on the Moon", "estimated_k": 12},
+        {"description": "Bletchley Park codebreakers", "estimated_k": 20}
+      ],
+      "anchor_values": ["Q131203 (Bell Labs)", "Q23548 (NASA)", "Q271446 (Bletchley Park)"],
+      "notes": "Historical employment is stable. Combine with notable achievement for bounded clusters."
+    },
+    {
+      "pid": "P27",
+      "label": "country of citizenship",
+      "cluster_type": "categorical",
+      "viability_scores": {
+        "cardinality": 0.6,
+        "wikipedia_coverage": 0.9,
+        "temporal_stability": 0.8,
+        "query_naturalness": 0.9,
+        "composite": 0.80
+      },
+      "typical_constraints": ["occupation", "achievement", "time_period"],
+      "example_clusters": [
+        {"description": "French Nobel Prize winners in Literature", "estimated_k": 16},
+        {"description": "Japanese astronauts", "estimated_k": 12},
+        {"description": "Brazilian Formula 1 world champions", "estimated_k": 3}
+      ],
+      "anchor_values": ["Q142 (France)", "Q30 (USA)", "Q17 (Japan)", "Q155 (Brazil)"],
+      "notes": "Always combine with occupation/achievement constraint. Solo use produces millions."
+    },
+    {
+      "pid": "P17",
+      "label": "country",
+      "cluster_type": "geographic_spatial",
+      "viability_scores": {
+        "cardinality": 0.65,
+        "wikipedia_coverage": 0.95,
+        "temporal_stability": 0.85,
+        "query_naturalness": 0.95,
+        "composite": 0.85
+      },
+      "typical_constraints": ["entity_type", "size_threshold", "designation"],
+      "example_clusters": [
+        {"description": "National parks in Japan", "estimated_k": 34},
+        {"description": "UNESCO World Heritage sites in Italy", "estimated_k": 59},
+        {"description": "Capital cities of African countries", "estimated_k": 54}
+      ],
+      "anchor_values": ["Q17 (Japan)", "Q38 (Italy)", "Q15 (Africa)"],
+      "notes": "Excellent for geographic enumeration queries. Combine with entity type."
+    },
+    {
+      "pid": "P31",
+      "label": "instance of",
+      "cluster_type": "categorical",
+      "viability_scores": {
+        "cardinality": 0.5,
+        "wikipedia_coverage": 0.9,
+        "temporal_stability": 0.95,
+        "query_naturalness": 0.85,
+        "composite": 0.80
+      },
+      "typical_constraints": ["geographic", "temporal", "property_filter"],
+      "example_clusters": [
+        {"description": "Countries in the European Union", "estimated_k": 27},
+        {"description": "Moons of Jupiter", "estimated_k": 95},
+        {"description": "Chemical elements discovered after 1900", "estimated_k": 30}
+      ],
+      "anchor_values": ["Q6256 (country)", "Q2775969 (natural satellite)", "Q11344 (chemical element)"],
+      "notes": "Foundation property - always needs additional constraints for bounded clusters."
+    },
+    {
+      "pid": "P57",
+      "label": "director",
+      "cluster_type": "relational",
+      "viability_scores": {
+        "cardinality": 0.85,
+        "wikipedia_coverage": 0.95,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.95,
+        "composite": 0.94
+      },
+      "typical_constraints": ["film_type", "time_period", "award_status"],
+      "example_clusters": [
+        {"description": "Films directed by Stanley Kubrick", "estimated_k": 13},
+        {"description": "Films directed by Hayao Miyazaki", "estimated_k": 11},
+        {"description": "Oscar-winning films directed by Steven Spielberg", "estimated_k": 7}
+      ],
+      "anchor_values": ["person QIDs for notable directors"],
+      "notes": "Excellent for filmography queries. Stable and well-documented."
+    },
+    {
+      "pid": "P50",
+      "label": "author",
+      "cluster_type": "relational",
+      "viability_scores": {
+        "cardinality": 0.8,
+        "wikipedia_coverage": 0.85,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.9,
+        "composite": 0.89
+      },
+      "typical_constraints": ["work_type", "genre", "publication_period"],
+      "example_clusters": [
+        {"description": "Novels by Gabriel García Márquez", "estimated_k": 8},
+        {"description": "Plays by William Shakespeare", "estimated_k": 37},
+        {"description": "Published works of Isaac Asimov", "estimated_k": 50}
+      ],
+      "anchor_values": ["person QIDs for notable authors"],
+      "notes": "Works well for bibliography queries. May need work-type filter for prolific authors."
+    },
+    {
+      "pid": "P175",
+      "label": "performer",
+      "cluster_type": "creative_ensemble",
+      "viability_scores": {
+        "cardinality": 0.8,
+        "wikipedia_coverage": 0.8,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.85,
+        "composite": 0.86
+      },
+      "typical_constraints": ["album_type", "chart_position"],
+      "example_clusters": [
+        {"description": "Musicians who performed at Woodstock 1969", "estimated_k": 32},
+        {"description": "Artists featured on 'We Are the World'", "estimated_k": 46},
+        {"description": "Members of the Traveling Wilburys", "estimated_k": 5}
+      ],
+      "anchor_values": ["Q5765 (Woodstock)", "specific album/event QIDs"],
+      "notes": "Good for music event and album queries. Festival lineups have high coverage."
+    },
+    {
+      "pid": "P39",
+      "label": "position held",
+      "cluster_type": "organizational",
+      "viability_scores": {
+        "cardinality": 0.75,
+        "wikipedia_coverage": 0.9,
+        "temporal_stability": 0.7,
+        "query_naturalness": 0.95,
+        "composite": 0.83
+      },
+      "typical_constraints": ["time_period", "jurisdiction", "party"],
+      "example_clusters": [
+        {"description": "US Presidents", "estimated_k": 46},
+        {"description": "UN Secretaries-General", "estimated_k": 9},
+        {"description": "Prime Ministers of UK since 1900", "estimated_k": 22}
+      ],
+      "anchor_values": ["Q11696 (US President)", "Q144478 (UNSG)", "Q14211 (UK PM)"],
+      "notes": "Excellent for political/leadership queries. Add temporal bounds for recent holders."
+    },
+    {
+      "pid": "P26",
+      "label": "spouse",
+      "cluster_type": "relational",
+      "viability_scores": {
+        "cardinality": 0.9,
+        "wikipedia_coverage": 0.85,
+        "temporal_stability": 0.8,
+        "query_naturalness": 0.75,
+        "composite": 0.82
+      },
+      "typical_constraints": ["marriage_period"],
+      "example_clusters": [
+        {"description": "Spouses of British monarchs", "estimated_k": 15},
+        {"description": "Spouses of US Presidents", "estimated_k": 50},
+        {"description": "Spouses of Henry VIII", "estimated_k": 6}
+      ],
+      "anchor_values": ["person QIDs", "role-based queries"],
+      "notes": "Small, well-defined clusters. Historical marriages are stable."
+    },
+    {
+      "pid": "P40",
+      "label": "child",
+      "cluster_type": "relational",
+      "viability_scores": {
+        "cardinality": 0.9,
+        "wikipedia_coverage": 0.7,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.8,
+        "composite": 0.84
+      },
+      "typical_constraints": ["notable_achievement"],
+      "example_clusters": [
+        {"description": "Children of Queen Victoria", "estimated_k": 9},
+        {"description": "Children of Johann Sebastian Bach", "estimated_k": 20},
+        {"description": "Children of Genghis Khan", "estimated_k": 8}
+      ],
+      "anchor_values": ["person QIDs for notable historical figures"],
+      "notes": "Best for historical figures with well-documented families."
+    },
+    {
+      "pid": "P112",
+      "label": "founded by",
+      "cluster_type": "relational",
+      "viability_scores": {
+        "cardinality": 0.85,
+        "wikipedia_coverage": 0.9,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.95,
+        "composite": 0.92
+      },
+      "typical_constraints": ["organization_type", "industry"],
+      "example_clusters": [
+        {"description": "Companies founded by Elon Musk", "estimated_k": 6},
+        {"description": "Companies founded by Steve Jobs", "estimated_k": 3},
+        {"description": "Universities founded by Thomas Jefferson", "estimated_k": 1}
+      ],
+      "anchor_values": ["person QIDs for notable founders"],
+      "notes": "Excellent for entrepreneurship/legacy queries. Naturally bounded clusters."
+    },
+    {
+      "pid": "P184",
+      "label": "doctoral advisor",
+      "cluster_type": "relational",
+      "viability_scores": {
+        "cardinality": 0.9,
+        "wikipedia_coverage": 0.75,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.8,
+        "composite": 0.85
+      },
+      "typical_constraints": ["student_achievement"],
+      "example_clusters": [
+        {"description": "Doctoral students of Richard Feynman", "estimated_k": 31},
+        {"description": "PhD students of Max Born who won Nobel Prize", "estimated_k": 4},
+        {"description": "Academic descendants of Gauss (direct)", "estimated_k": 10}
+      ],
+      "anchor_values": ["person QIDs for notable academics"],
+      "notes": "Great for academic lineage queries. Stable and well-documented in academia."
+    },
+    {
+      "pid": "P1344",
+      "label": "participant in",
+      "cluster_type": "event_temporal",
+      "viability_scores": {
+        "cardinality": 0.75,
+        "wikipedia_coverage": 0.85,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.9,
+        "composite": 0.87
+      },
+      "typical_constraints": ["event_type", "outcome", "role"],
+      "example_clusters": [
+        {"description": "Athletes at 2020 Tokyo Olympics (US team)", "estimated_k": 100},
+        {"description": "Heads of state at Yalta Conference", "estimated_k": 3},
+        {"description": "Signatories of the Declaration of Independence", "estimated_k": 56}
+      ],
+      "anchor_values": ["Q159821 (Yalta)", "Q8016 (Declaration)", "event QIDs"],
+      "notes": "Excellent for historical event queries. Combine with country for sports events."
+    },
+    {
+      "pid": "P1411",
+      "label": "nominated for",
+      "cluster_type": "award_recognition",
+      "viability_scores": {
+        "cardinality": 0.8,
+        "wikipedia_coverage": 0.9,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.85,
+        "composite": 0.89
+      },
+      "typical_constraints": ["award_type", "year", "category"],
+      "example_clusters": [
+        {"description": "Oscar Best Picture nominees 2023", "estimated_k": 10},
+        {"description": "Grammy Album of the Year nominees 2020", "estimated_k": 8},
+        {"description": "Nobel Peace Prize nominees (known)", "estimated_k": 50}
+      ],
+      "anchor_values": ["Q19020 (Academy Award)", "Q41254 (Grammy)"],
+      "notes": "Broader than winners. Some nominations are not public (Nobel)."
+    },
+    {
+      "pid": "P102",
+      "label": "member of political party",
+      "cluster_type": "organizational",
+      "viability_scores": {
+        "cardinality": 0.65,
+        "wikipedia_coverage": 0.8,
+        "temporal_stability": 0.7,
+        "query_naturalness": 0.85,
+        "composite": 0.75
+      },
+      "typical_constraints": ["position_held", "time_period", "country"],
+      "example_clusters": [
+        {"description": "US Presidents from Democratic Party", "estimated_k": 16},
+        {"description": "British Prime Ministers from Conservative Party", "estimated_k": 15},
+        {"description": "Founding members of the Nazi Party", "estimated_k": 25}
+      ],
+      "anchor_values": ["Q29552 (Democratic)", "Q9626 (Conservative)", "party QIDs"],
+      "notes": "Combine with position for notable members. Party switching complicates queries."
+    },
+    {
+      "pid": "P463",
+      "label": "member of",
+      "cluster_type": "organizational",
+      "viability_scores": {
+        "cardinality": 0.7,
+        "wikipedia_coverage": 0.85,
+        "temporal_stability": 0.75,
+        "query_naturalness": 0.85,
+        "composite": 0.79
+      },
+      "typical_constraints": ["organization_type", "time_period"],
+      "example_clusters": [
+        {"description": "Members of the French Academy", "estimated_k": 40},
+        {"description": "Countries in NATO", "estimated_k": 32},
+        {"description": "Current members of the G7", "estimated_k": 7}
+      ],
+      "anchor_values": ["Q161806 (French Academy)", "Q7184 (NATO)", "Q37143 (G7)"],
+      "notes": "Works for both people and organizations. Add temporal qualifier for current membership."
+    },
+    {
+      "pid": "P131",
+      "label": "located in administrative territorial entity",
+      "cluster_type": "geographic_spatial",
+      "viability_scores": {
+        "cardinality": 0.6,
+        "wikipedia_coverage": 0.85,
+        "temporal_stability": 0.9,
+        "query_naturalness": 0.9,
+        "composite": 0.81
+      },
+      "typical_constraints": ["entity_type", "size", "designation"],
+      "example_clusters": [
+        {"description": "Universities in Massachusetts", "estimated_k": 50},
+        {"description": "Fortune 500 companies headquartered in Texas", "estimated_k": 50},
+        {"description": "Airports in California", "estimated_k": 30}
+      ],
+      "anchor_values": ["Q771 (Massachusetts)", "Q1439 (Texas)", "Q99 (California)"],
+      "notes": "Always combine with entity type. Administrative boundaries change occasionally."
+    },
+    {
+      "pid": "P36",
+      "label": "capital",
+      "cluster_type": "geographic_spatial",
+      "viability_scores": {
+        "cardinality": 0.95,
+        "wikipedia_coverage": 0.98,
+        "temporal_stability": 0.85,
+        "query_naturalness": 0.95,
+        "composite": 0.93
+      },
+      "typical_constraints": ["region_type", "continent"],
+      "example_clusters": [
+        {"description": "Capital cities of European countries", "estimated_k": 44},
+        {"description": "Capital cities of US states", "estimated_k": 50},
+        {"description": "Former capitals of China", "estimated_k": 8}
+      ],
+      "anchor_values": ["continent/region QIDs"],
+      "notes": "Well-defined, high coverage. Historical capitals add variety."
+    },
+    {
+      "pid": "P106",
+      "label": "occupation",
+      "cluster_type": "categorical",
+      "viability_scores": {
+        "cardinality": 0.5,
+        "wikipedia_coverage": 0.85,
+        "temporal_stability": 0.9,
+        "query_naturalness": 0.9,
+        "composite": 0.79
+      },
+      "typical_constraints": ["country", "achievement", "time_period", "gender"],
+      "example_clusters": [
+        {"description": "Female astronauts from the United States", "estimated_k": 50},
+        {"description": "Philosophers from Ancient Greece", "estimated_k": 40},
+        {"description": "Chemists who won Nobel Prize", "estimated_k": 190}
+      ],
+      "anchor_values": ["Q11631 (astronaut)", "Q4964182 (philosopher)", "Q593644 (chemist)"],
+      "notes": "Requires additional constraints. Very flexible for cross-sectional queries."
+    },
+    {
+      "pid": "P1346",
+      "label": "winner",
+      "cluster_type": "event_temporal",
+      "viability_scores": {
+        "cardinality": 0.85,
+        "wikipedia_coverage": 0.9,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.9,
+        "composite": 0.91
+      },
+      "typical_constraints": ["competition_type", "year_range"],
+      "example_clusters": [
+        {"description": "FIFA World Cup winners", "estimated_k": 8},
+        {"description": "Super Bowl winners", "estimated_k": 23},
+        {"description": "Eurovision Song Contest winners", "estimated_k": 67}
+      ],
+      "anchor_values": ["Q19317 (FIFA World Cup)", "Q32096 (Super Bowl)"],
+      "notes": "Used on competition/event to get winning entities. Very stable."
+    },
+    {
+      "pid": "P607",
+      "label": "conflict",
+      "cluster_type": "event_temporal",
+      "viability_scores": {
+        "cardinality": 0.75,
+        "wikipedia_coverage": 0.8,
+        "temporal_stability": 1.0,
+        "query_naturalness": 0.85,
+        "composite": 0.84
+      },
+      "typical_constraints": ["role", "outcome", "rank"],
+      "example_clusters": [
+        {"description": "Generals in the American Civil War (Union)", "estimated_k": 50},
+        {"description": "Countries involved in World War II", "estimated_k": 50},
+        {"description": "Battles of Napoleon Bonaparte", "estimated_k": 30}
+      ],
+      "anchor_values": ["Q8676 (WW2)", "Q8683 (WW1)", "Q361 (Civil War)"],
+      "notes": "Good for military history queries. Combine with side/role for bounded sets."
+    },
+    {
+      "pid": "P800",
+      "label": "notable work",
+      "cluster_type": "relational",
+      "viability_scores": {
+        "cardinality": 0.8,
+        "wikipedia_coverage": 0.85,
+        "temporal_stability": 0.9,
+        "query_naturalness": 0.85,
+        "composite": 0.85
+      },
+      "typical_constraints": ["work_type", "time_period"],
+      "example_clusters": [
+        {"description": "Notable works of Leonardo da Vinci", "estimated_k": 15},
+        {"description": "Notable inventions of Thomas Edison", "estimated_k": 20},
+        {"description": "Notable buildings by Frank Lloyd Wright", "estimated_k": 25}
+      ],
+      "anchor_values": ["person QIDs"],
+      "notes": "Curated by Wikidata community. May miss lesser-known works."
+    },
+    {
+      "pid": "P179",
+      "label": "part of the series",
+      "cluster_type": "creative_ensemble",
+      "viability_scores": {
+        "cardinality": 0.9,
+        "wikipedia_coverage": 0.9,
+        "temporal_stability": 0.95,
+        "query_naturalness": 0.85,
+        "composite": 0.90
+      },
+      "typical_constraints": ["series_type"],
+      "example_clusters": [
+        {"description": "Harry Potter book series", "estimated_k": 7},
+        {"description": "Marvel Cinematic Universe films", "estimated_k": 35},
+        {"description": "James Bond films", "estimated_k": 27}
+      ],
+      "anchor_values": ["Q8337 (HP)", "Q642878 (MCU)", "Q2484680 (Bond films)"],
+      "notes": "Excellent for franchise/series enumeration. Well-maintained in Wikidata."
+    }
+  ],
+
+  "coverage_summary": {
+    "by_cluster_type": {
+      "categorical": ["P31", "P27", "P106"],
+      "creative_ensemble": ["P161", "P175", "P179"],
+      "award_recognition": ["P166", "P1411"],
+      "organizational": ["P54", "P69", "P108", "P39", "P102", "P463"],
+      "event_temporal": ["P1344", "P1346", "P607"],
+      "geographic_spatial": ["P17", "P131", "P36"],
+      "relational": ["P57", "P50", "P26", "P40", "P112", "P184", "P800"]
+    },
+    "top_10_by_viability": [
+      {"pid": "P166", "label": "award received", "score": 0.96},
+      {"pid": "P57", "label": "director", "score": 0.94},
+      {"pid": "P36", "label": "capital", "score": 0.93},
+      {"pid": "P161", "label": "cast member", "score": 0.92},
+      {"pid": "P112", "label": "founded by", "score": 0.92},
+      {"pid": "P1346", "label": "winner", "score": 0.91},
+      {"pid": "P179", "label": "part of the series", "score": 0.90},
+      {"pid": "P50", "label": "author", "score": 0.89},
+      {"pid": "P1411", "label": "nominated for", "score": 0.89},
+      {"pid": "P1344", "label": "participant in", "score": 0.87}
+    ]
+  },
+
+  "recommended_first_batch": {
+    "description": "Properties to prioritize for initial SPARQL profiling in Phase A.2",
+    "properties": [
+      {"pid": "P166", "rationale": "High viability, clear temporal bounding, excellent coverage"},
+      {"pid": "P161", "rationale": "Natural clusters from films, high engagement potential"},
+      {"pid": "P57", "rationale": "Clean filmography enumeration, stable data"},
+      {"pid": "P39", "rationale": "Political positions well-documented, clear temporal bounds"},
+      {"pid": "P36", "rationale": "Geographic enumeration with near-complete coverage"},
+      {"pid": "P179", "rationale": "Series membership is naturally bounded"},
+      {"pid": "P1344", "rationale": "Event participation creates interesting cross-entity sets"},
+      {"pid": "P112", "rationale": "Founder relationships are stable and well-documented"}
+    ]
+  }
+}
