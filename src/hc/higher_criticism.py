@@ -41,6 +41,9 @@ class HigherCriticism:
 
     Uses HC statistics to identify which retrieved documents are
     statistically significant (likely relevant) vs random noise.
+    
+    Supports both global and per-query null distributions. Per-query nulls
+    are critical for correctness when queries have different similarity baselines.
     """
 
     def __init__(self, null_distribution: Optional[NullDistribution] = None):
@@ -48,13 +51,23 @@ class HigherCriticism:
         Initialize Higher Criticism module.
 
         Args:
-            null_distribution: Pre-computed null distribution (optional)
+            null_distribution: Pre-computed null distribution (optional).
+                              Can be overridden per-query using set_null_distribution().
         """
         self.null_distribution = null_distribution
         logger.info("HigherCriticism module initialized")
 
         if null_distribution is not None:
             logger.info(f"  Loaded null distribution: {null_distribution}")
+    
+    def set_null_distribution(self, null_distribution: NullDistribution):
+        """
+        Set null distribution (allows per-query null distributions).
+        
+        Args:
+            null_distribution: The null distribution to use for p-value computation.
+        """
+        self.null_distribution = null_distribution
 
     # =========================================================================
     # Higher Criticism Statistic Calculation
@@ -101,6 +114,120 @@ class HigherCriticism:
         p_values = np.clip(p_values, eps, 1.0 - eps)
 
         return p_values
+
+    def compute_hc_from_pvalues(
+        self,
+        p_values: np.ndarray,
+        gamma: float = 0.1
+    ) -> Tuple[float, int]:
+        """
+        Compute Higher Criticism statistic from pre-computed p-values.
+        
+        Use this when p-values are computed externally (e.g., position-aware nulls).
+        
+        Args:
+            p_values: Pre-computed p-values (must be sorted in ascending order)
+            gamma: Fraction of top scores to search for HC maximum (0 < gamma <= 1)
+            
+        Returns:
+            Tuple of (hc_statistic, best_index)
+        """
+        # Validate gamma
+        if not (0 < gamma <= 1):
+            raise ValueError(f"gamma must be in (0, 1], got {gamma}")
+        
+        if len(p_values) == 0:
+            return 0.0, 0
+        
+        # Sort p-values ascending (smallest first)
+        sorted_pvals = np.sort(p_values)
+        n = len(sorted_pvals)
+        
+        # Clip p-values to avoid edge cases
+        sorted_pvals = np.clip(sorted_pvals, 1e-10, 1 - 1e-10)
+        
+        # Only consider top gamma fraction
+        n_gamma = min(n, max(1, int(np.floor(gamma * n))))
+        
+        # Compute HC statistic
+        hc_values = []
+        for i in range(1, n_gamma + 1):
+            expected_quantile = i / n
+            p_i = sorted_pvals[i - 1]
+            
+            numerator = expected_quantile - p_i
+            denominator = np.sqrt(p_i * (1 - p_i) / n)
+            
+            if denominator > 0:
+                hc_i = numerator / denominator
+                hc_values.append(hc_i)
+            else:
+                hc_values.append(0.0)
+        
+        if hc_values:
+            max_hc = float(np.max(hc_values))
+            best_idx = int(np.argmax(hc_values))
+        else:
+            max_hc = 0.0
+            best_idx = 0
+        
+        return max_hc, best_idx
+
+    def compute_hc_threshold_from_pvalues(
+        self,
+        p_values: np.ndarray,
+        similarities: np.ndarray,
+        gamma: float = 0.1,
+        min_hc: float = 0.0,
+        allow_empty: bool = True
+    ) -> 'HCThresholdResult':
+        """
+        Compute HC-based threshold from pre-computed p-values.
+        
+        IMPORTANT: With position-aware nulls, p-values are not monotonic with similarity.
+        HC determines how many of the SMALLEST p-values are significant, then we
+        return the k documents with highest similarity (standard top-k retrieval).
+        
+        This preserves compatibility with downstream systems that expect similarity ranking.
+        
+        Args:
+            p_values: Pre-computed p-values (same order as similarities)
+            similarities: Original similarity scores (for threshold computation)
+            gamma: HC gamma parameter
+            min_hc: Minimum HC statistic threshold
+            allow_empty: Allow empty result set
+            
+        Returns:
+            HCThresholdResult with threshold, hc_statistic, and k
+        """
+        if len(p_values) == 0:
+            return HCThresholdResult(threshold=np.inf, hc_statistic=0.0, k=0)
+        
+        n = len(p_values)
+        
+        # Compute HC from p-values (sorts internally)
+        hc_stat, best_idx = self.compute_hc_from_pvalues(p_values, gamma=gamma)
+        
+        # Check HC gate
+        if allow_empty and hc_stat < min_hc:
+            return HCThresholdResult(threshold=np.inf, hc_statistic=float(hc_stat), k=0)
+        
+        # k is number of "significant" p-values (smallest p-values)
+        k = max(0, min(n, best_idx + 1))
+        
+        if not allow_empty and k == 0:
+            k = 1
+        
+        # Return top-k by SIMILARITY (not by p-value ranking)
+        # This maintains compatibility with standard retrieval
+        sorted_sims = np.sort(similarities)[::-1]  # Sort descending
+        
+        if k > 0:
+            threshold = float(sorted_sims[k - 1])
+        else:
+            threshold = np.inf
+        
+        return HCThresholdResult(threshold=threshold, hc_statistic=float(hc_stat), k=int(k))
 
     def compute_hc_statistic(
         self,
