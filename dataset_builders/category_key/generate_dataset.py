@@ -184,7 +184,7 @@ def main():
     """Generate the category-key dataset."""
     script_dir = Path(__file__).parent
     config_dir = script_dir / "config"
-    output_dir = script_dir / "output"
+    output_dir = script_dir.parent.parent / "datasets" / "category_key"
 
     print("=" * 70)
     print("Category-Key Synthetic Dataset Generator")

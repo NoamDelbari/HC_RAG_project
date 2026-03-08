@@ -236,7 +236,7 @@ def generate_plots(results: list, null_dists: QueryNullDistributions, output_dir
 
 def main():
     script_dir = Path(__file__).parent
-    output_dir = script_dir / "output"
+    output_dir = script_dir.parent.parent / "datasets" / "category_key"
     null_path = str(output_dir / "null_distributions" / "category_key_per_query_null")
 
     print("=" * 70)

@@ -74,7 +74,7 @@ def serialize(agg, per_query):
 
 
 def main():
-    data_dir = Path(__file__).parent / "output"
+    data_dir = Path(__file__).resolve().parent.parent.parent / "datasets" / "category_key"
     db_path = str(data_dir / "category_key_vector_db")
     null_path = str(data_dir / "null_distributions" / "category_key_per_query_null")
     out_dir = PROJECT_ROOT / "results" / "category_key"

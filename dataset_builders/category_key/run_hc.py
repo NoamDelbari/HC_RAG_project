@@ -76,7 +76,7 @@ def run_hc_at_gamma(
 
 def main():
     script_dir = Path(__file__).parent
-    output_dir = script_dir / "output"
+    output_dir = script_dir.parent.parent / "datasets" / "category_key"
     results_dir = Path(PROJECT_ROOT) / "results" / "category_key" / "hc"
     results_dir.mkdir(parents=True, exist_ok=True)
 

@@ -27,7 +27,7 @@ def load_category_key_dataset(
     Load the category-key dataset.
 
     Args:
-        output_dir: Path to output directory (default: datasets/category_key/output)
+        output_dir: Path to output directory (default: datasets/category_key)
 
     Returns:
         (queries, qrels) where:
@@ -35,7 +35,7 @@ def load_category_key_dataset(
             qrels: Dict mapping query_id -> Set of relevant doc_ids
     """
     if output_dir is None:
-        output_dir = Path(__file__).parent / "output"
+        output_dir = Path(__file__).resolve().parent.parent.parent / "datasets" / "category_key"
     else:
         output_dir = Path(output_dir)
 
@@ -79,7 +79,7 @@ def load_corpus(output_dir: str = None) -> Dict[str, dict]:
         Dict mapping doc_id -> document dict
     """
     if output_dir is None:
-        output_dir = Path(__file__).parent / "output"
+        output_dir = Path(__file__).resolve().parent.parent.parent / "datasets" / "category_key"
     else:
         output_dir = Path(output_dir)
 

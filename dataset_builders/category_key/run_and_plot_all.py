@@ -581,7 +581,7 @@ def plot_hc_outcome(val_data, baseline_results, hc_result, hc_gamma, matched_bas
 
 def main():
     script_dir = Path(__file__).parent
-    data_dir = script_dir / "output"
+    data_dir = script_dir.parent.parent / "datasets" / "category_key"
     db_path = str(data_dir / "category_key_vector_db")
     null_path = str(data_dir / "null_distributions" / "category_key_per_query_null")
 

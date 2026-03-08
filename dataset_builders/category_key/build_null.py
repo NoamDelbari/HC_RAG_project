@@ -92,7 +92,7 @@ class CategoryKeyNegativePairingNull(NegativePairingNull):
 
 def main():
     script_dir = Path(__file__).parent
-    output_dir = script_dir / "output"
+    output_dir = script_dir.parent.parent / "datasets" / "category_key"
     db_path = str(output_dir / "category_key_vector_db")
     null_path = str(output_dir / "null_distributions" / "category_key_per_query_null")
 

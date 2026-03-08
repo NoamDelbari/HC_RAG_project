@@ -19,7 +19,7 @@ from embeddings.vector_database import VectorDatabase
 
 def main():
     script_dir = Path(__file__).parent
-    output_dir = script_dir / "output"
+    output_dir = script_dir.parent.parent / "datasets" / "category_key"
     db_path = output_dir / "category_key_vector_db"
 
     print("=" * 70)
