@@ -3,7 +3,7 @@ Embedding Model Wrapper
 
 Provides a unified interface for generating embeddings using:
 - Local models (sentence transformers) with GPU acceleration
-- API-based models (Google Gemini) via API calls
+- API-based models (Google Gemini, OpenAI) via API calls
 
 Supports batched processing and handles API rate limiting.
 """
@@ -387,6 +387,167 @@ class GeminiEmbeddingModel:
         return self.model_name
 
 
+class OpenAIEmbeddingModel:
+    """
+    OpenAI API-based embedding model.
+
+    Uses OpenAI's embedding API for generating embeddings.
+    Handles API rate limiting and batching automatically.
+    """
+
+    # OpenAI embedding models
+    SMALL_MODEL = "text-embedding-3-small"   # 1536 dim
+    LARGE_MODEL = "text-embedding-3-large"   # 3072 dim
+    ADA_MODEL = "text-embedding-ada-002"     # 1536 dim (legacy)
+
+    EMBEDDING_DIMS = {
+        "text-embedding-3-small": 1536,
+        "text-embedding-3-large": 3072,
+        "text-embedding-ada-002": 1536,
+    }
+
+    def __init__(
+        self,
+        model_name: str = SMALL_MODEL,
+        api_key: Optional[str] = None,
+        batch_size: int = 500,
+        rate_limit_delay: float = 0.05,
+        normalize_embeddings: bool = True,
+    ):
+        """
+        Initialize OpenAI embedding model.
+
+        Args:
+            model_name: OpenAI model identifier
+            api_key: OpenAI API key (if None, reads from OPENAI_API_KEY env var)
+            batch_size: Number of texts per API request (max 2048)
+            rate_limit_delay: Delay between API calls in seconds
+            normalize_embeddings: Whether to L2-normalize embeddings
+        """
+        try:
+            from openai import OpenAI
+        except ImportError:
+            raise ImportError(
+                "openai package not found. Install it with: pip install openai"
+            )
+
+        self.model_name = model_name
+        self.batch_size = min(batch_size, 2048)
+        self.rate_limit_delay = rate_limit_delay
+        self.normalize_embeddings = normalize_embeddings
+
+        if api_key is None:
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                raise ValueError(
+                    "OPENAI_API_KEY not found. Set it in your .env file or pass it as a parameter."
+                )
+
+        self.client = OpenAI(api_key=api_key)
+        self.embedding_dim = self.EMBEDDING_DIMS.get(model_name, 1536)
+
+        logger.info(f"OpenAI embedding model configured")
+        logger.info(f"  Model: {model_name}")
+        logger.info(f"  Embedding dimension: {self.embedding_dim}")
+        logger.info(f"  Batch size: {self.batch_size}")
+
+    def _truncate_text(self, text: str, max_chars: int = 20000) -> str:
+        """Rough truncation to stay under 8192 token limit (~3 chars/token conservative)."""
+        if len(text) > max_chars:
+            return text[:max_chars]
+        return text
+
+    def _embed_batch(self, texts: List[str]) -> np.ndarray:
+        """Embed a batch of texts using OpenAI API. Auto-splits on token limit errors."""
+        texts = [self._truncate_text(t) for t in texts]
+        try:
+            response = self.client.embeddings.create(input=texts, model=self.model_name)
+        except Exception as e:
+            err_msg = str(e)
+            if "max_tokens" in err_msg or "maximum input length" in err_msg:
+                if len(texts) > 1:
+                    mid = len(texts) // 2
+                    left = self._embed_batch(texts[:mid])
+                    time.sleep(self.rate_limit_delay)
+                    right = self._embed_batch(texts[mid:])
+                    return np.vstack([left, right])
+                else:
+                    # Single text too long — aggressively truncate
+                    texts = [t[:10000] for t in texts]
+                    response = self.client.embeddings.create(input=texts, model=self.model_name)
+            else:
+                raise
+
+        embeddings = np.array(
+            [item.embedding for item in response.data], dtype=np.float32
+        )
+
+        if self.normalize_embeddings:
+            norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+            embeddings = embeddings / (norms + 1e-8)
+
+        return embeddings
+
+    def embed(
+        self,
+        texts: Union[str, List[str]],
+        show_progress: bool = False,
+    ) -> np.ndarray:
+        """
+        Generate embeddings for input texts.
+
+        Args:
+            texts: Single text string or list of text strings
+            show_progress: Whether to show progress bar
+
+        Returns:
+            Numpy array of embeddings with shape (n_texts, embedding_dim)
+        """
+        if isinstance(texts, str):
+            texts = [texts]
+
+        if not texts:
+            logger.warning("Empty text list provided")
+            return np.array([])
+
+        all_embeddings = []
+
+        if show_progress:
+            from tqdm import tqdm
+            batches = tqdm(
+                range(0, len(texts), self.batch_size),
+                desc="Embedding batches",
+            )
+        else:
+            batches = range(0, len(texts), self.batch_size)
+
+        for i in batches:
+            batch_texts = texts[i : i + self.batch_size]
+            batch_embeddings = self._embed_batch(batch_texts)
+            all_embeddings.append(batch_embeddings)
+
+            if i + self.batch_size < len(texts):
+                time.sleep(self.rate_limit_delay)
+
+        return np.vstack(all_embeddings)
+
+    def embed_query(self, query: str) -> np.ndarray:
+        """Generate embedding for a single query."""
+        return self.embed([query], show_progress=False)[0]
+
+    def embed_documents(
+        self, documents: List[str], show_progress: bool = True
+    ) -> np.ndarray:
+        """Generate embeddings for a list of documents."""
+        return self.embed(documents, show_progress=show_progress)
+
+    def get_embedding_dim(self) -> int:
+        return self.embedding_dim
+
+    def get_model_name(self) -> str:
+        return self.model_name
+
+
 def create_embedding_model(
     model_name: str,
     batch_size: Optional[int] = None,
@@ -409,6 +570,12 @@ def create_embedding_model(
         if batch_size is None:
             batch_size = 100  # Gemini default
         return GeminiEmbeddingModel(model_name=model_name, batch_size=batch_size, **kwargs)
+    # Check if it's an OpenAI model
+    elif "text-embedding" in model_name or model_name in OpenAIEmbeddingModel.EMBEDDING_DIMS:
+        logger.info("Creating OpenAI API-based embedding model")
+        if batch_size is None:
+            batch_size = 500
+        return OpenAIEmbeddingModel(model_name=model_name, batch_size=batch_size, **kwargs)
     else:
         logger.info("Creating local embedding model")
         if batch_size is None:

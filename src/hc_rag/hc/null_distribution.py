@@ -4,7 +4,7 @@ import numpy as np
 import pickle
 from pathlib import Path
 from dataclasses import dataclass
-from typing import List, Dict, Set
+from typing import List, Dict, Optional, Set
 
 
 @dataclass
@@ -16,10 +16,34 @@ class NullDistribution:
     min_val: float
     max_val: float
     n_samples: int
+    # GPD tail fit parameters (optional, for composite p-values)
+    gpd_shape: Optional[float] = None      # GPD shape parameter (xi)
+    gpd_scale: Optional[float] = None      # GPD scale parameter (sigma)
+    gpd_threshold: Optional[float] = None  # Threshold above which GPD applies
+    gpd_rate_above: Optional[float] = None # Fraction of null samples above threshold
 
     def __repr__(self):
         return (f"NullDistribution(n={self.n_samples}, "
                 f"mean={self.mean:.4f}, std={self.std:.4f})")
+
+    def save(self, path: str):
+        """Save global null distribution to disk."""
+        path = Path(path).with_suffix('.pkl')
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, 'wb') as f:
+            pickle.dump(self, f)
+
+    @staticmethod
+    def load(path: str) -> "NullDistribution":
+        """Load global null distribution from disk."""
+        path = Path(path).with_suffix('.pkl')
+        with open(path, 'rb') as f:
+            obj = pickle.load(f)
+        # Backward compat: old pickles lack GPD fields
+        for attr in ('gpd_shape', 'gpd_scale', 'gpd_threshold', 'gpd_rate_above'):
+            if not hasattr(obj, attr):
+                object.__setattr__(obj, attr, None)
+        return obj
 
 
 @dataclass

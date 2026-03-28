@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from embeddings.vector_database import VectorDatabase, SearchResult
 from embeddings.embedding_model import EmbeddingModel
 from hc.higher_criticism import HigherCriticism
-from hc.null_distribution import QueryNullDistributions
+from hc.null_distribution import NullDistribution, QueryNullDistributions
 from retrieval.baseline_retrieval import RetrievalOutput
 from retrieval.chunked_retrieval import ChunkedRetrievalMixin
 
@@ -40,7 +40,7 @@ class HCRetrieval(ChunkedRetrievalMixin):
     def __init__(
         self,
         vector_db: VectorDatabase,
-        query_null_distributions: QueryNullDistributions,
+        query_null_distributions: Optional[QueryNullDistributions] = None,
         gamma: float = 0.1,
         max_candidates: int = 50,
         min_hc: float = 0.0,
@@ -49,14 +49,20 @@ class HCRetrieval(ChunkedRetrievalMixin):
         chunk_to_doc_mapping: Optional[Dict[str, str]] = None,
         aggregation: str = "max_score",
         top_chunks_multiplier: int = 10,
-        max_k: Optional[int] = None
+        max_k: Optional[int] = None,
+        global_null_distribution: Optional[NullDistribution] = None,
+        use_zscore: bool = False,
+        parametric: bool = False,
+        z_cap: Optional[float] = None,
+        method: str = "hc",
+        gpd_composite: bool = False
     ):
         """
         Initialize HC-based retriever.
 
         Args:
             vector_db: Vector database containing indexed documents or chunks
-            query_null_distributions: Per-query null distributions
+            query_null_distributions: Per-query null distributions (used when global_null_distribution is not set)
             gamma: Fraction of top scores to search for HC maximum (0 < gamma <= 1)
             max_candidates: Maximum number of candidates to fetch before HC filtering
             min_hc: Minimum HC statistic to accept any documents (0 = disabled)
@@ -69,6 +75,19 @@ class HCRetrieval(ChunkedRetrievalMixin):
                                   (retrieves max_candidates * multiplier chunks)
             max_k: Maximum number of documents to return (None = no limit, use HC threshold only)
                    Returns min(HC_threshold_k, max_k) documents
+            global_null_distribution: A single NullDistribution used for ALL queries.
+                                     If set, overrides per-query null distributions.
+            use_zscore: If True, use z-score standardized p-values for HC computation.
+                       Defaults to True when global_null_distribution is set.
+            parametric: If True and use_zscore=True, use Gaussian CDF instead of empirical
+                       CDF for p-value computation. Eliminates p-value floor saturation.
+            z_cap: If not None, clip z-scores at this upper bound before computing p-values.
+                   Only used when use_zscore=True.
+            method: Statistical method for thresholding. "hc" for Higher Criticism (default),
+                    "berk_jones" for Berk-Jones statistic. BJ avoids the p-value floor
+                    pathology of HC by using KL divergence instead of variance normalization.
+            gpd_composite: If True, use GPD composite p-values (empirical CDF + GPD tail).
+                          Requires null_distribution to have GPD parameters fitted.
         """
         self.vector_db = vector_db
         self.query_null_distributions = query_null_distributions
@@ -81,6 +100,18 @@ class HCRetrieval(ChunkedRetrievalMixin):
         self.aggregation = aggregation
         self.top_chunks_multiplier = top_chunks_multiplier
         self.max_k = max_k
+        self.global_null_distribution = global_null_distribution
+        self.use_zscore = use_zscore
+        self.parametric = parametric
+        self.z_cap = z_cap
+        self.method = method
+        self.gpd_composite = gpd_composite
+
+        # Validate: must have at least one null distribution source
+        if query_null_distributions is None and global_null_distribution is None:
+            raise ValueError(
+                "Must provide either query_null_distributions or global_null_distribution (or both)"
+            )
 
         # Validate parameters
         if not (0 < gamma <= 1):
@@ -93,6 +124,8 @@ class HCRetrieval(ChunkedRetrievalMixin):
             raise ValueError(f"Invalid aggregation: {aggregation}. Must be 'max_score', 'mean_score', or 'sum_score'")
         if max_k is not None and max_k < 1:
             raise ValueError(f"max_k must be >= 1 or None, got {max_k}")
+        if method not in ("hc", "berk_jones"):
+            raise ValueError(f"method must be 'hc' or 'berk_jones', got '{method}'")
 
         logger.info(f"HCRetrieval initialized:")
         logger.info(f"  gamma={gamma}")
@@ -100,7 +133,13 @@ class HCRetrieval(ChunkedRetrievalMixin):
         logger.info(f"  min_hc={min_hc}")
         logger.info(f"  allow_empty={allow_empty}")
         logger.info(f"  max_k={max_k if max_k else 'unlimited'}")
-        logger.info(f"  Per-query null distributions: {len(query_null_distributions.distributions)} queries")
+        logger.info(f"  method={self.method}")
+        logger.info(f"  use_zscore={self.use_zscore}")
+        logger.info(f"  parametric={self.parametric}")
+        if global_null_distribution is not None:
+            logger.info(f"  Global null distribution: {global_null_distribution}")
+        if query_null_distributions is not None:
+            logger.info(f"  Per-query null distributions: {len(query_null_distributions.distributions)} queries")
         logger.info(f"  Vector DB contains {vector_db.get_num_documents()} {'chunks' if chunk_to_doc_mapping else 'documents'}")
         if chunk_to_doc_mapping:
             logger.info(f"  Chunked mode: top_chunks={max_candidates * top_chunks_multiplier}, aggregation={aggregation}")
@@ -109,7 +148,7 @@ class HCRetrieval(ChunkedRetrievalMixin):
     def from_database_path(
         cls,
         db_path: str,
-        query_null_distributions: QueryNullDistributions,
+        query_null_distributions: Optional[QueryNullDistributions] = None,
         gamma: float = 0.1,
         max_candidates: int = 50,
         min_hc: float = 0.0,
@@ -117,7 +156,13 @@ class HCRetrieval(ChunkedRetrievalMixin):
         embedding_model: Optional[EmbeddingModel] = None,
         aggregation: str = "max_score",
         top_chunks_multiplier: int = 10,
-        max_k: Optional[int] = None
+        max_k: Optional[int] = None,
+        global_null_distribution: Optional[NullDistribution] = None,
+        use_zscore: bool = False,
+        parametric: bool = False,
+        z_cap: Optional[float] = None,
+        method: str = "hc",
+        gpd_composite: bool = False
     ) -> "HCRetrieval":
         """
         Load HC retrieval system from database path.
@@ -127,7 +172,7 @@ class HCRetrieval(ChunkedRetrievalMixin):
 
         Args:
             db_path: Path to database (without extension)
-            query_null_distributions: Per-query null distributions
+            query_null_distributions: Per-query null distributions (used when global_null_distribution is not set)
             gamma: Fraction of top scores to search for HC maximum
             max_candidates: Maximum number of candidates before HC filtering
             min_hc: Minimum HC statistic threshold
@@ -136,6 +181,14 @@ class HCRetrieval(ChunkedRetrievalMixin):
             aggregation: Aggregation strategy for chunked mode
             top_chunks_multiplier: Multiplier for retrieving chunks
             max_k: Maximum number of documents to return (None = unlimited)
+            global_null_distribution: A single NullDistribution used for ALL queries.
+                                     If set, overrides per-query null distributions.
+            use_zscore: If True, use z-score standardized p-values for HC computation.
+            parametric: If True and use_zscore=True, use Gaussian CDF instead of
+                       empirical CDF for p-value computation.
+            z_cap: If not None, clip z-scores at this upper bound.
+            method: Statistical method for thresholding. "hc" or "berk_jones".
+            gpd_composite: If True, use GPD composite p-values.
 
         Returns:
             HCRetrieval instance
@@ -166,7 +219,13 @@ class HCRetrieval(ChunkedRetrievalMixin):
             chunk_to_doc_mapping=chunk_to_doc_mapping,
             aggregation=aggregation,
             top_chunks_multiplier=top_chunks_multiplier,
-            max_k=max_k
+            max_k=max_k,
+            global_null_distribution=global_null_distribution,
+            use_zscore=use_zscore,
+            parametric=parametric,
+            z_cap=z_cap,
+            method=method,
+            gpd_composite=gpd_composite
         )
 
     def retrieve(
@@ -213,16 +272,24 @@ class HCRetrieval(ChunkedRetrievalMixin):
         # Extract similarities
         candidate_scores = np.array([c.similarity for c in candidates])
 
-        # Step 2: Get query-specific null distribution and create HC module
-        null_dist = self.query_null_distributions.get(query_id)
+        # Step 2: Get null distribution (global overrides per-query)
+        if self.global_null_distribution is not None:
+            null_dist = self.global_null_distribution
+        else:
+            null_dist = self.query_null_distributions.get(query_id)
         hc_module = HigherCriticism(null_distribution=null_dist)
 
-        # Step 3: Compute HC threshold using query-specific null distribution
+        # Step 3: Compute threshold using query-specific null distribution
         hc_result = hc_module.compute_hc_threshold(
             similarities=candidate_scores,
             gamma=self.gamma,
             min_hc=self.min_hc,
-            allow_empty=self.allow_empty
+            allow_empty=self.allow_empty,
+            use_zscore=self.use_zscore,
+            parametric=self.parametric,
+            z_cap=self.z_cap,
+            method=self.method,
+            gpd_composite=self.gpd_composite
         )
 
         # Step 4: Filter candidates by HC threshold
@@ -342,12 +409,16 @@ class HCRetrieval(ChunkedRetrievalMixin):
     def get_config(self) -> dict:
         """Get retriever configuration."""
         return {
-            'method': 'hc',
+            'method': self.method,
             'gamma': self.gamma,
             'max_candidates': self.max_candidates,
             'min_hc': self.min_hc,
             'allow_empty': self.allow_empty,
-            'max_k': self.max_k
+            'max_k': self.max_k,
+            'use_zscore': self.use_zscore,
+            'parametric': self.parametric,
+            'z_cap': self.z_cap,
+            'gpd_composite': self.gpd_composite
         }
 
 
