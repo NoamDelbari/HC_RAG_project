@@ -4,8 +4,6 @@ from dotenv import load_dotenv
 from openai import OpenAI, APIError, APIConnectionError, RateLimitError, AuthenticationError
 from .base_llm import BaseLLM
 from .llm_io import LLMRAGInput, format_docs, clean_output, TITLE_TRUNCATE
-from .prompts.qa_prompts import V2_QA_SYSTEM_PROMPT, V2_QA_USER_PROMPT, QA_SCHEMA
-from .prompts.judge_prompts import V2_JUDGE_SYSTEM_PROMPT, V2_JUDGE_USER_PROMPT, JUDGE_SCHEMA
 
 
 class OpenAILLM(BaseLLM):
@@ -14,18 +12,17 @@ class OpenAILLM(BaseLLM):
     Supports structured output mode for extracting product titles as JSON.
     """
 
-    def __init__(self, model_name: str = "gpt-4o-mini", structured_output: bool = False, **kwargs):
+    def __init__(
+        self,
+        model_name: str = "gpt-4o-mini",
+        structured_output: bool = False,
+        response_format: dict = None,
+        **kwargs,
+    ):
         self._skip_temperature = False
         self.structured_output = structured_output
+        self.response_format = response_format
         super().__init__(model_name=model_name, **kwargs)
-        # Override prompts for structured mode
-        if self.structured_output:
-            if self.qa_mode:
-                self.system_prompt = V2_QA_SYSTEM_PROMPT
-                self.user_prompt = V2_QA_USER_PROMPT
-            else:
-                self.system_prompt = V2_JUDGE_SYSTEM_PROMPT
-                self.user_prompt = V2_JUDGE_USER_PROMPT
 
     def init_client(self):
         """Initialize the OpenAI client."""
@@ -56,8 +53,8 @@ class OpenAILLM(BaseLLM):
             if not self._skip_temperature:
                 kwargs["temperature"] = self.temperature
 
-            if self.structured_output:
-                kwargs["response_format"] = QA_SCHEMA if self.qa_mode else JUDGE_SCHEMA
+            if self.structured_output and self.response_format:
+                kwargs["response_format"] = self.response_format
 
             response = self.client.chat.completions.create(**kwargs)
 

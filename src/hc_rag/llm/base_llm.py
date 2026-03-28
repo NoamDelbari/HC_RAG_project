@@ -4,8 +4,6 @@ from logging import Logger
 from abc import ABC, abstractmethod
 from typing import List, Dict, Optional, Union
 from hc_rag.llm.llm_io import LLMRAGInput, format_docs, clean_output
-from .prompts.qa_prompts import QA_SYSTEM_PROMPT, QA_USER_PROMPT
-from .prompts.judge_prompts import JUDGE_SYSTEM_PROMPT, JUDGE_USER_PROMPT, JUDGE_INSTRUCTIONS_PROMPT
 
 
 class BaseLLM(ABC):
@@ -29,8 +27,13 @@ class BaseLLM(ABC):
         self.max_tokens = max_tokens
         self.qa_mode = qa_mode
         self.combine_system_user_prompt = combine_system_user_prompt
-        self.system_prompt = system_prompt or (QA_SYSTEM_PROMPT if qa_mode else JUDGE_SYSTEM_PROMPT)
-        self.user_prompt = user_prompt or (QA_USER_PROMPT if qa_mode else JUDGE_USER_PROMPT)
+        if system_prompt is None or user_prompt is None:
+            raise ValueError(
+                "system_prompt and user_prompt are required. "
+                "Use load_prompt() from hc_rag.llm.llm_io to load prompt templates."
+            )
+        self.system_prompt = system_prompt
+        self.user_prompt = user_prompt
         self.logger = logger
         self.client = self.init_client()
 
@@ -112,8 +115,8 @@ class BaseLLM(ABC):
         if self.qa_mode:
             raise ValueError("judge_answer is only available in Judge mode.")
 
-        # Build the judge prompt using existing templates
-        user_prompt = JUDGE_USER_PROMPT.format(
+        # Build the judge prompt using instance templates
+        user_prompt = self.user_prompt.format(
             query=query,
             ground_truth_docs=ground_truth_docs,
             ground_truth_answer=ground_truth_answer,
@@ -121,14 +124,11 @@ class BaseLLM(ABC):
             generated_answer=generated_answer,
         )
 
-        # Combine instructions with user prompt
-        full_user_prompt = JUDGE_INSTRUCTIONS_PROMPT + "\n\n" + user_prompt
-
         # Build messages based on combine mode
         if self.combine_system_user_prompt:
-            prompt = self.system_prompt + "\n" + full_user_prompt
+            prompt = self.system_prompt + "\n" + user_prompt
         else:
-            prompt = full_user_prompt
+            prompt = user_prompt
 
         raw_output = self.call_model(prompt)
         self.log(f"Judge raw output: {raw_output}")
