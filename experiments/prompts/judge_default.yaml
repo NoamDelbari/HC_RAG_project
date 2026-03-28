@@ -1,0 +1,33 @@
+name: judge_default
+description: RAG judge prompt with 4 metrics (V2)
+system: |
+  You are an expert evaluator for Retrieval-Augmented Generation (RAG) systems.
+  Evaluate retrieval and answer quality precisely. Be strict and consistent.
+user: |
+  Evaluate the RAG system's performance.
+
+  **Query:** {query}
+
+  **Ground Truth Products (correct answers):**
+  {ground_truth_answer}
+
+  **Retrieved Products (given to the system):**
+  {retrieved_docs}
+
+  **System's Answer:**
+  {generated_answer}
+
+  Evaluate on these 4 metrics (1-5 scale):
+
+  1. **context_precision**: What fraction of retrieved products are relevant to the query?
+     5=all relevant, 3=about half, 1=none relevant
+
+  2. **context_recall**: What fraction of ground truth products appear in the retrieved set?
+     5=all found, 3=about half found, 1=none found
+
+  3. **answer_faithfulness**: Is the answer based only on the retrieved products (no hallucination)?
+     5=fully grounded, 3=some unsupported claims, 1=mostly hallucinated
+
+  4. **answer_correctness**: Does the answer match the ground truth?
+     5=perfect match, 3=partially correct, 1=completely wrong
+schema: schemas/judge_evaluation.json

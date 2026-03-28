@@ -1,0 +1,50 @@
+{
+  "type": "json_schema",
+  "json_schema": {
+    "name": "judge_evaluation",
+    "strict": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "context_precision": {
+          "type": "object",
+          "properties": {
+            "rating": {"type": "integer", "description": "1-5 rating"},
+            "reasoning": {"type": "string"}
+          },
+          "required": ["rating", "reasoning"],
+          "additionalProperties": false
+        },
+        "context_recall": {
+          "type": "object",
+          "properties": {
+            "rating": {"type": "integer", "description": "1-5 rating"},
+            "reasoning": {"type": "string"}
+          },
+          "required": ["rating", "reasoning"],
+          "additionalProperties": false
+        },
+        "answer_faithfulness": {
+          "type": "object",
+          "properties": {
+            "rating": {"type": "integer", "description": "1-5 rating"},
+            "reasoning": {"type": "string"}
+          },
+          "required": ["rating", "reasoning"],
+          "additionalProperties": false
+        },
+        "answer_correctness": {
+          "type": "object",
+          "properties": {
+            "rating": {"type": "integer", "description": "1-5 rating"},
+            "reasoning": {"type": "string"}
+          },
+          "required": ["rating", "reasoning"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["context_precision", "context_recall", "answer_faithfulness", "answer_correctness"],
+      "additionalProperties": false
+    }
+  }
+}

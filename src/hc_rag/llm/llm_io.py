@@ -1,4 +1,7 @@
+import json
 import re
+import yaml
+from pathlib import Path
 from typing import List, Dict, Optional
 from dataclasses import dataclass
 
@@ -95,3 +98,20 @@ def retrieval_output_to_llm_input(
             "retrieved_ids": retrieval_output.retrieved_ids,
         },
     )
+
+
+def load_prompt(name: str, prompts_dir: str) -> dict:
+    """Load a prompt template YAML file by name."""
+    path = Path(prompts_dir) / f"{name}.yaml"
+    with open(path) as f:
+        prompt = yaml.safe_load(f)
+    if "schema" in prompt:
+        schema_path = Path(prompts_dir) / prompt["schema"]
+        with open(schema_path) as f:
+            prompt["schema"] = json.load(f)
+    return prompt
+
+
+def render_prompt(template: str, **kwargs) -> str:
+    """Render a prompt template with keyword arguments."""
+    return template.format(**kwargs)
