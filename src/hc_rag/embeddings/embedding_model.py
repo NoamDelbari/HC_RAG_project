@@ -10,19 +10,29 @@ Supports batched processing and handles API rate limiting.
 
 import numpy as np
 import torch
-from typing import List, Union, Optional
+from typing import List, Protocol, Union, Optional, runtime_checkable
 from sentence_transformers import SentenceTransformer
 import logging
 import os
 from dotenv import load_dotenv
 import time
-from abc import ABC, abstractmethod
 
 # Load environment variables from .env file
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+@runtime_checkable
+class EmbeddingModelProtocol(Protocol):
+    """Protocol for embedding models (local and API-based)."""
+
+    def embed(self, texts: Union[str, List[str]], show_progress: bool = False) -> np.ndarray: ...
+    def embed_query(self, query: str) -> np.ndarray: ...
+    def embed_documents(self, documents: List[str], show_progress: bool = True) -> np.ndarray: ...
+    def get_embedding_dim(self) -> int: ...
+    def get_model_name(self) -> str: ...
 
 
 class EmbeddingModel:
@@ -552,7 +562,7 @@ def create_embedding_model(
     model_name: str,
     batch_size: Optional[int] = None,
     **kwargs
-) -> Union[EmbeddingModel, GeminiEmbeddingModel]:
+) -> EmbeddingModelProtocol:
     """
     Factory function to create the appropriate embedding model.
 
@@ -562,7 +572,7 @@ def create_embedding_model(
         **kwargs: Additional arguments passed to model constructor
 
     Returns:
-        EmbeddingModel or GeminiEmbeddingModel instance
+        EmbeddingModelProtocol instance
     """
     # Check if it's a Gemini model
     if model_name.startswith("models/") or "gemini" in model_name.lower():

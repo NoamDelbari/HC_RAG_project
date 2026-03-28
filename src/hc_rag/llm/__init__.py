@@ -1,5 +1,4 @@
 from .base_llm import BaseLLM
-from .open_router_llm import OpenRouterLLM
 from .openai_llm import OpenAILLM
 from .llm_io import (
     LLMRAGInput, format_docs, clean_output, retrieval_output_to_llm_input,

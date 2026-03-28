@@ -9,32 +9,15 @@ Supports both full document and chunked document retrieval with automatic aggreg
 
 import numpy as np
 from typing import List, Optional, Dict
-from dataclasses import dataclass
 from pathlib import Path
 import logging
 
 from hc_rag.embeddings.vector_database import VectorDatabase, SearchResult
 from hc_rag.embeddings.embedding_model import EmbeddingModel
+from hc_rag.retrieval import RetrievalOutput
 from hc_rag.retrieval.chunked_retrieval import ChunkedRetrievalMixin
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class RetrievalOutput:
-    """
-    Unified retrieval output format.
-
-    Used by both BaselineRetrieval and HCRetrieval for consistent API.
-    """
-    query_id: str
-    retrieved_ids: List[str]  # Document IDs in rank order
-    retrieved_scores: List[float]  # Similarity scores
-    k: int  # Number of documents retrieved
-    method: str  # "baseline" or "hc"
-
-    # Method-specific metadata
-    threshold: Optional[float] = None  # For HC: the adaptive threshold used
 
 
 class BaselineRetrieval(ChunkedRetrievalMixin):

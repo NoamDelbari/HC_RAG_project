@@ -17,7 +17,7 @@ from hc_rag.embeddings.vector_database import VectorDatabase, SearchResult
 from hc_rag.embeddings.embedding_model import EmbeddingModel
 from hc_rag.hc.higher_criticism import HigherCriticism
 from hc_rag.hc.null_distribution import NullDistribution, QueryNullDistributions
-from hc_rag.retrieval.baseline_retrieval import RetrievalOutput
+from hc_rag.retrieval import RetrievalOutput
 from hc_rag.retrieval.chunked_retrieval import ChunkedRetrievalMixin
 
 logger = logging.getLogger(__name__)
