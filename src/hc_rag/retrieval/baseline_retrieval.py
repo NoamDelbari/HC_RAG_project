@@ -12,13 +12,10 @@ from typing import List, Optional, Dict
 from dataclasses import dataclass
 from pathlib import Path
 import logging
-import sys
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from embeddings.vector_database import VectorDatabase, SearchResult
-from embeddings.embedding_model import EmbeddingModel
-from retrieval.chunked_retrieval import ChunkedRetrievalMixin
+from hc_rag.embeddings.vector_database import VectorDatabase, SearchResult
+from hc_rag.embeddings.embedding_model import EmbeddingModel
+from hc_rag.retrieval.chunked_retrieval import ChunkedRetrievalMixin
 
 logger = logging.getLogger(__name__)
 

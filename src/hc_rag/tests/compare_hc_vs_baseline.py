@@ -8,13 +8,9 @@ Usage:
 """
 
 import json
-import sys
 from pathlib import Path
 import numpy as np
 from typing import Dict, List
-
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 
 def load_baseline_results(baseline_dir: Path) -> Dict:

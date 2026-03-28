@@ -16,7 +16,7 @@ from typing import List, Dict, Optional, Tuple
 from pathlib import Path
 import logging
 
-from embeddings.vector_database import VectorDatabase, SearchResult
+from hc_rag.embeddings.vector_database import VectorDatabase, SearchResult
 
 logger = logging.getLogger(__name__)
 

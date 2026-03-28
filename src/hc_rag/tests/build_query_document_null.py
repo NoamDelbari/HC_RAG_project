@@ -1,15 +1,12 @@
 """Build Per-Query Null Distributions."""
 
 import argparse
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from data.crag_loader import CRAGLoader
-from embeddings.embedding_model import EmbeddingModel
-from embeddings.vector_database import VectorDatabase
-from hc.null_distribution import NegativePairingNull
+from hc_rag.data.crag_loader import CRAGLoader
+from hc_rag.embeddings.embedding_model import EmbeddingModel
+from hc_rag.embeddings.vector_database import VectorDatabase
+from hc_rag.hc.null_distribution import NegativePairingNull
 
 
 def main():

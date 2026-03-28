@@ -9,16 +9,12 @@ Tests the complete pipeline:
 5. Save and load database
 """
 
-import sys
 from pathlib import Path
 import numpy as np
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from data.crag_loader import CRAGLoader
-from embeddings.embedding_model import EmbeddingModel
-from embeddings.vector_database import VectorDatabase
+from hc_rag.data.crag_loader import CRAGLoader
+from hc_rag.embeddings.embedding_model import EmbeddingModel
+from hc_rag.embeddings.vector_database import VectorDatabase
 import time
 
 
@@ -196,7 +192,7 @@ def test_vector_database_end_to_end():
                 gt_doc_embedding = doc_embeddings[doc_idx]
 
                 # Compute cosine similarity
-                from embeddings.embedding_model import batch_cosine_similarity
+                from hc_rag.embeddings.embedding_model import batch_cosine_similarity
                 similarity = batch_cosine_similarity(query_embedding, gt_doc_embedding.reshape(1, -1))[0]
 
                 print(f"    [GT Doc {idx+1}] Similarity: {similarity:.4f}")

@@ -3,7 +3,7 @@ import re
 from logging import Logger
 from abc import ABC, abstractmethod
 from typing import List, Dict, Optional, Union
-from src.llm.llm_io import LLMRAGInput, format_docs, clean_output
+from hc_rag.llm.llm_io import LLMRAGInput, format_docs, clean_output
 from .prompts.qa_prompts import QA_SYSTEM_PROMPT, QA_USER_PROMPT
 from .prompts.judge_prompts import JUDGE_SYSTEM_PROMPT, JUDGE_USER_PROMPT, JUDGE_INSTRUCTIONS_PROMPT
 

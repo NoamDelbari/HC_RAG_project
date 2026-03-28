@@ -10,7 +10,6 @@ Usage:
 """
 
 import argparse
-import sys
 import json
 from pathlib import Path
 from typing import List, Set
@@ -18,14 +17,11 @@ import numpy as np
 from tqdm import tqdm
 import time
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from data.crag_loader import CRAGLoader
-from embeddings.embedding_model import EmbeddingModel
-from embeddings.vector_database import VectorDatabase
-from retrieval.baseline_retrieval import BaselineRetrieval
-from evaluation.evaluator import RetrievalEvaluator, RetrievalResult
+from hc_rag.data.crag_loader import CRAGLoader
+from hc_rag.embeddings.embedding_model import EmbeddingModel
+from hc_rag.embeddings.vector_database import VectorDatabase
+from hc_rag.retrieval.baseline_retrieval import BaselineRetrieval
+from hc_rag.evaluation.evaluator import RetrievalEvaluator, RetrievalResult
 
 
 def extract_ground_truth_ids(query) -> Set[str]:

@@ -24,18 +24,14 @@ Usage:
 """
 
 import argparse
-import sys
 from pathlib import Path
 import time
 import pickle
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from data.crag_loader import CRAGLoader
-from embeddings.embedding_model import EmbeddingModel, GeminiEmbeddingModel, create_embedding_model
-from embeddings.vector_database import VectorDatabase
-from embeddings.chunking import get_chunker, Chunk
+from hc_rag.data.crag_loader import CRAGLoader
+from hc_rag.embeddings.embedding_model import EmbeddingModel, GeminiEmbeddingModel, create_embedding_model
+from hc_rag.embeddings.vector_database import VectorDatabase
+from hc_rag.embeddings.chunking import get_chunker, Chunk
 from typing import List, Dict
 import logging
 

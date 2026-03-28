@@ -9,15 +9,8 @@ import numpy as np
 from scipy.stats import norm
 from typing import Optional, Tuple, NamedTuple
 import logging
-import sys
-from pathlib import Path
 
-# Handle both direct execution and module import
-try:
-    from .null_distribution import NullDistribution
-except ImportError:
-    sys.path.insert(0, str(Path(__file__).parent))
-    from null_distribution import NullDistribution
+from hc_rag.hc.null_distribution import NullDistribution
 
 logger = logging.getLogger(__name__)
 

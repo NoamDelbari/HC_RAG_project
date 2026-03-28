@@ -4,14 +4,10 @@ Test Embedding Model with CRAG Dataset
 Tests the embedding model using a real query and documents from CRAG Task 1/2.
 """
 
-import sys
 from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from data.crag_loader import CRAGLoader
-from embeddings.embedding_model import EmbeddingModel, batch_cosine_similarity
+from hc_rag.data.crag_loader import CRAGLoader
+from hc_rag.embeddings.embedding_model import EmbeddingModel, batch_cosine_similarity
 import numpy as np
 
 
@@ -57,7 +53,7 @@ def test_embeddings_with_crag():
     print("Step 3: Extracting documents for this query...")
     print("-" * 80)
 
-    from data.crag_loader import CRAGDocument
+    from hc_rag.data.crag_loader import CRAGDocument
     test_documents = []
     for idx, result in enumerate(test_query.search_results):
         doc = CRAGDocument.from_dict(result, doc_id=f"{test_query.query_id}_doc_{idx}")
