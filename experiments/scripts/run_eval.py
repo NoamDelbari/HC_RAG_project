@@ -101,6 +101,9 @@ def main():
     qa_schema = qa_prompt.get("schema")
     judge_schema = judge_prompt.get("schema")
 
+    # Uses raw OpenAI client rather than hc_rag.llm.OpenAILLM because the E2E
+    # eval requires structured output (response_format) with custom JSON schemas,
+    # which the current BaseLLM abstraction does not support.
     client = OpenAI()
     evaluator = E2EEvaluator()
 

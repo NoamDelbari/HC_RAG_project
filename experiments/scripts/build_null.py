@@ -78,6 +78,10 @@ def main():
     args = parser.parse_args()
 
     config = load_config(args.config)
+    # Note: config.null.z_score_fraction is an inference-time parameter used by
+    # HCRetrieval to estimate mu/sigma from the bottom fraction of candidates.
+    # During null building, we use ground-truth qrels to identify non-relevant docs,
+    # so the fraction parameter does not apply here.
     import experiments.datasets  # noqa: F401
     adapter = get_adapter(config.dataset.name)
 

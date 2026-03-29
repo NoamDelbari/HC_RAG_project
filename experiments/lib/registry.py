@@ -33,11 +33,15 @@ class DatasetAdapter:
     def get_gold_answers(self, query: Query, corpus: dict, qrels: dict) -> list[str]:
         """Default: relevant doc titles (first sentence, truncated to 100 chars)."""
         relevant_ids = qrels.get(query.query_id, set())
-        return [
-            corpus[did]["text"].split(". ")[0][:100]
-            for did in relevant_ids
-            if did in corpus
-        ]
+        titles = []
+        for doc_id in sorted(relevant_ids):
+            doc = corpus.get(doc_id)
+            if doc and "text" in doc:
+                full_text = str(doc["text"])
+                dot_pos = full_text.find(". ")
+                title = full_text[:dot_pos] if dot_pos > 0 else full_text
+                titles.append(title[:100].strip())
+        return titles
 
     def get_result_metadata(self, query: Query) -> dict:
         return {}

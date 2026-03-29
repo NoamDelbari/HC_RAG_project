@@ -37,19 +37,19 @@ python -m pytest src/hc_rag/tests/ -v
 
 ### Core Pipeline: Query → Embed → Search → Select → Evaluate
 
-1. **Data** (`src/data/`): `CRAGLoader` loads the CRAG benchmark (~2,700 queries, ~12,000 docs). Document IDs are MD5 hashes of URLs.
+1. **Data** (`src/hc_rag/data/`): `CRAGLoader` loads the CRAG benchmark (~2,700 queries, ~12,000 docs). Document IDs are MD5 hashes of URLs.
 
-2. **Embeddings** (`src/embeddings/`): `EmbeddingModel` (sentence-transformers, GPU-accelerated) and `GeminiEmbeddingModel`. Three supported models: `all-MiniLM-L6-v2` (384d, fast), `all-mpnet-base-v2` (768d, quality), `BAAI/bge-base-en-v1.5` (768d, SOTA). `DocumentChunker` subclasses handle fixed/sentence/recursive chunking. `VectorDatabase` wraps FAISS (`IndexFlatIP`, cosine similarity).
+2. **Embeddings** (`src/hc_rag/embeddings/`): `EmbeddingModel` (sentence-transformers, GPU-accelerated) and `GeminiEmbeddingModel`. Three supported models: `all-MiniLM-L6-v2` (384d, fast), `all-mpnet-base-v2` (768d, quality), `BAAI/bge-base-en-v1.5` (768d, SOTA). `DocumentChunker` subclasses handle fixed/sentence/recursive chunking. `VectorDatabase` wraps FAISS (`IndexFlatIP`, cosine similarity).
 
-3. **Retrieval** (`src/retrieval/`): `BaselineRetrieval` (fixed top-k) and `HCRetrieval` (adaptive via HC statistics) share a common interface. `ChunkedRetrievalMixin` provides chunk-to-document score aggregation (max/mean/sum strategies).
+3. **Retrieval** (`src/hc_rag/retrieval/`): `BaselineRetrieval` (fixed top-k) and `HCRetrieval` (adaptive via HC statistics) share a common interface. `ChunkedRetrievalMixin` provides chunk-to-document score aggregation (max/mean/sum strategies).
 
-4. **Higher Criticism** (`src/hc/`): The core statistical module. `HigherCriticism` converts cosine similarities → p-values → HC statistic to find the optimal threshold adaptively. `NegativePairingNull` builds per-query null distributions from negative document pairs.
+4. **Higher Criticism** (`src/hc_rag/hc/`): The core statistical module. `HigherCriticism` converts cosine similarities → p-values → HC statistic to find the optimal threshold adaptively. `NegativePairingNull` builds per-query null distributions from negative document pairs.
 
-5. **Evaluation** (`src/evaluation/`): `RetrievalEvaluator` computes IR metrics (Recall@k, Precision@k, MRR, NDCG, MAP, Hit Rate). Results use `RetrievalResult` and `AggregateMetrics` dataclasses.
+5. **Evaluation** (`src/hc_rag/evaluation/`): `RetrievalEvaluator` computes IR metrics (Recall@k, Precision@k, MRR, NDCG, MAP, Hit Rate). Results use `RetrievalResult` and `AggregateMetrics` dataclasses.
 
-6. **LLM** (`src/llm/`): Scaffolding for end-to-end RAG (Phase 4, not yet implemented). `OpenRouterLLM` for API calls, modular prompt templates.
+6. **LLM** (`src/hc_rag/llm/`): End-to-end RAG evaluation. `OpenAILLM` for API calls, YAML-based prompt templates.
 
-7. **Database Builder** (`src/database/`): `build_vector_db.py` supports full-document and chunked modes with resumable builds. Pre-built DB available in `src/database/crag_vector_db.7z`.
+7. **Database Builder** (`src/hc_rag/database/`): `build_vector_db.py` supports full-document and chunked modes with resumable builds. Pre-built DB available in `src/hc_rag/database/crag_vector_db.7z`.
 
 8. **Datasets** (`datasets/`): Each subdirectory is a self-contained dataset with its own generator code and config. `datasets/crag/` holds the CRAG benchmark data. `datasets/cross_entity_qa/` generates cross-entity QA datasets using Wikidata SPARQL, Wikipedia passage mapping, and LLM-based question generation with constraint-based sub-clustering for variable K.
 
@@ -59,6 +59,8 @@ python -m pytest src/hc_rag/tests/ -v
 - **Mixin pattern**: `ChunkedRetrievalMixin` shared between retrieval classes
 - **Dataclass results**: `RetrievalOutput`, `RetrievalResult`, `AggregateMetrics` for structured outputs
 - **Unified retrieval API**: Both retrieval strategies share the same interface
+- **Registry pattern**: `DatasetAdapter` registry for dataset-specific behavior
+- **Config-driven pipeline**: YAML configs drive experiment execution
 
 ## Environment
 
