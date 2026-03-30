@@ -8,3 +8,7 @@ __pycache__/
 .env
 **/__pycache__/
 *.egg-info/
+
+# Derived artifacts (vector DBs, null distributions)
+artifacts/
+dataset_builders/*/output/
