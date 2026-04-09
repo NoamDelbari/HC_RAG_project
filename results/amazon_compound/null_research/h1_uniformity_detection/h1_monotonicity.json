@@ -1,0 +1,1235 @@
+{
+  "config": {
+    "dataset": "amazon_compound",
+    "pool_sizes": [
+      1000,
+      2000,
+      3000,
+      4000,
+      5000,
+      6000,
+      7000,
+      8000,
+      9000,
+      10000
+    ],
+    "z_score_fractions": [
+      0.5,
+      0.6,
+      0.7,
+      0.8
+    ],
+    "max_relevant": 43,
+    "n_queries": 135
+  },
+  "grid": {
+    "0.5": {
+      "1000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.004932121806828449,
+            "median_ks_pval": 0.08007539649948503
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.5407407407407407,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.39705353934602944,
+            "n_relevant_docs": 2783
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 2.3444071051205033,
+            "unique_k_values": 30,
+            "n_negative_hc": 57
+          }
+        ]
+      },
+      "2000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0030568596106134716,
+            "median_ks_pval": 0.16572619765442598
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.4444444444444444,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.4802222948676038,
+            "n_relevant_docs": 3059
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 1.5917392510380928,
+            "unique_k_values": 25,
+            "n_negative_hc": 69
+          }
+        ]
+      },
+      "3000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.00230152795688654,
+            "median_ks_pval": 0.23925720142251455
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.37777777777777777,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.5384615384615384,
+            "n_relevant_docs": 3211
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.7752881640940785,
+            "unique_k_values": 22,
+            "n_negative_hc": 79
+          }
+        ]
+      },
+      "4000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0023308503225181743,
+            "median_ks_pval": 0.10820450489883698
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.35555555555555557,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.5900791235544736,
+            "n_relevant_docs": 3286
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.4937172252944033,
+            "unique_k_values": 18,
+            "n_negative_hc": 82
+          }
+        ]
+      },
+      "5000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.002039590309334857,
+            "median_ks_pval": 0.12275074834455502
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.35555555555555557,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6208742194469223,
+            "n_relevant_docs": 3363
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.47439620218727957,
+            "unique_k_values": 13,
+            "n_negative_hc": 80
+          }
+        ]
+      },
+      "6000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0017256055063442632,
+            "median_ks_pval": 0.18149738980640884
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.3333333333333333,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6432971545907891,
+            "n_relevant_docs": 3409
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.42750378369253156,
+            "unique_k_values": 14,
+            "n_negative_hc": 81
+          }
+        ]
+      },
+      "7000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0016259239845027168,
+            "median_ks_pval": 0.17759426624713387
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.32592592592592595,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6595991867557363,
+            "n_relevant_docs": 3443
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.2974880351650642,
+            "unique_k_values": 13,
+            "n_negative_hc": 83
+          }
+        ]
+      },
+      "8000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0014595391573574146,
+            "median_ks_pval": 0.2022137972554573
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.3037037037037037,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.677512237258854,
+            "n_relevant_docs": 3473
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.28169710369604173,
+            "unique_k_values": 14,
+            "n_negative_hc": 85
+          }
+        ]
+      },
+      "9000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0014393429574124095,
+            "median_ks_pval": 0.16472283428042916
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.24444444444444444,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6891621389762653,
+            "n_relevant_docs": 3497
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.2942422430959892,
+            "unique_k_values": 13,
+            "n_negative_hc": 85
+          }
+        ]
+      },
+      "10000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.001409603424638195,
+            "median_ks_pval": 0.14182456236394625
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.22962962962962963,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.696763202725724,
+            "n_relevant_docs": 3522
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.25631958956061146,
+            "unique_k_values": 15,
+            "n_negative_hc": 85
+          }
+        ]
+      }
+    },
+    "0.6": {
+      "1000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.004894318630087491,
+            "median_ks_pval": 0.08406455405708957
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.6074074074074074,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.3959755659360402,
+            "n_relevant_docs": 2783
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 2.560502123726808,
+            "unique_k_values": 29,
+            "n_negative_hc": 54
+          }
+        ]
+      },
+      "2000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0031168070989630037,
+            "median_ks_pval": 0.15020316493031788
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.4666666666666667,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.4805491990846682,
+            "n_relevant_docs": 3059
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 1.902381615257112,
+            "unique_k_values": 23,
+            "n_negative_hc": 66
+          }
+        ]
+      },
+      "3000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.00220256353574369,
+            "median_ks_pval": 0.28364945992597607
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.4444444444444444,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.5344129554655871,
+            "n_relevant_docs": 3211
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 1.090156951442641,
+            "unique_k_values": 22,
+            "n_negative_hc": 76
+          }
+        ]
+      },
+      "4000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0024053779107681417,
+            "median_ks_pval": 0.08947437943791242
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.4222222222222222,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.5870359099208764,
+            "n_relevant_docs": 3286
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.599570470724875,
+            "unique_k_values": 17,
+            "n_negative_hc": 81
+          }
+        ]
+      },
+      "5000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.002090381849951445,
+            "median_ks_pval": 0.10931257838233915
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.37037037037037035,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6173059768064229,
+            "n_relevant_docs": 3363
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.4883467276547804,
+            "unique_k_values": 16,
+            "n_negative_hc": 81
+          }
+        ]
+      },
+      "6000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0016778240651769694,
+            "median_ks_pval": 0.20624035344925362
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.35555555555555557,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6418304488119683,
+            "n_relevant_docs": 3409
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.45454396254669255,
+            "unique_k_values": 14,
+            "n_negative_hc": 80
+          }
+        ]
+      },
+      "7000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0015919390114849802,
+            "median_ks_pval": 0.18841225770625392
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.35555555555555557,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6601800755155388,
+            "n_relevant_docs": 3443
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.3768347072256952,
+            "unique_k_values": 13,
+            "n_negative_hc": 82
+          }
+        ]
+      },
+      "8000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0014775113442739157,
+            "median_ks_pval": 0.19083648538749964
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.362962962962963,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6757846242441693,
+            "n_relevant_docs": 3473
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.362568119498318,
+            "unique_k_values": 16,
+            "n_negative_hc": 84
+          }
+        ]
+      },
+      "9000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0014395628438403363,
+            "median_ks_pval": 0.16621785598484157
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.3333333333333333,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.688018301401201,
+            "n_relevant_docs": 3497
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.3020371611869477,
+            "unique_k_values": 16,
+            "n_negative_hc": 85
+          }
+        ]
+      },
+      "10000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0013865803971546686,
+            "median_ks_pval": 0.1523546450048796
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.28888888888888886,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6970471323111869,
+            "n_relevant_docs": 3522
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.3109767908653841,
+            "unique_k_values": 14,
+            "n_negative_hc": 84
+          }
+        ]
+      }
+    },
+    "0.7": {
+      "1000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.004828844912305688,
+            "median_ks_pval": 0.09155596137795746
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.674074074074074,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.39561624146604385,
+            "n_relevant_docs": 2783
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 2.797105627791418,
+            "unique_k_values": 32,
+            "n_negative_hc": 52
+          }
+        ]
+      },
+      "2000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.002945804405479119,
+            "median_ks_pval": 0.19862495271758046
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.5555555555555556,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.4776070611310886,
+            "n_relevant_docs": 3059
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 2.0657356360264294,
+            "unique_k_values": 24,
+            "n_negative_hc": 69
+          }
+        ]
+      },
+      "3000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0022869483629931464,
+            "median_ks_pval": 0.24374951753113738
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.5037037037037037,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.5328558081594519,
+            "n_relevant_docs": 3211
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 1.3739988439619235,
+            "unique_k_values": 25,
+            "n_negative_hc": 70
+          }
+        ]
+      },
+      "4000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.002310355235749406,
+            "median_ks_pval": 0.11378792733046172
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.4666666666666667,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.5846013390139988,
+            "n_relevant_docs": 3286
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.8497248906176947,
+            "unique_k_values": 20,
+            "n_negative_hc": 78
+          }
+        ]
+      },
+      "5000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.002200429151220429,
+            "median_ks_pval": 0.07881847989141932
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.43703703703703706,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6149271483794231,
+            "n_relevant_docs": 3363
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.6351633557475168,
+            "unique_k_values": 18,
+            "n_negative_hc": 79
+          }
+        ]
+      },
+      "6000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0017444449629324954,
+            "median_ks_pval": 0.17225269828243472
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.3925925925925926,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6432971545907891,
+            "n_relevant_docs": 3409
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.47993113477441574,
+            "unique_k_values": 14,
+            "n_negative_hc": 80
+          }
+        ]
+      },
+      "7000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.001594768275216929,
+            "median_ks_pval": 0.18740572001686734
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.362962962962963,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6607609642753413,
+            "n_relevant_docs": 3443
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.4356511784534381,
+            "unique_k_values": 15,
+            "n_negative_hc": 82
+          }
+        ]
+      },
+      "8000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.001492511793207807,
+            "median_ks_pval": 0.1814733421027927
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.3925925925925926,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6731932047221423,
+            "n_relevant_docs": 3473
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.4003684339494971,
+            "unique_k_values": 14,
+            "n_negative_hc": 81
+          }
+        ]
+      },
+      "9000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0014849587435467604,
+            "median_ks_pval": 0.14012970348998838
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.35555555555555557,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6871604232199028,
+            "n_relevant_docs": 3497
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.34917500794755824,
+            "unique_k_values": 14,
+            "n_negative_hc": 82
+          }
+        ]
+      },
+      "10000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.001385837718848787,
+            "median_ks_pval": 0.151508197965727
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.3333333333333333,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6990346394094265,
+            "n_relevant_docs": 3522
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.3388646949303539,
+            "unique_k_values": 14,
+            "n_negative_hc": 84
+          }
+        ]
+      }
+    },
+    "0.8": {
+      "1000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.004834900628271632,
+            "median_ks_pval": 0.09200405305427639
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.6888888888888889,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.38447718289615523,
+            "n_relevant_docs": 2783
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 3.0441008902344158,
+            "unique_k_values": 32,
+            "n_negative_hc": 55
+          }
+        ]
+      },
+      "2000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0029519904773394473,
+            "median_ks_pval": 0.19974488178206395
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.5703703703703704,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.473030402092187,
+            "n_relevant_docs": 3059
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 2.2706249676427954,
+            "unique_k_values": 26,
+            "n_negative_hc": 66
+          }
+        ]
+      },
+      "3000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.002197088494506172,
+            "median_ks_pval": 0.2866725722736279
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.4666666666666667,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.5278729367798194,
+            "n_relevant_docs": 3211
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 1.7734209370946432,
+            "unique_k_values": 21,
+            "n_negative_hc": 68
+          }
+        ]
+      },
+      "4000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.002215332560730643,
+            "median_ks_pval": 0.14344937148201675
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.45925925925925926,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": false,
+            "signal_rate": 0.5815581253804017,
+            "n_relevant_docs": 3286
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": true,
+            "mean_hc_statistic": 1.2886068246012143,
+            "unique_k_values": 22,
+            "n_negative_hc": 71
+          }
+        ]
+      },
+      "5000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0022746557032588266,
+            "median_ks_pval": 0.06430203645777655
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.4222222222222222,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6152245019327981,
+            "n_relevant_docs": 3363
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.8897646998513321,
+            "unique_k_values": 20,
+            "n_negative_hc": 78
+          }
+        ]
+      },
+      "6000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0018527857672308856,
+            "median_ks_pval": 0.1274757486479754
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.3925925925925926,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6432971545907891,
+            "n_relevant_docs": 3409
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.7136263383203744,
+            "unique_k_values": 18,
+            "n_negative_hc": 78
+          }
+        ]
+      },
+      "7000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0016201350293553463,
+            "median_ks_pval": 0.18343120096946647
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.362962962962963,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.65814696485623,
+            "n_relevant_docs": 3443
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.5723113346071216,
+            "unique_k_values": 16,
+            "n_negative_hc": 81
+          }
+        ]
+      },
+      "8000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0015305355478437976,
+            "median_ks_pval": 0.16075809500999905
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.3333333333333333,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6723293982147999,
+            "n_relevant_docs": 3473
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.4921068593269885,
+            "unique_k_values": 15,
+            "n_negative_hc": 81
+          }
+        ]
+      },
+      "9000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0014403904920601285,
+            "median_ks_pval": 0.16249235506956267
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.3037037037037037,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6871604232199028,
+            "n_relevant_docs": 3497
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.4648066749956916,
+            "unique_k_values": 17,
+            "n_negative_hc": 82
+          }
+        ]
+      },
+      "10000": {
+        "all_passed": false,
+        "tests": [
+          {
+            "test": "split_half_ks",
+            "passed": true,
+            "median_ks_stat": 0.0014244569907566063,
+            "median_ks_pval": 0.13021218741215773
+          },
+          {
+            "test": "per_query_uniformity",
+            "passed": false,
+            "pass_rate": 0.26666666666666666,
+            "n_queries_tested": 135
+          },
+          {
+            "test": "signal_detection",
+            "passed": true,
+            "signal_rate": 0.6993185689948893,
+            "n_relevant_docs": 3522
+          },
+          {
+            "test": "hc_k_correlation",
+            "passed": false,
+            "mean_hc_statistic": 0.4338090061448231,
+            "unique_k_values": 14,
+            "n_negative_hc": 80
+          }
+        ]
+      }
+    }
+  }
+}
