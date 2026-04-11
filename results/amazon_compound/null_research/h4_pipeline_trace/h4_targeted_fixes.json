@@ -1,0 +1,1683 @@
+{
+  "config": {
+    "dataset": "amazon_compound",
+    "pool_size": 1000,
+    "z_score_fraction": 0.8,
+    "gamma": 0.043,
+    "max_relevant": 43,
+    "n_queries": 135,
+    "top_n_stored": 100
+  },
+  "fix1_contamination_removal": {
+    "n_tested": 24,
+    "n_flipped": 0,
+    "per_query": [
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_shoes_union_girls_boots_clogs__mules_above",
+        "hc_stat_original_pq": -0.1810851341806882,
+        "hc_stat_clean_pq": -0.1810851341806882,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.43266506716609,
+        "mu_clean": 0.4326644655377832,
+        "sigma_dirty": 0.015555378971380457,
+        "sigma_clean": 0.015570872229902007,
+        "n_relevant_in_estimation": 3
+      },
+      {
+        "query_id": "q_electronics_ebook_readers__accessories_screen_protectors_above",
+        "hc_stat_original_pq": -0.20809840993227455,
+        "hc_stat_clean_pq": -0.20809840993227455,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.4352767999842763,
+        "mu_clean": 0.4350134127134017,
+        "sigma_dirty": 0.028416143436205653,
+        "sigma_clean": 0.028416719075107257,
+        "n_relevant_in_estimation": 9
+      },
+      {
+        "query_id": "q_electronics_ebook_readers__accessories_power_adapters_above",
+        "hc_stat_original_pq": -0.16090008902503095,
+        "hc_stat_clean_pq": -0.16090008902503095,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.4418070491030812,
+        "mu_clean": 0.44182588656743366,
+        "sigma_dirty": 0.014957853448286844,
+        "sigma_clean": 0.014955357284964122,
+        "n_relevant_in_estimation": 2
+      },
+      {
+        "query_id": "q_electronics_wearable_technology_rings_above",
+        "hc_stat_original_pq": -0.1676213367129648,
+        "hc_stat_clean_pq": -0.1676213367129648,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.40375755496323107,
+        "mu_clean": 0.4037555999109706,
+        "sigma_dirty": 0.017383492977536098,
+        "sigma_clean": 0.01735457879797911,
+        "n_relevant_in_estimation": 3
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_shoes_union_girls_flats__loafers_above",
+        "hc_stat_original_pq": -0.16090008902503095,
+        "hc_stat_clean_pq": -0.16090008902503095,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.4478260938078165,
+        "mu_clean": 0.4478492300611988,
+        "sigma_dirty": 0.015434633396098655,
+        "sigma_clean": 0.015446601573598914,
+        "n_relevant_in_estimation": 2
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_shoes_union_girls_sneakers_above",
+        "hc_stat_original_pq": -0.16090008902503095,
+        "hc_stat_clean_pq": -0.16090008902503095,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.43260614067316056,
+        "mu_clean": 0.43260532266514046,
+        "sigma_dirty": 0.015097837613081018,
+        "sigma_clean": 0.015088845593923716,
+        "n_relevant_in_estimation": 2
+      },
+      {
+        "query_id": "q_home__kitchen_kitchen__dining_travel__togo_drinkware_above",
+        "hc_stat_original_pq": -0.20133433848702864,
+        "hc_stat_clean_pq": -0.20133433848702864,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.42594663847237824,
+        "mu_clean": 0.4259660615861041,
+        "sigma_dirty": 0.02147941398089311,
+        "sigma_clean": 0.021458213546202278,
+        "n_relevant_in_estimation": 5
+      },
+      {
+        "query_id": "q_electronics_ebook_readers__accessories_power_cables_above",
+        "hc_stat_original_pq": -0.14747881203752733,
+        "hc_stat_clean_pq": -0.14747881203752733,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.431879016533494,
+        "mu_clean": 0.431879016533494,
+        "sigma_dirty": 0.014997314867139332,
+        "sigma_clean": 0.014997314867139332,
+        "n_relevant_in_estimation": 0
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_novelty__more_watches_above",
+        "hc_stat_original_pq": -0.03759996941761112,
+        "hc_stat_clean_pq": -0.03759996941761112,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.40181734282523396,
+        "mu_clean": 0.4016498375299295,
+        "sigma_dirty": 0.023960205709909806,
+        "sigma_clean": 0.023913457586449957,
+        "n_relevant_in_estimation": 6
+      },
+      {
+        "query_id": "q_home__kitchen_seasonal_d\u00e9cor_collectible_figurines_above",
+        "hc_stat_original_pq": -0.1676213367129648,
+        "hc_stat_clean_pq": -0.1676213367129648,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.3636000000685453,
+        "mu_clean": 0.3635943993963395,
+        "sigma_dirty": 0.013250825954751922,
+        "sigma_clean": 0.01326544520076261,
+        "n_relevant_in_estimation": 2
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_test_w_genz_all_test_w_genz_shoes_above",
+        "hc_stat_original_pq": -0.14747881203752733,
+        "hc_stat_clean_pq": -0.14747881203752733,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.3661424109712243,
+        "mu_clean": 0.3661424109712243,
+        "sigma_dirty": 0.008785640889988408,
+        "sigma_clean": 0.008785640889988408,
+        "n_relevant_in_estimation": 0
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_clothing_boys_activewear_above",
+        "hc_stat_original_pq": -0.02267133955693153,
+        "hc_stat_clean_pq": -0.02267133955693153,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.4334032081067562,
+        "mu_clean": 0.43332309626426124,
+        "sigma_dirty": 0.0176526333185973,
+        "sigma_clean": 0.017635454948416944,
+        "n_relevant_in_estimation": 3
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_shoes_union_girls_sandals__pumps_above",
+        "hc_stat_original_pq": -0.18782771761801442,
+        "hc_stat_clean_pq": -0.18782771761801442,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.4300075278058648,
+        "mu_clean": 0.4299982294964431,
+        "sigma_dirty": 0.018226483979716285,
+        "sigma_clean": 0.018205689132383903,
+        "n_relevant_in_estimation": 4
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_men_handbags__shoulder_bags_above",
+        "hc_stat_original_pq": -0.17434967949841568,
+        "hc_stat_clean_pq": -0.17434967949841568,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.4104786268994212,
+        "mu_clean": 0.4105698433021081,
+        "sigma_dirty": 0.019837375250618648,
+        "sigma_clean": 0.01981828050175611,
+        "n_relevant_in_estimation": 3
+      },
+      {
+        "query_id": "q_home__kitchen_seasonal_d\u00e9cor_ornaments_above",
+        "hc_stat_original_pq": -0.02856598257174312,
+        "hc_stat_clean_pq": -0.02856598257174312,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.41203445170074704,
+        "mu_clean": 0.4116852292231978,
+        "sigma_dirty": 0.017337182307624467,
+        "sigma_clean": 0.017173129098111348,
+        "n_relevant_in_estimation": 17
+      },
+      {
+        "query_id": "q_home__kitchen_event__party_supplies_tableware_above",
+        "hc_stat_original_pq": -0.04552741922884876,
+        "hc_stat_clean_pq": -0.04552741922884876,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.40055113784968854,
+        "mu_clean": 0.4004634797193442,
+        "sigma_dirty": 0.012765082020386948,
+        "sigma_clean": 0.012729533907101628,
+        "n_relevant_in_estimation": 15
+      },
+      {
+        "query_id": "q_electronics_computers__accessories_computer_accessories__peripherals_above",
+        "hc_stat_original_pq": -0.007265801963485362,
+        "hc_stat_clean_pq": -0.007265801963485362,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.3992459851130843,
+        "mu_clean": 0.39927172970801666,
+        "sigma_dirty": 0.010770404738117323,
+        "sigma_clean": 0.010769715450606631,
+        "n_relevant_in_estimation": 2
+      },
+      {
+        "query_id": "q_electronics_wearable_technology_arm__wristband_accessories_above",
+        "hc_stat_original_pq": -0.08806238691551203,
+        "hc_stat_clean_pq": -0.08806238691551203,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.4030550681054592,
+        "mu_clean": 0.40255874919493484,
+        "sigma_dirty": 0.01903742684077684,
+        "sigma_clean": 0.018970864025691495,
+        "n_relevant_in_estimation": 21
+      },
+      {
+        "query_id": "q_home__kitchen_event__party_supplies_headwear_below",
+        "hc_stat_original_pq": -0.26247151452701445,
+        "hc_stat_clean_pq": -0.26247151452701445,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.3839362808316946,
+        "mu_clean": 0.3840353698487494,
+        "sigma_dirty": 0.015361491660212851,
+        "sigma_clean": 0.015330608979069044,
+        "n_relevant_in_estimation": 15
+      },
+      {
+        "query_id": "q_electronics_wearable_technology_glasses_above",
+        "hc_stat_original_pq": -0.4000187721561518,
+        "hc_stat_clean_pq": -0.4000187721561518,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.38065938983112574,
+        "mu_clean": 0.3798968347267331,
+        "sigma_dirty": 0.032500709708437776,
+        "sigma_clean": 0.03269053804382518,
+        "n_relevant_in_estimation": 36
+      },
+      {
+        "query_id": "q_home__kitchen_kitchen__dining_storage__organization_above",
+        "hc_stat_original_pq": -0.052770806147551225,
+        "hc_stat_clean_pq": -0.052770806147551225,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.4027980253100395,
+        "mu_clean": 0.40282953556046286,
+        "sigma_dirty": 0.017209168385148514,
+        "sigma_clean": 0.01728920851243712,
+        "n_relevant_in_estimation": 11
+      },
+      {
+        "query_id": "q_home__kitchen_bedding_bedspreads_coverlets__sets_above",
+        "hc_stat_original_pq": -0.25353954690702557,
+        "hc_stat_clean_pq": -0.25353954690702557,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.4698815891891718,
+        "mu_clean": 0.4695985447901946,
+        "sigma_dirty": 0.015572461550999193,
+        "sigma_clean": 0.015502384445235764,
+        "n_relevant_in_estimation": 20
+      },
+      {
+        "query_id": "q_electronics_ebook_readers__accessories_skins_above",
+        "hc_stat_original_pq": -0.027386127875258306,
+        "hc_stat_clean_pq": -0.027386127875258306,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.32014407593756916,
+        "mu_clean": 0.3201278341886325,
+        "sigma_dirty": 0.008616269632116452,
+        "sigma_clean": 0.00860904639377388,
+        "n_relevant_in_estimation": 20
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_shoe_jewelry__watch_accessories_jewelry_access_above",
+        "hc_stat_original_pq": -0.20133433848702864,
+        "hc_stat_clean_pq": -0.20133433848702864,
+        "delta": 0.0,
+        "flipped": false,
+        "mu_dirty": 0.4371575544402003,
+        "mu_clean": 0.4371754476045181,
+        "sigma_dirty": 0.010244126509493596,
+        "sigma_clean": 0.010247897232179755,
+        "n_relevant_in_estimation": 6
+      }
+    ]
+  },
+  "fix2_detection_boundary": {
+    "boundary_formula": "mu > sqrt(2 * log(1/epsilon))",
+    "summary_by_group": {
+      "positive_hc": {
+        "n": 80,
+        "n_above_boundary": 62,
+        "n_below_boundary": 18,
+        "mean_epsilon": 0.19069767441860466,
+        "mean_mu_signal": 3.4063994196520953
+      },
+      "fixable": {
+        "n": 31,
+        "n_above_boundary": 31,
+        "n_below_boundary": 0,
+        "mean_epsilon": 0.15003750937734434,
+        "mean_mu_signal": 3.0723576890971396
+      },
+      "irreducible": {
+        "n": 24,
+        "n_above_boundary": 7,
+        "n_below_boundary": 17,
+        "mean_epsilon": 0.01065891472868217,
+        "mean_mu_signal": 1.2301640482894125
+      }
+    },
+    "per_query": [
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_shoes_union_girls_boots_clogs__mules_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.1810851341806882
+      },
+      {
+        "query_id": "q_electronics_ebook_readers__accessories_screen_protectors_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.20809840993227455
+      },
+      {
+        "query_id": "q_electronics_ebook_readers__accessories_power_adapters_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.16090008902503095
+      },
+      {
+        "query_id": "q_electronics_power_accessories_line_conditioners_above",
+        "group": "positive_hc",
+        "epsilon": 0.13953488372093023,
+        "mu_signal": 7.491179048128484,
+        "boundary_threshold": 1.984661505882304,
+        "above_boundary": true,
+        "n_rel_in_gamma": 6,
+        "hc_stat_perquery": 2.986471004956202
+      },
+      {
+        "query_id": "q_electronics_wearable_technology_rings_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.1676213367129648
+      },
+      {
+        "query_id": "q_electronics_gaming_accessories_accessories__peripherals_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.14747881203752733
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_shoes_union_girls_flats__loafers_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.16090008902503095
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_clothing_boys_pants_above",
+        "group": "fixable",
+        "epsilon": 0.11627906976744186,
+        "mu_signal": 3.206203460722703,
+        "boundary_threshold": 2.0744937711448843,
+        "above_boundary": true,
+        "n_rel_in_gamma": 5,
+        "hc_stat_perquery": 0.6665363260395804
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_sleepwear__robes_total_sleepwear__robes_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.16090008902503095
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_ice_hockey_above",
+        "group": "positive_hc",
+        "epsilon": 0.09302325581395349,
+        "mu_signal": 3.0765690813800712,
+        "boundary_threshold": 2.179406228574045,
+        "above_boundary": true,
+        "n_rel_in_gamma": 4,
+        "hc_stat_perquery": 0.4658326199990739
+      },
+      {
+        "query_id": "q_electronics_canon_accessories_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.14747881203752733
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_volleyball_below",
+        "group": "positive_hc",
+        "epsilon": 0.09302325581395349,
+        "mu_signal": 5.678388280268619,
+        "boundary_threshold": 2.179406228574045,
+        "above_boundary": true,
+        "n_rel_in_gamma": 4,
+        "hc_stat_perquery": 0.8046042094968228
+      },
+      {
+        "query_id": "q_home__kitchen_vacuums__floor_care_floor_buffers__parts_above",
+        "group": "positive_hc",
+        "epsilon": 0.09302325581395349,
+        "mu_signal": 3.707046282596855,
+        "boundary_threshold": 2.179406228574045,
+        "above_boundary": true,
+        "n_rel_in_gamma": 4,
+        "hc_stat_perquery": 0.5574748755904615
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_shoes_union_girls_sneakers_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.16090008902503095
+      },
+      {
+        "query_id": "q_electronics_pc_gaming_gaming_computers_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.18782771761801442
+      },
+      {
+        "query_id": "q_home__kitchen_seasonal_d\u00e9cor_tinsel_above",
+        "group": "positive_hc",
+        "epsilon": 0.13953488372093023,
+        "mu_signal": 3.9097669039845955,
+        "boundary_threshold": 1.984661505882304,
+        "above_boundary": true,
+        "n_rel_in_gamma": 6,
+        "hc_stat_perquery": 1.088662107903635
+      },
+      {
+        "query_id": "q_home__kitchen_kitchen__dining_travel__togo_drinkware_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.20133433848702864
+      },
+      {
+        "query_id": "q_electronics_ebook_readers__accessories_power_cables_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.14747881203752733
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_novelty__more_watches_above",
+        "group": "irreducible",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 2.654341864854879,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": false,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": -0.03759996941761112
+      },
+      {
+        "query_id": "q_home__kitchen_irons__steamers_travel_garment_steamers_above",
+        "group": "positive_hc",
+        "epsilon": 0.23255813953488372,
+        "mu_signal": 6.02880000941259,
+        "boundary_threshold": 1.7079900600995994,
+        "above_boundary": true,
+        "n_rel_in_gamma": 10,
+        "hc_stat_perquery": 4.013644911932585
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_apparel_and_accessories_made_in_italy_womens_f_above",
+        "group": "positive_hc",
+        "epsilon": 0.046511627906976744,
+        "mu_signal": 2.8067251994267455,
+        "boundary_threshold": 2.4771164426137164,
+        "above_boundary": true,
+        "n_rel_in_gamma": 2,
+        "hc_stat_perquery": 0.1308071562621099
+      },
+      {
+        "query_id": "q_home__kitchen_seasonal_d\u00e9cor_collectible_figurines_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.1676213367129648
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_test_w_genz_all_test_w_genz_shoes_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.14747881203752733
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_clothing_boys_activewear_above",
+        "group": "irreducible",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 2.792184232848498,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": true,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": -0.02267133955693153
+      },
+      {
+        "query_id": "q_electronics_portable_audio__video_portable__handheld_tvs_above",
+        "group": "positive_hc",
+        "epsilon": 0.23255813953488372,
+        "mu_signal": 4.253406138824841,
+        "boundary_threshold": 1.7079900600995994,
+        "above_boundary": true,
+        "n_rel_in_gamma": 10,
+        "hc_stat_perquery": 1.9126842034276972
+      },
+      {
+        "query_id": "q_electronics_television__video_video_glasses_above",
+        "group": "fixable",
+        "epsilon": 0.09302325581395349,
+        "mu_signal": 3.5163026632829353,
+        "boundary_threshold": 2.179406228574045,
+        "above_boundary": true,
+        "n_rel_in_gamma": 4,
+        "hc_stat_perquery": 0.6903431718968817
+      },
+      {
+        "query_id": "q_home__kitchen_summer_products_in_home_outdoor_cushions__pillows_above",
+        "group": "positive_hc",
+        "epsilon": 0.11627906976744186,
+        "mu_signal": 4.242461404055029,
+        "boundary_threshold": 2.0744937711448843,
+        "above_boundary": true,
+        "n_rel_in_gamma": 5,
+        "hc_stat_perquery": 0.9899494936611671
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_kids_shoes_union_girls_sandals__pumps_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.18782771761801442
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_swimwear_test_girls_swimwear_above",
+        "group": "positive_hc",
+        "epsilon": 0.046511627906976744,
+        "mu_signal": 3.8461247050699017,
+        "boundary_threshold": 2.4771164426137164,
+        "above_boundary": true,
+        "n_rel_in_gamma": 2,
+        "hc_stat_perquery": 0.21863960914830774
+      },
+      {
+        "query_id": "q_electronics_ebook_readers__accessories_reading_lights_above",
+        "group": "positive_hc",
+        "epsilon": 0.16279069767441862,
+        "mu_signal": 5.445720634027307,
+        "boundary_threshold": 1.90540807526275,
+        "above_boundary": true,
+        "n_rel_in_gamma": 7,
+        "hc_stat_perquery": 2.98496231131986
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_swimwear_test_mens_swimwear_above",
+        "group": "positive_hc",
+        "epsilon": 0.11627906976744186,
+        "mu_signal": 4.096257629550172,
+        "boundary_threshold": 2.0744937711448843,
+        "above_boundary": true,
+        "n_rel_in_gamma": 5,
+        "hc_stat_perquery": 0.9798705738327966
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_bowling_above",
+        "group": "positive_hc",
+        "epsilon": 0.13953488372093023,
+        "mu_signal": 4.447568379596711,
+        "boundary_threshold": 1.984661505882304,
+        "above_boundary": true,
+        "n_rel_in_gamma": 6,
+        "hc_stat_perquery": 1.0002206801174973
+      },
+      {
+        "query_id": "q_electronics_television__video_tvdvd_combos_above",
+        "group": "positive_hc",
+        "epsilon": 0.16279069767441862,
+        "mu_signal": 4.438589933044349,
+        "boundary_threshold": 1.90540807526275,
+        "above_boundary": true,
+        "n_rel_in_gamma": 7,
+        "hc_stat_perquery": 1.2643067315448202
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_rugby_above",
+        "group": "positive_hc",
+        "epsilon": 0.16279069767441862,
+        "mu_signal": 5.7494115788598315,
+        "boundary_threshold": 1.90540807526275,
+        "above_boundary": true,
+        "n_rel_in_gamma": 7,
+        "hc_stat_perquery": 2.0264927188473094
+      },
+      {
+        "query_id": "q_home__kitchen_bedding_bed_runners__scarves_above",
+        "group": "positive_hc",
+        "epsilon": 0.23255813953488372,
+        "mu_signal": 5.8086327432054246,
+        "boundary_threshold": 1.7079900600995994,
+        "above_boundary": true,
+        "n_rel_in_gamma": 10,
+        "hc_stat_perquery": 5.9669095091939415
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_men_handbags__shoulder_bags_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.17434967949841568
+      },
+      {
+        "query_id": "q_electronics_security__surveillance_radio_scanners_above",
+        "group": "fixable",
+        "epsilon": 0.09302325581395349,
+        "mu_signal": 3.8243352290555332,
+        "boundary_threshold": 2.179406228574045,
+        "above_boundary": true,
+        "n_rel_in_gamma": 4,
+        "hc_stat_perquery": 0.7066314564343156
+      },
+      {
+        "query_id": "q_amazon_devices__accessories_amazon_device_accessories_protection_plans_below",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.3033165624972438
+      },
+      {
+        "query_id": "q_home__kitchen_seasonal_d\u00e9cor_artificial_snow_below",
+        "group": "positive_hc",
+        "epsilon": 0.5116279069767442,
+        "mu_signal": 6.618304013326252,
+        "boundary_threshold": 1.1577198817807755,
+        "above_boundary": true,
+        "n_rel_in_gamma": 22,
+        "hc_stat_perquery": 8.81816423951066
+      },
+      {
+        "query_id": "q_home__kitchen_seasonal_d\u00e9cor_snow_globes_above",
+        "group": "fixable",
+        "epsilon": 0.09302325581395349,
+        "mu_signal": 3.0556801963273315,
+        "boundary_threshold": 2.179406228574045,
+        "above_boundary": true,
+        "n_rel_in_gamma": 4,
+        "hc_stat_perquery": 0.36263499572902225
+      },
+      {
+        "query_id": "q_home__kitchen_irons__steamers_ironing_accessories_above",
+        "group": "positive_hc",
+        "epsilon": 0.3953488372093023,
+        "mu_signal": 4.214312566195473,
+        "boundary_threshold": 1.3623411992869823,
+        "above_boundary": true,
+        "n_rel_in_gamma": 17,
+        "hc_stat_perquery": 3.56790924784476
+      },
+      {
+        "query_id": "q_electronics_television__video_av_receivers__amplifiers_above",
+        "group": "positive_hc",
+        "epsilon": 0.13953488372093023,
+        "mu_signal": 3.627756597081903,
+        "boundary_threshold": 1.984661505882304,
+        "above_boundary": true,
+        "n_rel_in_gamma": 6,
+        "hc_stat_perquery": 0.8201245726111744
+      },
+      {
+        "query_id": "q_electronics_power_accessories_isolation_transformers_above",
+        "group": "positive_hc",
+        "epsilon": 0.4186046511627907,
+        "mu_signal": 6.733412950521147,
+        "boundary_threshold": 1.3197184228443564,
+        "above_boundary": true,
+        "n_rel_in_gamma": 18,
+        "hc_stat_perquery": 9.068526119695887
+      },
+      {
+        "query_id": "q_electronics_television__video_analogtodigital_dtv_converters_below",
+        "group": "positive_hc",
+        "epsilon": 0.3488372093023256,
+        "mu_signal": 6.397666652258417,
+        "boundary_threshold": 1.451309694442473,
+        "above_boundary": true,
+        "n_rel_in_gamma": 15,
+        "hc_stat_perquery": 9.914636927618886
+      },
+      {
+        "query_id": "q_electronics_security__surveillance_biometrics_above",
+        "group": "positive_hc",
+        "epsilon": 0.4186046511627907,
+        "mu_signal": 6.870981946795585,
+        "boundary_threshold": 1.3197184228443564,
+        "above_boundary": true,
+        "n_rel_in_gamma": 18,
+        "hc_stat_perquery": 8.374256134948075
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_unisex_baby_clothing_bodysuits_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.21486967816024077
+      },
+      {
+        "query_id": "q_home__kitchen_storage__organization_gift_wrap_storage_above",
+        "group": "positive_hc",
+        "epsilon": 0.2558139534883721,
+        "mu_signal": 7.465369945262211,
+        "boundary_threshold": 1.6512448897090897,
+        "above_boundary": true,
+        "n_rel_in_gamma": 11,
+        "hc_stat_perquery": 7.028513356322232
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_ice_skating_above",
+        "group": "positive_hc",
+        "epsilon": 0.4186046511627907,
+        "mu_signal": 4.939669732744008,
+        "boundary_threshold": 1.3197184228443564,
+        "above_boundary": true,
+        "n_rel_in_gamma": 18,
+        "hc_stat_perquery": 4.346476442652065
+      },
+      {
+        "query_id": "q_electronics_ebook_readers__accessories_sleeves_below",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.1676213367129648
+      },
+      {
+        "query_id": "q_home__kitchen_vacuums__floor_care_carpet__upholstery_cleaners__accesso_above",
+        "group": "positive_hc",
+        "epsilon": 0.3488372093023256,
+        "mu_signal": 4.098709476283667,
+        "boundary_threshold": 1.451309694442473,
+        "above_boundary": true,
+        "n_rel_in_gamma": 15,
+        "hc_stat_perquery": 2.7723870339686343
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_boxing_above",
+        "group": "positive_hc",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 5.372922289291199,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": true,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": -0.0056739015636262605
+      },
+      {
+        "query_id": "q_electronics_gps_finders__accessories_vehicle_gps_above",
+        "group": "positive_hc",
+        "epsilon": 0.2558139534883721,
+        "mu_signal": 3.4775160361598907,
+        "boundary_threshold": 1.6512448897090897,
+        "above_boundary": true,
+        "n_rel_in_gamma": 11,
+        "hc_stat_perquery": 1.6213158036190647
+      },
+      {
+        "query_id": "q_home__kitchen_vacuums__floor_care_sweepers__accessories_above",
+        "group": "positive_hc",
+        "epsilon": 0.23255813953488372,
+        "mu_signal": 4.36259522645786,
+        "boundary_threshold": 1.7079900600995994,
+        "above_boundary": true,
+        "n_rel_in_gamma": 10,
+        "hc_stat_perquery": 2.160128794830626
+      },
+      {
+        "query_id": "q_home__kitchen_bedding_bedding_sets__collections_above",
+        "group": "fixable",
+        "epsilon": 0.06976744186046512,
+        "mu_signal": 2.849313548116192,
+        "boundary_threshold": 2.3076342114925636,
+        "above_boundary": true,
+        "n_rel_in_gamma": 3,
+        "hc_stat_perquery": 0.24126462097049228
+      },
+      {
+        "query_id": "q_electronics_wearable_technology_smart_clip_accessories_above",
+        "group": "positive_hc",
+        "epsilon": 0.11627906976744186,
+        "mu_signal": 3.088339966645023,
+        "boundary_threshold": 2.0744937711448843,
+        "above_boundary": true,
+        "n_rel_in_gamma": 5,
+        "hc_stat_perquery": 0.6206672005353812
+      },
+      {
+        "query_id": "q_home__kitchen_bedding_kids_bedding_below",
+        "group": "positive_hc",
+        "epsilon": 0.046511627906976744,
+        "mu_signal": 5.096393510952825,
+        "boundary_threshold": 2.4771164426137164,
+        "above_boundary": true,
+        "n_rel_in_gamma": 2,
+        "hc_stat_perquery": 0.564011605296461
+      },
+      {
+        "query_id": "q_home__kitchen_home_d\u00e9cor_products_clocks_above",
+        "group": "fixable",
+        "epsilon": 0.27906976744186046,
+        "mu_signal": 3.122106687259472,
+        "boundary_threshold": 1.5976817367082607,
+        "above_boundary": true,
+        "n_rel_in_gamma": 12,
+        "hc_stat_perquery": 1.8880661417920939
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_american_football_above",
+        "group": "positive_hc",
+        "epsilon": 0.3023255813953488,
+        "mu_signal": 3.7008606241001845,
+        "boundary_threshold": 1.5467713200289344,
+        "above_boundary": true,
+        "n_rel_in_gamma": 13,
+        "hc_stat_perquery": 2.008779026416864
+      },
+      {
+        "query_id": "q_electronics_car__vehicle_electronics_vehicle_electronics_accessories_above",
+        "group": "fixable",
+        "epsilon": 0.046511627906976744,
+        "mu_signal": 2.6178829865855495,
+        "boundary_threshold": 2.4771164426137164,
+        "above_boundary": true,
+        "n_rel_in_gamma": 2,
+        "hc_stat_perquery": 0.023759244090063643
+      },
+      {
+        "query_id": "q_home__kitchen_event__party_supplies_photobooth_props_above",
+        "group": "positive_hc",
+        "epsilon": 0.16279069767441862,
+        "mu_signal": 3.3255080729702975,
+        "boundary_threshold": 1.90540807526275,
+        "above_boundary": true,
+        "n_rel_in_gamma": 7,
+        "hc_stat_perquery": 0.815403379258511
+      },
+      {
+        "query_id": "q_home__kitchen_bedding_quilts__sets_above",
+        "group": "fixable",
+        "epsilon": 0.13953488372093023,
+        "mu_signal": 2.9238516915328048,
+        "boundary_threshold": 1.984661505882304,
+        "above_boundary": true,
+        "n_rel_in_gamma": 6,
+        "hc_stat_perquery": 0.5961480425204061
+      },
+      {
+        "query_id": "q_home__kitchen_bedding_comforters__sets_above",
+        "group": "fixable",
+        "epsilon": 0.11627906976744186,
+        "mu_signal": 2.7380943592339397,
+        "boundary_threshold": 2.0744937711448843,
+        "above_boundary": true,
+        "n_rel_in_gamma": 5,
+        "hc_stat_perquery": 0.4295314193639182
+      },
+      {
+        "query_id": "q_electronics_accessories__supplies_telephone_accessories_above",
+        "group": "positive_hc",
+        "epsilon": 0.046511627906976744,
+        "mu_signal": 3.8926795134196914,
+        "boundary_threshold": 2.4771164426137164,
+        "above_boundary": true,
+        "n_rel_in_gamma": 2,
+        "hc_stat_perquery": 0.08944271909999174
+      },
+      {
+        "query_id": "q_electronics_camera__photo_bags__cases_above",
+        "group": "fixable",
+        "epsilon": 0.06976744186046512,
+        "mu_signal": 2.985136556402998,
+        "boundary_threshold": 2.3076342114925636,
+        "above_boundary": true,
+        "n_rel_in_gamma": 3,
+        "hc_stat_perquery": 0.18498229774557742
+      },
+      {
+        "query_id": "q_home__kitchen_home_d\u00e9cor_products_rugs_pads__protectors_above",
+        "group": "fixable",
+        "epsilon": 0.09302325581395349,
+        "mu_signal": 2.74295796005549,
+        "boundary_threshold": 2.179406228574045,
+        "above_boundary": true,
+        "n_rel_in_gamma": 4,
+        "hc_stat_perquery": 0.2837754822756371
+      },
+      {
+        "query_id": "q_home__kitchen_heating_cooling__air_quality_humidifiers_above",
+        "group": "positive_hc",
+        "epsilon": 0.37209302325581395,
+        "mu_signal": 2.9736249801299905,
+        "boundary_threshold": 1.4061375419593782,
+        "above_boundary": true,
+        "n_rel_in_gamma": 16,
+        "hc_stat_perquery": 2.719293059698705
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_gymnastics_above",
+        "group": "positive_hc",
+        "epsilon": 0.23255813953488372,
+        "mu_signal": 3.726428690564945,
+        "boundary_threshold": 1.7079900600995994,
+        "above_boundary": true,
+        "n_rel_in_gamma": 10,
+        "hc_stat_perquery": 1.4981485761675732
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_luggage__travel_gear_travel_totes_above",
+        "group": "fixable",
+        "epsilon": 0.13953488372093023,
+        "mu_signal": 2.8267995263746406,
+        "boundary_threshold": 1.984661505882304,
+        "above_boundary": true,
+        "n_rel_in_gamma": 6,
+        "hc_stat_perquery": 0.6376649130643645
+      },
+      {
+        "query_id": "q_home__kitchen_home_d\u00e9cor_products_dried__preserved_flora_above",
+        "group": "positive_hc",
+        "epsilon": 0.16279069767441862,
+        "mu_signal": 3.3800868636802206,
+        "boundary_threshold": 1.90540807526275,
+        "above_boundary": true,
+        "n_rel_in_gamma": 7,
+        "hc_stat_perquery": 0.8098705142660219
+      },
+      {
+        "query_id": "q_home__kitchen_storage__organization_decorative_wreath_storage_below",
+        "group": "positive_hc",
+        "epsilon": 0.6744186046511628,
+        "mu_signal": 4.791224798394849,
+        "boundary_threshold": 0.887585810732786,
+        "above_boundary": true,
+        "n_rel_in_gamma": 29,
+        "hc_stat_perquery": 11.874995851778257
+      },
+      {
+        "query_id": "q_home__kitchen_seasonal_d\u00e9cor_ornaments_above",
+        "group": "irreducible",
+        "epsilon": 0.046511627906976744,
+        "mu_signal": 2.804860925144589,
+        "boundary_threshold": 2.4771164426137164,
+        "above_boundary": true,
+        "n_rel_in_gamma": 2,
+        "hc_stat_perquery": -0.02856598257174312
+      },
+      {
+        "query_id": "q_home__kitchen_bedding_duvet_covers__sets_above",
+        "group": "fixable",
+        "epsilon": 0.06976744186046512,
+        "mu_signal": 2.6997710246547086,
+        "boundary_threshold": 2.3076342114925636,
+        "above_boundary": true,
+        "n_rel_in_gamma": 3,
+        "hc_stat_perquery": 0.11071879460070212
+      },
+      {
+        "query_id": "q_electronics_camera__photo_binoculars__scopes_above",
+        "group": "positive_hc",
+        "epsilon": 0.2558139534883721,
+        "mu_signal": 3.2843003785126386,
+        "boundary_threshold": 1.6512448897090897,
+        "above_boundary": true,
+        "n_rel_in_gamma": 11,
+        "hc_stat_perquery": 1.5970075848041392
+      },
+      {
+        "query_id": "q_home__kitchen_event__party_supplies_tableware_above",
+        "group": "irreducible",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 3.8721889482732275,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": true,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": -0.04552741922884876
+      },
+      {
+        "query_id": "q_home__kitchen_home_d\u00e9cor_products_candles__holders_above",
+        "group": "positive_hc",
+        "epsilon": 0.2558139534883721,
+        "mu_signal": 3.5446698001277674,
+        "boundary_threshold": 1.6512448897090897,
+        "above_boundary": true,
+        "n_rel_in_gamma": 11,
+        "hc_stat_perquery": 1.5801395909615688
+      },
+      {
+        "query_id": "q_dining__entertaining_dinnerware__serveware_serveware_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.16090008902503095
+      },
+      {
+        "query_id": "q_home__kitchen_bedding_air_mattresses__accessories_above",
+        "group": "positive_hc",
+        "epsilon": 0.627906976744186,
+        "mu_signal": 4.2562453299278715,
+        "boundary_threshold": 0.9647416749464421,
+        "above_boundary": true,
+        "n_rel_in_gamma": 27,
+        "hc_stat_perquery": 6.485091689432382
+      },
+      {
+        "query_id": "q_home__kitchen_bedding_decorative_pillows_inserts__covers_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.3405947551475843
+      },
+      {
+        "query_id": "q_home__kitchen_kitchen__dining_kitchen__table_linens_above",
+        "group": "fixable",
+        "epsilon": 0.11627906976744186,
+        "mu_signal": 3.4451137727348353,
+        "boundary_threshold": 2.0744937711448843,
+        "above_boundary": true,
+        "n_rel_in_gamma": 5,
+        "hc_stat_perquery": 0.4982983533530865
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_boys_accessories_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.14747881203752733
+      },
+      {
+        "query_id": "q_electronics_ebook_readers__accessories_ebook_readers_above",
+        "group": "positive_hc",
+        "epsilon": 0.32558139534883723,
+        "mu_signal": 5.277787160237867,
+        "boundary_threshold": 1.498093979747802,
+        "above_boundary": true,
+        "n_rel_in_gamma": 14,
+        "hc_stat_perquery": 3.998513443280835
+      },
+      {
+        "query_id": "q_electronics_computers__accessories_computer_accessories__peripherals_above",
+        "group": "irreducible",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 3.3299291956002253,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": true,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": -0.007265801963485362
+      },
+      {
+        "query_id": "q_home__kitchen_furniture_game__recreation_room_furniture_above",
+        "group": "fixable",
+        "epsilon": 0.09302325581395349,
+        "mu_signal": 3.6336703386054356,
+        "boundary_threshold": 2.179406228574045,
+        "above_boundary": true,
+        "n_rel_in_gamma": 4,
+        "hc_stat_perquery": 0.7402773830323073
+      },
+      {
+        "query_id": "q_electronics_computers__accessories_monitors_above",
+        "group": "fixable",
+        "epsilon": 0.20930232558139536,
+        "mu_signal": 3.062594443413336,
+        "boundary_threshold": 1.7686014465431963,
+        "above_boundary": true,
+        "n_rel_in_gamma": 9,
+        "hc_stat_perquery": 1.11066648325481
+      },
+      {
+        "query_id": "q_home__kitchen_home_d\u00e9cor_products_window_treatment_hardware_above",
+        "group": "fixable",
+        "epsilon": 0.2558139534883721,
+        "mu_signal": 3.024695857198876,
+        "boundary_threshold": 1.6512448897090897,
+        "above_boundary": true,
+        "n_rel_in_gamma": 11,
+        "hc_stat_perquery": 1.5248519446534141
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_men_accessories_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.15418591969396972
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_toddler_test_boys_above",
+        "group": "fixable",
+        "epsilon": 0.046511627906976744,
+        "mu_signal": 3.0385315812974176,
+        "boundary_threshold": 2.4771164426137164,
+        "above_boundary": true,
+        "n_rel_in_gamma": 2,
+        "hc_stat_perquery": 0.0878407911146727
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_luggage__travel_gear_waist_packs_above",
+        "group": "positive_hc",
+        "epsilon": 0.2558139534883721,
+        "mu_signal": 3.714639295367188,
+        "boundary_threshold": 1.6512448897090897,
+        "above_boundary": true,
+        "n_rel_in_gamma": 11,
+        "hc_stat_perquery": 1.5781950028372536
+      },
+      {
+        "query_id": "q_home__kitchen_seasonal_d\u00e9cor_seasonal_lighting_below",
+        "group": "fixable",
+        "epsilon": 0.20930232558139536,
+        "mu_signal": 2.9157492466027333,
+        "boundary_threshold": 1.7686014465431963,
+        "above_boundary": true,
+        "n_rel_in_gamma": 9,
+        "hc_stat_perquery": 1.2741090216345534
+      },
+      {
+        "query_id": "q_home__kitchen_seasonal_d\u00e9cor_wreaths_garlands__swags_above",
+        "group": "fixable",
+        "epsilon": 0.2558139534883721,
+        "mu_signal": 3.2028618467310106,
+        "boundary_threshold": 1.6512448897090897,
+        "above_boundary": true,
+        "n_rel_in_gamma": 11,
+        "hc_stat_perquery": 1.6386468010703674
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_yoga_above",
+        "group": "positive_hc",
+        "epsilon": 0.27906976744186046,
+        "mu_signal": 3.2021692794408803,
+        "boundary_threshold": 1.5976817367082607,
+        "above_boundary": true,
+        "n_rel_in_gamma": 12,
+        "hc_stat_perquery": 1.7710817813542887
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_women_maternity_above",
+        "group": "positive_hc",
+        "epsilon": 0.09302325581395349,
+        "mu_signal": 3.287297967028957,
+        "boundary_threshold": 2.179406228574045,
+        "above_boundary": true,
+        "n_rel_in_gamma": 4,
+        "hc_stat_perquery": 0.5456005865099485
+      },
+      {
+        "query_id": "q_electronics_wearable_technology_arm__wristband_accessories_above",
+        "group": "irreducible",
+        "epsilon": 0.046511627906976744,
+        "mu_signal": 2.621442399465515,
+        "boundary_threshold": 2.4771164426137164,
+        "above_boundary": true,
+        "n_rel_in_gamma": 2,
+        "hc_stat_perquery": -0.08806238691551203
+      },
+      {
+        "query_id": "q_home__kitchen_home_d\u00e9cor_products_vase_fillers_above",
+        "group": "positive_hc",
+        "epsilon": 0.18604651162790697,
+        "mu_signal": 3.63165275204272,
+        "boundary_threshold": 1.8339894078285874,
+        "above_boundary": true,
+        "n_rel_in_gamma": 8,
+        "hc_stat_perquery": 1.3766264629194223
+      },
+      {
+        "query_id": "q_home__kitchen_event__party_supplies_headwear_below",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.26247151452701445
+      },
+      {
+        "query_id": "q_electronics_wearable_technology_glasses_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.4000187721561518
+      },
+      {
+        "query_id": "q_electronics_portable_audio__video_portable_dvd_players_above",
+        "group": "positive_hc",
+        "epsilon": 0.3953488372093023,
+        "mu_signal": 3.8684889646765614,
+        "boundary_threshold": 1.3623411992869823,
+        "above_boundary": true,
+        "n_rel_in_gamma": 17,
+        "hc_stat_perquery": 3.4198774311129356
+      },
+      {
+        "query_id": "q_electronics_portable_audio__video_mp3__mp4_player_accessories_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.21486967816024077
+      },
+      {
+        "query_id": "q_electronics_portable_audio__video_microcassette_recorders_above",
+        "group": "positive_hc",
+        "epsilon": 0.6744186046511628,
+        "mu_signal": 3.9176199167790533,
+        "boundary_threshold": 0.887585810732786,
+        "above_boundary": true,
+        "n_rel_in_gamma": 29,
+        "hc_stat_perquery": 7.240013039129017
+      },
+      {
+        "query_id": "q_electronics_portable_audio__video_cb__twoway_radios_above",
+        "group": "fixable",
+        "epsilon": 0.37209302325581395,
+        "mu_signal": 3.547381124881809,
+        "boundary_threshold": 1.4061375419593782,
+        "above_boundary": true,
+        "n_rel_in_gamma": 16,
+        "hc_stat_perquery": 3.2291486767367323
+      },
+      {
+        "query_id": "q_home__kitchen_irons__steamers_irons_above",
+        "group": "positive_hc",
+        "epsilon": 0.4186046511627907,
+        "mu_signal": 4.138579954994313,
+        "boundary_threshold": 1.3197184228443564,
+        "above_boundary": true,
+        "n_rel_in_gamma": 18,
+        "hc_stat_perquery": 3.2829924414285814
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_basketball_above",
+        "group": "positive_hc",
+        "epsilon": 0.23255813953488372,
+        "mu_signal": 3.7782560989096656,
+        "boundary_threshold": 1.7079900600995994,
+        "above_boundary": true,
+        "n_rel_in_gamma": 10,
+        "hc_stat_perquery": 1.472171617723508
+      },
+      {
+        "query_id": "q_home__kitchen_wall_art_posters__prints_above",
+        "group": "positive_hc",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 3.2572755985700095,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": true,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": -0.1414736142428231
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_boot_shop_men_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.15418591969396972
+      },
+      {
+        "query_id": "q_electronics_portable_audio__video_digital_voice_recorders_above",
+        "group": "positive_hc",
+        "epsilon": 0.20930232558139536,
+        "mu_signal": 3.167523996099941,
+        "boundary_threshold": 1.7686014465431963,
+        "above_boundary": true,
+        "n_rel_in_gamma": 9,
+        "hc_stat_perquery": 1.1332202830481806
+      },
+      {
+        "query_id": "q_home__kitchen_kitchen__dining_storage__organization_above",
+        "group": "irreducible",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 3.059539494909575,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": true,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": -0.052770806147551225
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_girls_clothing_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.17434967949841568
+      },
+      {
+        "query_id": "q_home__kitchen_wall_art_paintings_above",
+        "group": "fixable",
+        "epsilon": 0.20930232558139536,
+        "mu_signal": 2.981759309330775,
+        "boundary_threshold": 1.7686014465431963,
+        "above_boundary": true,
+        "n_rel_in_gamma": 9,
+        "hc_stat_perquery": 1.3597793938724032
+      },
+      {
+        "query_id": "q_home__kitchen_bedding_bedspreads_coverlets__sets_above",
+        "group": "irreducible",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 2.644197135788201,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": false,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": -0.25353954690702557
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_tennis_above",
+        "group": "positive_hc",
+        "epsilon": 0.3953488372093023,
+        "mu_signal": 4.0365577348585315,
+        "boundary_threshold": 1.3623411992869823,
+        "above_boundary": true,
+        "n_rel_in_gamma": 17,
+        "hc_stat_perquery": 3.0654329926821298
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_women_clothing_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.2556493850123498
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_men_clothing_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.20809840993227455
+      },
+      {
+        "query_id": "q_home__kitchen_seasonal_d\u00e9cor_trees_above",
+        "group": "fixable",
+        "epsilon": 0.09302325581395349,
+        "mu_signal": 3.1419013005822434,
+        "boundary_threshold": 2.179406228574045,
+        "above_boundary": true,
+        "n_rel_in_gamma": 4,
+        "hc_stat_perquery": 0.27733794101006237
+      },
+      {
+        "query_id": "q_electronics_headphones_earbuds__accessories_cases_above",
+        "group": "positive_hc",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 2.757196864057224,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": true,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": -0.07272250294384522
+      },
+      {
+        "query_id": "q_home__kitchen_kitchen__dining_wine_accessories_above",
+        "group": "fixable",
+        "epsilon": 0.13953488372093023,
+        "mu_signal": 2.5947512674122466,
+        "boundary_threshold": 1.984661505882304,
+        "above_boundary": true,
+        "n_rel_in_gamma": 6,
+        "hc_stat_perquery": 0.6357185396470614
+      },
+      {
+        "query_id": "q_home__kitchen_bath_bath_rugs_above",
+        "group": "fixable",
+        "epsilon": 0.13953488372093023,
+        "mu_signal": 3.2680728587090977,
+        "boundary_threshold": 1.984661505882304,
+        "above_boundary": true,
+        "n_rel_in_gamma": 6,
+        "hc_stat_perquery": 1.3748241547373652
+      },
+      {
+        "query_id": "q_electronics_portable_audio__video_radios_above",
+        "group": "fixable",
+        "epsilon": 0.18604651162790697,
+        "mu_signal": 3.4592146900920637,
+        "boundary_threshold": 1.8339894078285874,
+        "above_boundary": true,
+        "n_rel_in_gamma": 8,
+        "hc_stat_perquery": 1.228787128928024
+      },
+      {
+        "query_id": "q_electronics_portable_audio__video_portable_speakers__docks_above",
+        "group": "fixable",
+        "epsilon": 0.09302325581395349,
+        "mu_signal": 2.9949538895914953,
+        "boundary_threshold": 2.179406228574045,
+        "above_boundary": true,
+        "n_rel_in_gamma": 4,
+        "hc_stat_perquery": 0.29589067058058316
+      },
+      {
+        "query_id": "q_electronics_ebook_readers__accessories_skins_above",
+        "group": "irreducible",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 5.745252962061194,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": true,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": -0.027386127875258306
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_baby_baby_girls_below",
+        "group": "fixable",
+        "epsilon": 0.23255813953488372,
+        "mu_signal": 3.1781843738134152,
+        "boundary_threshold": 1.7079900600995994,
+        "above_boundary": true,
+        "n_rel_in_gamma": 10,
+        "hc_stat_perquery": 1.3899012556749746
+      },
+      {
+        "query_id": "q_electronics_headphones_earbuds__accessories_headphones__earbuds_above",
+        "group": "fixable",
+        "epsilon": 0.32558139534883723,
+        "mu_signal": 3.4368548140129156,
+        "boundary_threshold": 1.498093979747802,
+        "above_boundary": true,
+        "n_rel_in_gamma": 14,
+        "hc_stat_perquery": 2.4242793569268164
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_boot_shop_women_above",
+        "group": "positive_hc",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.16090008902503095
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_shoe_jewelry__watch_accessories_jewelry_access_above",
+        "group": "irreducible",
+        "epsilon": 0.0,
+        "mu_signal": 0.0,
+        "boundary_threshold": Infinity,
+        "above_boundary": false,
+        "n_rel_in_gamma": 0,
+        "hc_stat_perquery": -0.20133433848702864
+      },
+      {
+        "query_id": "q_electronics_camera__photo_flashes_below",
+        "group": "positive_hc",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 2.7208370651921903,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": false,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": -0.05185629788417284
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_martial_arts_above",
+        "group": "positive_hc",
+        "epsilon": 0.20930232558139536,
+        "mu_signal": 3.792303416316633,
+        "boundary_threshold": 1.7686014465431963,
+        "above_boundary": true,
+        "n_rel_in_gamma": 9,
+        "hc_stat_perquery": 1.156689702183298
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_sport_specific_clothing_golf_above",
+        "group": "positive_hc",
+        "epsilon": 0.13953488372093023,
+        "mu_signal": 3.547413936265409,
+        "boundary_threshold": 1.984661505882304,
+        "above_boundary": true,
+        "n_rel_in_gamma": 6,
+        "hc_stat_perquery": 0.7259745087700952
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_men_uniforms_work__safety_above",
+        "group": "fixable",
+        "epsilon": 0.06976744186046512,
+        "mu_signal": 2.9066889885839076,
+        "boundary_threshold": 2.3076342114925636,
+        "above_boundary": true,
+        "n_rel_in_gamma": 3,
+        "hc_stat_perquery": 0.11504256689252931
+      },
+      {
+        "query_id": "q_electronics_power_accessories_pdus_above",
+        "group": "positive_hc",
+        "epsilon": 0.46511627906976744,
+        "mu_signal": 5.8127639610919415,
+        "boundary_threshold": 1.2373098578283221,
+        "above_boundary": true,
+        "n_rel_in_gamma": 20,
+        "hc_stat_perquery": 7.346738103057171
+      },
+      {
+        "query_id": "q_home__kitchen_furniture_bedroom_furniture_above",
+        "group": "positive_hc",
+        "epsilon": 0.2558139534883721,
+        "mu_signal": 5.242205632206909,
+        "boundary_threshold": 1.6512448897090897,
+        "above_boundary": true,
+        "n_rel_in_gamma": 11,
+        "hc_stat_perquery": 4.150531091549074
+      },
+      {
+        "query_id": "q_electronics_television__video_bluray_players__recorders_above",
+        "group": "positive_hc",
+        "epsilon": 0.2558139534883721,
+        "mu_signal": 3.223407576493763,
+        "boundary_threshold": 1.6512448897090897,
+        "above_boundary": true,
+        "n_rel_in_gamma": 11,
+        "hc_stat_perquery": 1.5714105350319845
+      },
+      {
+        "query_id": "q_home__kitchen_kids_home_store_kids_bath_above",
+        "group": "positive_hc",
+        "epsilon": 0.3023255813953488,
+        "mu_signal": 4.010823078287069,
+        "boundary_threshold": 1.5467713200289344,
+        "above_boundary": true,
+        "n_rel_in_gamma": 13,
+        "hc_stat_perquery": 2.2642771727248436
+      },
+      {
+        "query_id": "q_electronics_camera__photo_simulated_cameras_above",
+        "group": "positive_hc",
+        "epsilon": 0.627906976744186,
+        "mu_signal": 5.313482059447357,
+        "boundary_threshold": 0.9647416749464421,
+        "above_boundary": true,
+        "n_rel_in_gamma": 27,
+        "hc_stat_perquery": 8.161231845971859
+      },
+      {
+        "query_id": "q_electronics_portable_audio__video_boomboxes_above",
+        "group": "positive_hc",
+        "epsilon": 0.20930232558139536,
+        "mu_signal": 3.5798826101613734,
+        "boundary_threshold": 1.7686014465431963,
+        "above_boundary": true,
+        "n_rel_in_gamma": 9,
+        "hc_stat_perquery": 1.1660656305529316
+      },
+      {
+        "query_id": "q_home__kitchen_vacuums__floor_care_vacuums_above",
+        "group": "fixable",
+        "epsilon": 0.18604651162790697,
+        "mu_signal": 2.3016727688133907,
+        "boundary_threshold": 1.8339894078285874,
+        "above_boundary": true,
+        "n_rel_in_gamma": 8,
+        "hc_stat_perquery": 0.962043814640557
+      },
+      {
+        "query_id": "q_clothing_shoes__jewelry_costumes__accessories_props_above",
+        "group": "positive_hc",
+        "epsilon": 0.023255813953488372,
+        "mu_signal": 2.967560740406573,
+        "boundary_threshold": 2.7426994424083593,
+        "above_boundary": true,
+        "n_rel_in_gamma": 1,
+        "hc_stat_perquery": 0.0
+      }
+    ]
+  }
+}

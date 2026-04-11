@@ -550,3 +550,136 @@ def h4_4_targeted_fixes(queries, qrels, all_faiss_results, global_null, traces):
             "per_query": boundary_results,
         },
     }
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def main():
+    parser = argparse.ArgumentParser(description="H4: Per-query pipeline trace")
+    parser.add_argument("--config", required=True, help="Config YAML path")
+    parser.add_argument("--force", action="store_true", help="Overwrite existing results")
+    args = parser.parse_args()
+
+    config = load_config(args.config)
+    adapter = get_adapter(config.dataset.name)
+    queries, qrels, _corpus = adapter.load_dataset(config.dataset.data_dir)
+
+    results_dir = Path(config.dataset.results_dir) / "null_research" / "h4_pipeline_trace"
+    out_files = {
+        "traces": results_dir / "h4_pipeline_traces.json",
+        "pvalues": results_dir / "h4_relevant_pvalues.json",
+        "modes": results_dir / "h4_failure_modes.json",
+        "fixes": results_dir / "h4_targeted_fixes.json",
+    }
+
+    if all(f.exists() for f in out_files.values()) and not args.force:
+        print(f"Results exist in {results_dir}. Use --force to rerun.")
+        return
+
+    # Load artifacts
+    artifacts_dir = Path(config.dataset.artifacts_dir)
+    vector_db = VectorDatabase.load(str(artifacts_dir / "vector_db"))
+    model = create_embedding_model(
+        config.embedding.model,
+        normalize_embeddings=config.embedding.normalize,
+    )
+    global_null = NullDistribution.load(
+        str(artifacts_dir / "pool_null" / "global_pool_null")
+    )
+
+    print(f"Loaded {len(queries)} queries, null with {global_null.n_samples} samples")
+    print(f"Global null: mean={global_null.mean:.4f}, std={global_null.std:.4f}")
+
+    # Pre-cache FAISS results
+    print("Running FAISS search...")
+    all_faiss_results = []
+    for i, query in enumerate(queries):
+        query_emb = model.embed_query(query.text)
+        candidates = vector_db.search(query_emb, k=POOL_SIZE)
+        all_faiss_results.append([(c.doc_id, c.similarity) for c in candidates])
+        if (i + 1) % 20 == 0:
+            print(f"  FAISS: {i + 1}/{len(queries)}")
+    print(f"  FAISS complete: {len(queries)} queries")
+
+    config_dict = {
+        "dataset": config.dataset.name,
+        "pool_size": POOL_SIZE,
+        "z_score_fraction": Z_SCORE_FRACTION,
+        "gamma": GAMMA,
+        "max_relevant": MAX_RELEVANT,
+        "n_queries": len(queries),
+        "top_n_stored": TOP_N_STORE,
+    }
+
+    # H4.1 — Full pipeline traces
+    print("\n=== H4.1: Full Pipeline Trace ===")
+    traces = h4_1_pipeline_traces(queries, qrels, all_faiss_results, global_null)
+    n_neg_global = sum(1 for t in traces if t["hc_stat_global"] <= 0)
+    n_neg_pq = sum(1 for t in traces if t["hc_stat_perquery"] <= 0)
+    print(f"  Traced {len(traces)} queries")
+    print(f"  Negative HC (global null): {n_neg_global}")
+    print(f"  Negative HC (per-query null): {n_neg_pq}")
+
+    save_results_json({"config": config_dict, "traces": traces}, str(out_files["traces"]))
+    print(f"  Saved: {out_files['traces']}")
+
+    # H4.4 — Targeted fixes (run BEFORE H4.3 so we can feed clean-flip results)
+    print("\n=== H4.4: Targeted Fix Tests ===")
+    fixes = h4_4_targeted_fixes(queries, qrels, all_faiss_results, global_null, traces)
+    print(f"  Fix 1 (contamination removal): {fixes['fix1_contamination_removal']['n_flipped']}/{fixes['fix1_contamination_removal']['n_tested']} flipped")
+    for grp, stats in fixes["fix2_detection_boundary"]["summary_by_group"].items():
+        print(f"  Fix 2 ({grp}): {stats['n_above_boundary']}/{stats['n']} above detection boundary")
+
+    save_results_json({"config": config_dict, **fixes}, str(out_files["fixes"]))
+    print(f"  Saved: {out_files['fixes']}")
+
+    # Build clean-flip lookup for H4.3
+    clean_flip_qids = {r["query_id"] for r in fixes["fix1_contamination_removal"]["per_query"]
+                       if r["flipped"]}
+
+    # H4.3 — Failure mode classification (uses clean-flip results from H4.4)
+    print("\n=== H4.3: Failure Mode Classification ===")
+    modes = h4_3_failure_modes(traces, global_null)
+    # Patch in clean z-score flip results
+    for c in modes["classifications"]:
+        if c["query_id"] in clean_flip_qids:
+            c["clean_flips_hc"] = True
+    # Re-classify with the patched data
+    mode_counts = {"weak_signal": 0, "too_sparse": 0, "zscore_distortion": 0,
+                   "borderline": 0, "too_scattered": 0}
+    for c in modes["classifications"]:
+        if c["mode"] != "zscore_distortion" and c["clean_flips_hc"]:
+            # Only reclassify if not already weak_signal or too_sparse
+            # (those modes take priority in the classification order)
+            if c["mode"] not in ("weak_signal", "too_sparse"):
+                c["mode"] = "zscore_distortion"
+        mode_counts[c["mode"]] += 1
+    modes["mode_counts"] = mode_counts
+
+    for mode, count in modes["mode_counts"].items():
+        print(f"  {mode}: {count}")
+
+    save_results_json({"config": config_dict, **modes}, str(out_files["modes"]))
+    print(f"  Saved: {out_files['modes']}")
+
+    # H4.2 — Relevant document p-value analysis
+    print("\n=== H4.2: Relevant Document P-Value Analysis ===")
+    pvalues = h4_2_relevant_pvalues(traces)
+    for grp, stats in pvalues["groups"].items():
+        if stats["n"] > 0 and stats.get("aggregate"):
+            agg = stats["aggregate"]
+            print(f"  {grp} (n={stats['n']}): "
+                  f"best_pval_pq={agg['mean_best_pval_perquery']:.4f}, "
+                  f"frac_sig_pq={agg['mean_frac_significant_perquery']:.3f}, "
+                  f"rel_in_gamma={agg['mean_n_rel_in_gamma_perquery']:.1f}")
+
+    save_results_json({"config": config_dict, **pvalues}, str(out_files["pvalues"]))
+    print(f"  Saved: {out_files['pvalues']}")
+
+    print("\nDone.")
+
+
+if __name__ == "__main__":
+    main()
