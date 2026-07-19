@@ -87,18 +87,20 @@ too extreme to be background noise. We evaluate HC as a drop-in cutoff
 across three existing RAG pipelines and in a controlled study we designed
 to expose its failure modes. On multi-hop QA it improves answer Exact
 Match by 23\% over gap-based Adaptive-K and raises context precision
-more than tenfold, while reading an order of magnitude fewer tokens. On
-a controlled 80K-document product-retrieval benchmark, however, a single
-global null---the calibration a deployable retriever must
-use---collapses HC to $k{=}0$ on 55 of 135 queries. We diagnose this as
-a per-query scale mismatch between the null and each query's non-relevant
-scores ($r{=}0.83$ with the failure) and correct it with a label-free
-recalibration that rescales $z$-scores from observable pool statistics
-while keeping one global null. The fix recovers 97\% of the fixable
-queries and gives HC the best retrieval F1 of eight competing cutoff
-rules, 12\% above the strongest fixed Top-$k$. The advantage carries to
-end-to-end generation---answer token-F1 improves by 15\% over a fixed
-Top-20---and holds from 726 documents up to 100{,}000.
+more than tenfold, while reading an order of magnitude fewer tokens.
+Deployment, however, forces a harder setting: a real retriever must
+calibrate one global null offline and reuse it on every unseen query. On
+a controlled 80K-document product-retrieval benchmark with 135 queries,
+this shared null makes HC return $k{=}0$ (nothing retrieved) on 55 of
+them. We diagnose this as a per-query scale mismatch between the null
+and each query's non-relevant scores ($r{=}0.83$ with the failure) and
+correct it with a label-free recalibration that rescales $z$-scores from
+observable pool statistics while keeping one global null. The fix
+recovers 97\% of the fixable queries and gives HC the best retrieval F1
+of eight competing cutoff rules, 12\% above the strongest fixed Top-$k$.
+The advantage carries to end-to-end generation, where answer token-F1
+improves by 15\% over a fixed Top-20, and holds from 726 documents up to
+100{,}000.
 \end{abstract}
 
 %====================================================================
