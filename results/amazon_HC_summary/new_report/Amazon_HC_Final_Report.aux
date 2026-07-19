@@ -1,0 +1,19 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Motivation: Controlled Environments for HC}{1}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Proof of Concept: the category-key Dataset}{1}{section.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces \texttt  {category\_key}: HC beats every fixed-$k$ baseline on F1 by adapting $k$ per query (true-$K$ correlation $0.835$). This validates the HC machinery and gives a clean reference point.}}{1}{table.caption.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Turning the Difficulty Knob: Compound Queries}{1}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Diagnosing the Failure: Three Mechanisms}{2}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}The Breakthrough: \texttt  {rescale\_trim}}{2}{section.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Per-group macro-F1 on \texttt  {amazon\_compound}. \texttt  {rescale\_trim} \textbf  {recovers 30 of 31 fixable queries} ($0.000\!\to \!0.157$), preserves the 77 already-working queries (within $0.002$), and correctly leaves the 24 embedding-limited queries untouched. The failure mode is substantially eliminated --- without touching the global null and without using any labels.}}{2}{table.caption.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Final Results and Generalization}{3}{section.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Algorithm comparison at the canonical pool $N\!=\!1000$. HC posts the best F1 and highest precision; Berk--Jones follows closely. The FWER/FDR rules collapse (flat thresholds cannot find an adaptive cut-off); CAR reaches HC's F1 only when its pool is hand-tuned to $N\!=\!100$, whereas HC needs no pool-size hyperparameter.}}{3}{table.caption.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces The journey at a glance. HC is the best method in every regime. The absolute F1 drop from \texttt  {category\_key} to the compound corpora reflects \emph  {dataset difficulty} (embeddings blind to price, $\le $4.8\% relevant), not a degradation of HC --- which remains the top performer throughout.}}{3}{table.caption.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusions}{3}{section.7}\protected@file@percent }
+\newlabel{LastPage}{{7}{3}{Conclusions}{page.3}{}}
+\gdef\lastpage@lastpage{3}
+\gdef\lastpage@lastpageHy{3}
+\gdef \@abspage@last{3}

@@ -1,0 +1,773 @@
+%File: main.tex
+%====================================================================
+% AAAI-style report for HC-RAG project.
+% Single source file (AAAI requirement). Edit between the
+%   "% === <SectionName> ==="
+% markers; macros for numeric results live in the EDITABLE NUMBERS
+% block so updates as new data arrives are one-line changes.
+%====================================================================
+
+\documentclass[letterpaper]{article}
+\usepackage{aaai}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\usepackage{graphicx}
+\usepackage{url}
+\frenchspacing
+\setlength{\pdfpagewidth}{8.5in}
+\setlength{\pdfpageheight}{11in}
+
+% --- PDF metadata (PLAIN ASCII ONLY; no LaTeX commands, no accents) ---
+\pdfinfo{
+/Title (Higher Criticism for Adaptive Retrieval in RAG Systems)
+/Author (Lihu Zur and Noam Delbari)
+/Keywords (Retrieval-Augmented Generation, Higher Criticism, Adaptive Retrieval, Information Retrieval, Large Language Models)
+}
+
+% --- Section numbering: 0=none, 1=sections, 2=subsections ---
+\setcounter{secnumdepth}{2}
+
+%====================================================================
+% === Editable Numbers ===
+% Update these macros when new experimental results arrive.
+% Reference them in the body as e.g. \HCemHotpot
+%====================================================================
+% CrossEntityQA vs Top-K (k=15)
+\newcommand{\CEqaEMHC}{0.751}
+\newcommand{\CEqaEMTopK}{0.500}
+\newcommand{\CEqaPrecHC}{0.711}
+\newcommand{\CEqaPrecTopK}{0.670}
+\newcommand{\CEqaRecHC}{0.572}
+\newcommand{\CEqaRecTopK}{0.610}
+
+% Musique vs Top-K (k=15)
+\newcommand{\MusEMHC}{0.453}
+\newcommand{\MusEMTopK}{0.561}
+\newcommand{\MusPrecHC}{0.611}
+\newcommand{\MusPrecTopK}{0.542}
+\newcommand{\MusRecHC}{0.405}
+\newcommand{\MusRecTopK}{0.550}
+\newcommand{\MusFOneHC}{0.487}
+\newcommand{\MusFOneTopK}{0.546}
+
+% HotpotQA vs Adaptive-K and Adaptive-RAG (IRCoT)
+\newcommand{\HotEMHC}{0.416}
+\newcommand{\HotEMIRCoT}{0.446}
+\newcommand{\HotEMAdaK}{0.338}
+\newcommand{\HotPrecHC}{0.562}
+\newcommand{\HotPrecIRCoT}{0.624}
+\newcommand{\HotPrecAdaK}{0.281}
+\newcommand{\HotRecHC}{0.559}
+\newcommand{\HotRecIRCoT}{0.637}
+\newcommand{\HotRecAdaK}{0.794}
+\newcommand{\HotFOneHC}{0.541}
+\newcommand{\HotFOneIRCoT}{0.604}
+\newcommand{\HotFOneAdaK}{0.338}
+
+% HotpotQA efficiency
+\newcommand{\HotTokHC}{1{,}320.2}
+\newcommand{\HotTokAdaK}{25{,}249.9}
+\newcommand{\HotDocsHC}{10.9}
+\newcommand{\HotDocsAdaK}{227.6}
+\newcommand{\HotLatHC}{15.1}
+\newcommand{\HotLatAdaK}{154.9}
+
+% Holobench vs Adaptive-K
+\newcommand{\HolEMHC}{0.374}
+\newcommand{\HolEMAdaK}{0.326}
+\newcommand{\HolPrecHC}{0.890}
+\newcommand{\HolPrecAdaK}{0.531}
+\newcommand{\HolRecHC}{0.606}
+\newcommand{\HolRecAdaK}{0.685}
+\newcommand{\HolFOneHC}{0.706}
+\newcommand{\HolFOneAdaK}{0.497}
+\newcommand{\HolTokHC}{5{,}849}
+\newcommand{\HolTokAdaK}{20{,}234}
+\newcommand{\HolDocsHC}{179.1}
+\newcommand{\HolDocsAdaK}{638.4}
+\newcommand{\HolLatHC}{1.46}
+\newcommand{\HolLatAdaK}{11.49}
+
+% Category-Key (44 country queries, 726 docs, BGE)
+\newcommand{\CatHCF}{0.893}
+\newcommand{\CatHCR}{0.852}
+\newcommand{\CatHCP}{0.938}
+\newcommand{\CatHCK}{9.7}
+\newcommand{\CatCorrK}{0.835}
+
+% Amazon Multi-Department (80K, 135 queries, OpenAI emb)
+\newcommand{\AmMdHCF}{0.204}
+\newcommand{\AmMdHCK}{34.1}
+\newcommand{\AmMdTwentyF}{0.185}
+\newcommand{\AmMdAvgF}{0.192}
+\newcommand{\AmMdFiftyF}{0.187}
+\newcommand{\AmMdHCTokF}{0.299}
+\newcommand{\AmMdTwentyTokF}{0.261}
+
+% Amazon Electronics / Book Categories
+\newcommand{\AmElHCF}{0.192}
+\newcommand{\AmElTwentyF}{0.185}
+\newcommand{\AmBkHCF}{0.133}
+\newcommand{\AmBkFiftyF}{0.128}
+
+% Algorithm comparison on Amazon Multi-Dept (pool=1000)
+\newcommand{\AlgHCF}{0.209}
+\newcommand{\AlgBJF}{0.202}
+\newcommand{\AlgBonfF}{0.022}
+\newcommand{\AlgBHF}{0.074}
+\newcommand{\AlgAdaKF}{0.138}
+\newcommand{\AlgCARF}{0.110}
+
+%====================================================================
+% === Title and Author ===
+%====================================================================
+\title{Higher Criticism for Adaptive Retrieval\\in Retrieval-Augmented Generation}
+\author{Lihu Zur \and Noam Delbari\\
+Final Project Report\\
+\texttt{lihu.zur@example.com} \quad \texttt{noam.delbari@example.com}\\
+}
+
+\begin{document}
+\maketitle
+
+%====================================================================
+% === Abstract ===
+%====================================================================
+\begin{abstract}
+\begin{quote}
+Retrieval-Augmented Generation (RAG) pipelines typically retrieve a
+fixed number of passages per query, wasting context budget on easy
+questions and starving hard ones. We study \emph{Higher Criticism}
+(HC), a statistical test for rare and weak signals, as a
+query-adaptive cutoff mechanism layered on top of any dense retriever.
+We integrate HC into three widely used RAG pipelines (Adaptive-K,
+Adaptive-RAG, FlashRAG) and into our own end-to-end evaluation
+pipeline, calibrate a per-corpus null distribution offline, and
+compare HC against fixed Top-K, Adaptive-K, and the multi-step
+Adaptive-RAG router across five evaluation datasets, with an
+additional focused failure-analysis study on BEIR FiQA. We also
+introduce \emph{CrossEntityQA}, a sparse multi-entity retrieval
+benchmark in which only $\sim$2\% of the corpus is relevant per query.
+On the sparse-relevance regime HC lifts Exact Match over fixed
+Top-K (CrossEntityQA: $+50\%$ relative) and uses up to $95\%$ fewer
+input tokens than Adaptive-K; it dominates Adaptive-K on long-context
+database-style reasoning (HoloBench), but underperforms on
+dependency-heavy multi-hop questions (MuSiQue vs.\ Top-K, HotpotQA
+vs.\ multi-step IRCoT). On controlled and compound-query benchmarks
+(Category-Key, Amazon Multi-Department / Electronics / Books) HC
+also beats every fixed top-$k$ on F1 and dominates five alternative
+adaptive cut-off rules (Berk--Jones, Bonferroni, BH, gap-based
+Adaptive-K, clustering-based CAR). We characterise when HC helps,
+when it fails, and outline a hybrid rerank-plus-HC direction.
+\end{quote}
+\end{abstract}
+
+%====================================================================
+% === Background ===
+%====================================================================
+\section{Background and Motivation}
+
+Retrieval-Augmented Generation (RAG), introduced by
+\citeauthor{lewis2020rag}~(\citeyear{lewis2020rag}), augments a Large
+Language Model (LLM) with passages pulled from an external corpus,
+typically via dense similarity search over an
+approximate-nearest-neighbour index. The
+dominant interface is \emph{Top-K}: fix an integer $k$ and pass the
+$k$ most similar passages to the generator. This choice is convenient
+but blunt --- a single $k$ cannot simultaneously serve a fact-lookup
+query that needs one passage, a multi-hop question that needs three,
+and a database-style aggregation that needs dozens. Too small a $k$
+discards evidence; too large a $k$ inflates context length, latency,
+and dollar cost, and degrades generation quality through distractor
+noise.
+
+\subsection{Existing Adaptive Approaches}
+Two families of remedies have been proposed. \emph{Adaptive-K}
+\cite{adaptivek2025} chooses $k$ per query by locating the largest gap
+in the sorted similarity scores. \emph{Adaptive-RAG}
+\cite{jeong2024adaptiverag} trains a small classifier that routes each
+query to one of \{no retrieval, single-step retrieval, iterative
+IRCoT\}. The first is cheap but brittle when score distributions are
+flat; the second is accurate on multi-hop questions but pays for it
+with many retriever and generator calls.
+
+\subsection{Retrieval as Sparse Signal Detection}
+\label{sec:sparse}
+A query-aware retriever projects every document in the corpus onto a
+similarity score against the query. The vast majority of those scores
+come from \emph{irrelevant} passages and together form a background
+``null'' distribution. Only a small, query-dependent number of
+relevant passages (the \emph{signals}) are pushed above this
+background. Choosing $k$ is therefore not really a ranking problem
+but a \emph{detection} problem: how many of the top scores are too
+unusual to have been produced by the irrelevant majority alone? This
+is exactly the rare/weak-signal mixture detection problem that Higher
+Criticism was designed to solve, with documents in place of features
+and the empirical similarity null in place of an analytic Gaussian
+null.
+
+\subsection{Higher Criticism as a Cutoff Rule}
+\emph{Higher Criticism} (HC) \cite{donohojin2004hc} is a
+goodness-of-fit statistic designed to detect a small number of
+\emph{rare and weak} signals buried in a sea of nulls --- exactly the
+statistical regime of a sparse-relevance retrieval ranking. Given a
+per-query score distribution and an offline null
+distribution of irrelevant-passage scores, HC ranks candidates by
+their $z$-score-based $p$-values and selects the cutoff that maximises
+the standardised deviation between observed and expected uniform
+$p$-values. The output is an adaptive $k^\star$ tied directly to the
+statistical separation of relevant from irrelevant passages.
+
+\subsection{Research Question}
+\emph{Can an HC-driven cutoff match or beat fixed-$k$ and existing
+adaptive baselines on answer quality while substantially reducing
+context cost, and on which kinds of questions does it fail?}
+This report answers that question across five datasets spanning
+single-hop QA, multi-hop QA, long-context aggregation, and scientific
+fact-checking, and introduces a purpose-built benchmark
+(CrossEntityQA) to stress-test the sparse-relevance regime that HC
+theory targets.
+
+%====================================================================
+% === Methodology ===
+%====================================================================
+\section{Methodology}
+
+\subsection{HC Retrieval Algorithm}
+For each query $q$ the retriever returns the top $N$ candidates with
+cosine similarities $s_1 \ge s_2 \ge \dots \ge s_N$. Offline, we build
+a \emph{null distribution} of similarities by sampling random
+(query, non-relevant passage) pairs from the corpus. At inference each
+$s_i$ is converted to a $z$-score under the null, then to a $p$-value
+$p_i$. Concretely, $p_i$ is the probability of observing a similarity
+\emph{at least as high as} $s_i$ between $q$ and a randomly drawn
+irrelevant passage: a small $p_i$ means $s_i$ is too high to be a
+noise hit, i.e.\ the candidate is unlikely to be irrelevant under
+the null. Sorting $p_{(1)} \le \dots \le p_{(N)}$, the HC statistic
+is
+\[
+\mathrm{HC}_i \;=\; \sqrt{N}\;\frac{i/N - p_{(i)}}{\sqrt{p_{(i)}(1-p_{(i)})}},
+\]
+which compares the empirical $i$-th order statistic $p_{(i)}$ against
+its expected value $i/N$ under the null --- where the $p$-values
+would be i.i.d.\ uniform on $[0,1]$, so the empirical quantiles are
+the ones implied by the calibrated null distribution. A large
+positive $\mathrm{HC}_i$ at some index $i$ therefore means the
+top-$i$ scores are systematically more extreme than the null
+predicts. The adaptive cutoff is
+$k^\star = \arg\max_{i \le \gamma N} \mathrm{HC}_i$, with $\gamma$ a
+small upper-fraction hyperparameter (typically $0.2$). The pipeline
+returns the top-$k^\star$ passages.
+
+\subsection{System Architecture}
+Figure~\ref{fig:arch} shows the offline / online split. Offline:
+chunking, embedding, FAISS indexing, and null calibration. Online:
+query embedding, ANN retrieval, HC cutoff, prompt construction,
+generation, and joint IR + generation evaluation.
+
+\begin{figure}[t]
+\centering
+% \includegraphics[width=0.95\linewidth]{figures/fig_architecture.pdf}
+\fbox{\parbox{0.9\linewidth}{\centering\vspace{6pt}
+\textit{[Figure placeholder: HC-RAG architecture --- offline indexing
++ HC calibration; online retrieve, cutoff, generate, evaluate.]}\vspace{6pt}}}
+\caption{HC-RAG high-level architecture.}
+\label{fig:arch}
+\end{figure}
+
+\subsection{Pipelines Integrated}
+We integrated HC as a drop-in cutoff stage into:
+\begin{itemize}
+\item \textbf{Adaptive-K} \cite{adaptivek2025} --- replaced the
+largest-gap heuristic with HC at the same insertion point;
+this method was designed for long-context QA in RAG.
+\item \textbf{Adaptive-RAG} \cite{jeong2024adaptiverag} --- the
+classifier-routed framework that dispatches each query to one of
+\{no-retrieval (NOR), single-step retrieval (OneR), iterative
+multi-hop retrieval (IRCoT)\}; HC was inserted to size the
+retrieval at every IRCoT iteration.
+\item \textbf{FlashRAG} \cite{jin2025flashrag} --- registered HC as a
+new retriever post-processor compatible with their sequential,
+conditional, branching, and iterative pipelines.
+\item \textbf{Our pipeline} --- end-to-end RAG with configurable
+HuggingFace embedders, FAISS index, multiple chunking strategies, and
+OpenRouter for LLM generation; this is where all controlled HC vs.\
+baseline experiments are run.
+\end{itemize}
+
+\subsection{Additional Cutoff Baselines}
+For the algorithm comparison study (Section~\ref{sec:algcomp}) we
+also evaluate four further selection rules that consume the same
+$p$-values as HC: \textbf{Berk--Jones} \cite{berkjones1979}, which
+replaces HC's numerator with a Bernoulli KL divergence;
+\textbf{Bonferroni} \cite{bonferroni1961dunn} FWER control;
+\textbf{Benjamini--Hochberg} \cite{benjamini1995fdr} step-up FDR
+control; and \textbf{CAR} \cite{xu2025car}, a clustering-based
+cut-off operating on the similarity vector directly.
+
+\subsection{CrossEntityQA: A New Benchmark}
+Most public RAG benchmarks favour single-passage answers, which masks
+the regime HC targets. We constructed \textbf{CrossEntityQA}, a
+synthetic QA retrieval benchmark built from Wikipedia. The construction
+pipeline (Figure~\ref{fig:ceqa}) clusters Wikidata entities into
+constraint-aligned groups of target size $K \in \{2, \dots, 19\}$,
+attaches a Wikipedia passage per entity, and uses an LLM to write a
+query that is answerable only when all $K$ passages are retrieved.
+The resulting corpus is \emph{sparse}: $\sim$2\% of passages are
+relevant per query, with an average of 8.8 ground-truth passages
+spanning unrelated topic groups.
+
+\begin{figure}[t]
+\centering
+% \includegraphics[width=0.95\linewidth]{figures/fig_ceqa_pipeline.pdf}
+\fbox{\parbox{0.9\linewidth}{\centering\vspace{6pt}
+\textit{[Figure placeholder: CrossEntityQA construction pipeline
+(Wikidata $\to$ entity clusters $\to$ K-aligned subclusters $\to$
+LLM query generation + filtering $\to$ corpus / queries / qrels).]}\vspace{6pt}}}
+\caption{CrossEntityQA construction pipeline.}
+\label{fig:ceqa}
+\end{figure}
+
+\subsection{Datasets}
+We evaluate on five datasets spanning the regimes that stress an
+adaptive cutoff: \textbf{CrossEntityQA} (our sparse multi-entity
+benchmark), \textbf{HotpotQA} \cite{yang2018hotpotqa} (multi-hop QA),
+\textbf{MuSiQue} \cite{trivedi2022musique} (compositional multi-hop
+QA), \textbf{HoloBench} \cite{maekawa2024holobench} (long-context
+database-style aggregation), and \textbf{BEIR SciFact}
+\cite{thakur2021beir,wadden2020scifact} (scientific fact
+verification). For failure analysis (Section~\ref{sec:failure}) we
+additionally use \textbf{BEIR FiQA} \cite{thakur2021beir}.
+
+The additional empirical studies in Section~\ref{sec:prelim}
+exercise HC on three benchmarks designed in-house:
+\textbf{Category-Key} (44 ``largest cities in $X$'' country queries
+over 726 Wikipedia passages, with variable ground-truth size
+$K \in [4,24]$); and three compound-query corpora derived from
+\texttt{McAuley-Lab/Amazon-Reviews-2023} --- \textbf{Amazon
+Multi-Department} (80K docs, 135 subcategory$+$price queries across
+three departments), \textbf{Amazon Electronics} (100K, 44 queries),
+and \textbf{Amazon Book Categories} (100K, 131 queries).
+
+\subsection{Experimental Setup}
+Embeddings use BAAI \texttt{bge-base-en-v1.5}
+\cite{bgeembeddings2023} (and \texttt{bge-large-en-v1.5} for
+ablations). Documents are chunked with \texttt{RecursiveChunker} at
+384 tokens / 50 overlap and indexed in FAISS \cite{johnson2019faiss}.
+Generation uses \texttt{gpt-4o-mini} via OpenRouter with a fixed
+task-specific prompt template, except for the Amazon end-to-end
+study (Section~\ref{sec:amazon}) which uses \texttt{gpt-5-mini}.
+HC uses an empirical null estimated from 10K random (query,
+non-relevant passage) pairs; parametric and rank-based nulls were
+evaluated as alternatives, and the empirical null is retained as
+default. Position-conditioned nulls remain a future-work direction
+(Section~\ref{sec:future}).
+
+\subsection{Metrics}
+Retrieval: Recall@$k$, Precision@$k$, average context size (avg
+$k^\star$). Generation: Exact Match (EM), token-level F1, Precision,
+Recall. Efficiency: input tokens, average retrieved documents,
+end-to-end retrieval latency (seconds).
+
+%====================================================================
+% === Contributions ===
+%====================================================================
+\section{Contributions}
+
+\begin{enumerate}
+\item \textbf{HC pipeline integrations} --- Drop-in HC cutoff in
+Adaptive-K, Adaptive-RAG, FlashRAG, and a custom end-to-end pipeline.
+\item \textbf{Null calibration} --- We compared empirical,
+parametric, and rank-based null distributions, and retained the
+empirical null as the default after observing no consistent quality
+gain from the alternatives.
+\item \textbf{CrossEntityQA benchmark} --- A new sparse multi-entity
+retrieval dataset with variable ground-truth size ($K = 2$--$19$),
+designed to stress-test adaptive-$k$ algorithms.
+\item \textbf{Head-to-head evaluation} --- Five datasets, three
+baselines (Top-K, Adaptive-K, Adaptive-RAG/IRCoT), reporting both
+quality and cost.
+\item \textbf{Negative results and root-cause analysis} --- We
+characterise the two failure modes (scattered relevance, multi-hop
+dependency) and a rerank-plus-threshold workaround that recovers
+$+7.5\%$ recall / $+81\%$ precision on FiQA.
+\end{enumerate}
+
+%====================================================================
+% === Results ===
+%====================================================================
+\section{Experiments and Results}
+
+\subsection{HC vs. Top-K Baseline}
+\label{sec:topk}
+Table~\ref{tab:topk} summarises HC vs.\ fixed Top-K ($k=15$).
+On the sparse single-hop CrossEntityQA, HC lifts EM by
+$+50\%$ relative ($\CEqaEMTopK \rightarrow \CEqaEMHC$) and precision
+by $+6.1\%$, at a small recall cost. On the dependency-heavy
+MuSiQue, the picture inverts: HC retrieves a tighter set
+(precision $\MusPrecHC$ vs.\ $\MusPrecTopK$) but loses the
+cross-passage evidence chain needed to answer ($-19\%$ EM).
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lccc}
+\hline
+Dataset / Metric & Top-K & HC & $\Delta$ \\
+\hline
+CrossEntityQA EM        & \CEqaEMTopK   & \CEqaEMHC   & $+50\%$ \\
+CrossEntityQA Precision & \CEqaPrecTopK & \CEqaPrecHC & $+6.1\%$ \\
+CrossEntityQA Recall    & \CEqaRecTopK  & \CEqaRecHC  & $-6.5\%$ \\
+\hline
+MuSiQue EM              & \MusEMTopK    & \MusEMHC    & $-19.2\%$ \\
+MuSiQue Precision       & \MusPrecTopK  & \MusPrecHC  & $+12.7\%$ \\
+MuSiQue Recall          & \MusRecTopK   & \MusRecHC   & $-26.4\%$ \\
+MuSiQue F1              & \MusFOneTopK  & \MusFOneHC  & $-10.8\%$ \\
+\hline
+\end{tabular}
+\caption{HC vs.\ Top-K ($k=15$). HC wins on sparse single-hop QA,
+loses on dependency-heavy multi-hop QA.}
+\label{tab:topk}
+\end{table}
+
+\subsection{HC vs. Adaptive-K}
+\label{sec:adak}
+On HoloBench (long-context database-style aggregation) HC dominates
+Adaptive-K on every quality metric while using fewer documents and
+tokens: precision $\HolPrecHC$ vs.\ $\HolPrecAdaK$ ($+67.6\%$
+relative), F1 $\HolFOneHC$ vs.\ $\HolFOneAdaK$ ($+42.1\%$), EM
+$\HolEMHC$ vs.\ $\HolEMAdaK$ ($+14.8\%$), with a small recall
+trade-off ($\HolRecHC$ vs.\ $\HolRecAdaK$). On HotpotQA the precision
+gap is even larger: HC doubles Adaptive-K's precision ($\HotPrecHC$
+vs.\ $\HotPrecAdaK$; $+100\%$ relative) and lifts F1 by $+60\%$
+($\HotFOneHC$ vs.\ $\HotFOneAdaK$) and EM by $+23\%$ ($\HotEMHC$
+vs.\ $\HotEMAdaK$). On BEIR SciFact HC adds $+10\%$ precision and
+$+4\%$ recall over Adaptive-K.
+
+\subsection{HC vs. Adaptive-RAG (IRCoT)}
+Against the multi-step Adaptive-RAG router on HotpotQA, HC
+underperforms by a uniform single-digit margin: EM $\HotEMHC$ vs.\
+$\HotEMIRCoT$ ($-6.7\%$), precision $\HotPrecHC$ vs.\
+$\HotPrecIRCoT$ ($-9.9\%$), F1 $\HotFOneHC$ vs.\ $\HotFOneIRCoT$
+($-10.4\%$). IRCoT's iterative query reformulation recovers
+cross-document evidence that a single-shot HC cutoff cannot, at the
+cost discussed below.
+
+\subsection{Efficiency}
+Table~\ref{tab:eff} shows the cost side. On HotpotQA HC uses
+$94.77\%$ fewer input tokens ($\HotTokHC$ vs.\ $\HotTokAdaK$),
+retrieves $\sim$21$\times$ fewer documents ($\HotDocsHC$ vs.\
+$\HotDocsAdaK$), and is $90.25\%$ faster ($\HotLatHC$\,s vs.\
+$\HotLatAdaK$\,s end-to-end). On HoloBench the gains carry over:
+$71\%$ fewer tokens ($\HolTokHC$ vs.\ $\HolTokAdaK$), $\sim$3.6$\times$
+fewer documents ($\HolDocsHC$ vs.\ $\HolDocsAdaK$), and $\sim$8$\times$
+faster ($\HolLatHC$\,s vs.\ $\HolLatAdaK$\,s). This is the central
+practical pitch for HC: when it matches or beats baselines on quality,
+it does so at a fraction of the dollar and latency budget.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lccc}
+\hline
+Dataset & Metric & HC & Adaptive-K \\
+\hline
+HotpotQA  & Input tokens     & \HotTokHC  & \HotTokAdaK \\
+HotpotQA  & Avg \# docs      & \HotDocsHC & \HotDocsAdaK \\
+HotpotQA  & Retrieval lat.\ (s) & \HotLatHC  & \HotLatAdaK \\
+\hline
+HoloBench & Input tokens     & \HolTokHC  & \HolTokAdaK \\
+HoloBench & Avg \# docs      & \HolDocsHC & \HolDocsAdaK \\
+HoloBench & Retrieval lat.\ (s) & \HolLatHC  & \HolLatAdaK \\
+\hline
+\end{tabular}
+\caption{Efficiency: HC vs.\ Adaptive-K.}
+\label{tab:eff}
+\end{table}
+
+\subsection{Failure Analysis}
+\label{sec:failure}
+To understand when HC fails we ran a focused position study on BEIR
+FiQA. HC implicitly assumes that relevant passages \emph{cluster} at
+the top of the ranked list; the test then detects the boundary where
+the score distribution stops being unusual. On FiQA the relevant
+passages are instead \emph{scattered}: only $6/100$ queries have
+$\ge 2$ consecutive relevant passages at the top, and the median
+position of a relevant passage is 5. Even after cross-encoder
+reranking (which lifts the bi-encoder Cohen's $d$ from $0.01$ to
+$1.13$) clustering improves only marginally (to $8/100$).
+
+A simple rerank-plus-fixed-threshold rule recovers most of what HC
+loses: \texttt{score $\ge 0$} after cross-encoder rerank delivers
+$+7.5\%$ recall and $+81\%$ precision over the Top-5 baseline,
+suggesting a productive hybrid (Section~\ref{sec:future}).
+
+%====================================================================
+% === Additional Empirical Studies ===
+%====================================================================
+\section{Additional Empirical Studies}
+\label{sec:prelim}
+
+This section reports three studies that broaden the empirical
+picture beyond the long-form QA benchmarks above: a controlled-$K$
+benchmark designed to isolate HC's adaptivity, a large-corpus
+compound-query retrieval study with end-to-end generation, and a
+head-to-head comparison of HC against five alternative adaptive
+cut-off rules.
+
+\subsection{Controlled-$K$ Benchmark: Category-Key}
+On Category-Key (44 ``largest cities in $X$'' queries over 726
+Wikipedia passages; BGE bi-encoder, FAISS), HC achieves F1
+$\CatHCF$ (Recall $\CatHCR$, Precision $\CatHCP$) at mean
+$k^\star = \CatHCK$, beating every fixed top-$k$ in the sweep
+$k \in \{5,8,10,12,15,20\}$ (best fixed F1 $= 0.783$ at $k{=}10$).
+The Pearson correlation between HC's adaptive $k^\star$ and the
+per-query ground-truth $K$ is $\CatCorrK$ --- direct evidence that
+the HC argmax tracks the true relevance boundary rather than
+collapsing to a constant.
+
+\subsection{Compound-Query Retrieval: Amazon (80K--100K)}
+\label{sec:amazon}
+The Amazon benchmarks stress HC on heterogeneous product
+embeddings (OpenAI \texttt{text-embedding-3-small}, FAISS) and
+compound subcategory$+$price queries that standard embeddings
+encode only weakly. On the 80K \textbf{Multi-Department} corpus
+(135 queries spanning Clothing, Electronics, Home \& Kitchen), HC
+reaches retrieval F1 $\AmMdHCF$ at mean $k^\star = \AmMdHCK$,
+ahead of Top-20 ($\AmMdTwentyF$; $+9.7\%$), Top-29 set to the
+average number of relevant documents per query ($\AmMdAvgF$;
+$+6.3\%$), and Top-50 ($\AmMdFiftyF$; $+8.9\%$), while retrieving
+$32\%$ fewer documents than Top-50. End-to-end with a
+\texttt{gpt-5-mini} generator HC posts Token-F1 $\AmMdHCTokF$
+vs.\ $\AmMdTwentyTokF$ for Top-20 ($+14.8\%$), with an LLM-judge
+Answer Faithfulness near $5.0$ (the maximum) across all methods,
+indicating the generator already filters distractors effectively.
+The same pattern holds on \textbf{Electronics} (HC F1 $\AmElHCF$
+vs.\ Top-20's $\AmElTwentyF$; $+3.5\%$) and \textbf{Book
+Categories} (HC F1 $\AmBkHCF$ vs.\ Top-50's $\AmBkFiftyF$;
+$+4.0\%$, with $37\%$ fewer documents).
+
+\subsection{Algorithm Comparison: HC vs.\ Other Adaptive Cut-offs}
+\label{sec:algcomp}
+On the same 135 Amazon Multi-Department queries we compared HC
+head-to-head against five further adaptive cut-off rules
+(Table~\ref{tab:algcomp}), all sharing an identical FAISS pool of
+$N{=}1000$ candidates. HC wins on F1 ($\AlgHCF$), with
+Berk--Jones a close second ($\AlgBJF$); the gap-based Adaptive-K
+\cite{adaptivek2025} sits well behind ($\AlgAdaKF$); the
+clustering-based CAR \cite{xu2025car} collapses at its default
+pool ($\AlgCARF$) and matches HC only after pool retuning. The
+classical multiple-testing rules under-retrieve drastically:
+Bonferroni ($\AlgBonfF$) and Benjamini--Hochberg ($\AlgBHF$)
+reject almost no candidates at a flat significance threshold,
+confirming that an \emph{adaptive} test statistic (HC, BJ) is
+essential when per-query signal strength varies.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lcc}
+\hline
+Method & F1 & Mean $k$ \\
+\hline
+HC + rescale     & $\AlgHCF$    & 34.0 \\
+Berk--Jones      & $\AlgBJF$    & 34.8 \\
+Top-50           & 0.187        & 50.0 \\
+Top-20           & 0.185        & 20.0 \\
+Adaptive-K (gap) & $\AlgAdaKF$  & 9.0 \\
+CAR (cluster)    & $\AlgCARF$   & 416.5 \\
+BH               & $\AlgBHF$    & 1.6 \\
+Bonferroni       & $\AlgBonfF$  & 0.3 \\
+\hline
+\end{tabular}
+\caption{Adaptive cut-off comparison on Amazon Multi-Department
+(135 compound queries, pool $N{=}1000$). HC posts the best F1;
+flat-threshold rules under-retrieve.}
+\label{tab:algcomp}
+\end{table}
+
+%====================================================================
+% === Discussion ===
+%====================================================================
+\section{Discussion}
+
+\paragraph{When HC wins.} Sparse-relevance corpora with
+well-separated embeddings and clustered relevant passages
+(CrossEntityQA, HoloBench, BEIR SciFact, Category-Key, Amazon
+Multi-Department). Here HC's adaptivity translates directly into
+precision gains and large token savings.
+
+\paragraph{When HC loses.} Two regimes. (i) \emph{Dependency-heavy
+multi-hop} questions (MuSiQue, HotpotQA vs.\ IRCoT) where the answer
+requires evidence that an iterative reformulation can find but a
+single cutoff cannot. (ii) \emph{Scattered relevance} corpora
+(FiQA) where the clustering assumption is violated.
+
+\paragraph{Limitations.} Across the regimes where HC wins it tends to
+lift Precision and lower Recall versus fixed Top-K. We read this as
+the expected finite-$N$ behaviour of
+$k^\star = \arg\max_{i \le \gamma N} \mathrm{HC}_i$ in the
+rare-and-weak regime: the standardised deviation peaks at the
+smallest $i$ for which the empirical $p_{(i)}$ already sits well
+below the uniform expectation $i/N$, so the rule prefers tight
+cutoffs whose entries are extreme under the null --- a precision-leaning
+operating point with a recall trade-off, rather than a contradiction
+of the underlying theory. We did not turn this into a formal
+finite-$N$ claim, and we ran the per-(query, non-relevant) $p$-value
+uniformity diagnostic only on FiQA, where we also prototyped
+position-aware and gap-based alternative nulls; running the same
+diagnostic across the full benchmark suite is the natural empirical
+companion (Section~\ref{sec:future}).
+
+\paragraph{Response to presentation feedback.}
+Feedback from the final presentation covered conceptual,
+methodological, and empirical points, which are addressed throughout
+this report: (i)~retrieval is framed up front as a sparse
+signal-detection problem (Section~\ref{sec:sparse}) so that the
+reason HC applies at all is explicit before the algorithm is defined;
+(ii)~the HC Retrieval Algorithm subsection now spells out, in plain
+language, what the $(q,d)$ $p$-value is, that the HC statistic
+compares empirical order-statistic quantiles against the uniform null
+implied by the calibrated null distribution, and how this drives the
+adaptive cutoff; (iii)~null-calibration choices are made explicit in
+the Methodology, with the empirical null retained as the default
+after comparison against parametric and rank-based alternatives;
+position-aware and gap-based variants were prototyped on FiQA, and
+a unified $p$-value uniformity diagnostic across all evaluation
+datasets is left for future work;
+(iv)~the failure-mode taxonomy (scattered relevance vs.\ multi-hop
+dependency) is stated directly in the abstract and revisited in this
+section; (v)~the rerank-plus-threshold hybrid is reported as an
+explicit comparison point in Section~\ref{sec:failure} rather than
+only as future work; and (vi)~efficiency numbers (tokens, document
+counts, latency) are reported alongside every quality result so that
+gains and trade-offs are directly comparable.
+
+%====================================================================
+% === Conclusion ===
+%====================================================================
+\section{Conclusions and Future Work}
+\label{sec:future}
+
+We showed that Higher Criticism is a competitive query-adaptive
+cutoff for RAG: matching or beating fixed Top-K and Adaptive-K on
+four of five long-form QA datasets while reducing input-token cost
+by up to $\sim$95\%; on the controlled Category-Key benchmark HC
+also beats every fixed top-$k$ in the sweep, and on the Amazon
+compound-query benchmark it leads five alternative adaptive
+cut-off rules including Berk--Jones, BH, Bonferroni, gap-based
+Adaptive-K, and clustering-based CAR. We documented the two
+regimes where HC fails. Three directions stand out for future
+work:
+\begin{itemize}
+\item \textbf{Rerank $+$ HC hybrid.} Apply HC after a cross-encoder
+rerank to address the scattered-relevance failure mode; the FiQA
+threshold experiment is a positive existence proof.
+\item \textbf{Iterative HC.} Embed HC inside Adaptive-RAG's IRCoT
+loop to combine multi-hop coverage with adaptive-cost control.
+\item \textbf{Position-aware nulls.} Replace the per-query
+empirical null with a position-conditioned null to reduce variance
+without destroying HC's signal-detection power.
+\item \textbf{Per-dataset $p$-value uniformity diagnostic.} Run the
+FiQA-style KS uniformity check on the calibrated $p$-values across
+all evaluation datasets, paired with a finite-$N$ analysis of
+$\arg\max \mathrm{HC}_i$, to convert the precision-leaning operating
+point from an empirical observation into a falsifiable prediction.
+\end{itemize}
+
+%====================================================================
+% === References ===
+%====================================================================
+\bibliographystyle{aaai}
+\bibliography{refs}
+
+%====================================================================
+% === Appendix Roadmap ===
+% Appendices do not count toward the 6-page body limit.
+%====================================================================
+\clearpage
+\onecolumn
+\section*{Appendix A: Project Roadmap}
+
+\begin{center}
+\small
+\begin{tabular}{p{0.07\linewidth}p{0.88\linewidth}}
+\hline
+Week & Milestone / Outcome \\
+\hline
+4   & \textbf{Foundations.} Implemented the HC module
+($p$-values from a per-query null, $\gamma$ upper-fraction cutoff)
+and built the indexing stack on the CRAG \cite{crag2024} corpus
+(\texttt{RecursiveChunker}, 384/50 overlap; LLM interface over
+OpenRouter). \emph{Direction change}: a small $k$-sweep with
+\texttt{all-mpnet-base-v2} showed $k{=}10$ as the best fixed
+operating point, but switching to BAAI \texttt{bge-base-en-v1.5}
+\cite{bgeembeddings2023} on a 1K-doc subset gave a meaningful
+recall lift, so BGE was adopted as the default embedder for the
+rest of the project. \\
+5   & \textbf{Survey of alternative adaptive retrievers.} Read and
+catalogued three competing approaches --- Reciprocal Rank Fusion,
+Cluster-Adaptive Retrieval (CAR) \cite{xu2025car}, and
+uncertainty-based filtering --- to position HC as a global,
+distribution-aware test rather than a per-document heuristic, and
+locked in the comparison set for later head-to-heads (Bonferroni
+\cite{bonferroni1961dunn}, Benjamini--Hochberg
+\cite{benjamini1995fdr}, gap-based Adaptive-K
+\cite{adaptivek2025}). First HC vs.\ Top-K runs on our pipeline. \\
+6   & \textbf{Long-context regime: HoloBench.} First head-to-head
+HC vs.\ gap-based Adaptive-K on HoloBench
+\cite{maekawa2024holobench}. Quality scores tracked closely on the
+3-level LLM judge --- \emph{iteration}: diagnosed as a
+generation/judge bottleneck on database-style aggregation, not a
+retrieval-side tie, which motivated stronger retrieval-only metrics
+in later rounds. \\
+7   & \textbf{Multi-hop regime + dataset-aware $\gamma$.} Repeated
+the comparison on HotpotQA \cite{yang2018hotpotqa}. \emph{Change in
+direction}: data analysis exposed a stark dense vs.\ sparse
+asymmetry between HotpotQA and HoloBench, and the \emph{same}
+$\gamma$ behaved very differently on the two ---
+$\gamma$ was reframed as a dataset-aware hyperparameter rather than
+a single global value. Began integration work for Adaptive-RAG
+\cite{jeong2024adaptiverag} and FlashRAG \cite{jin2025flashrag}. \\
+8   & \textbf{Pipeline integrations + FiQA failure.} Two parallel
+tracks. (a)~Plugged HC into Adaptive-RAG as a fourth strategy
+alongside NOR / OneR / IRCoT; on HotpotQA HC beat single-step OneR
+and lost to multi-step IRCoT, as expected on a multi-hop benchmark.
+(b)~Registered HC and Berk--Jones \cite{berkjones1979} as
+FlashRAG / LlamaIndex post-processors and ran them against
+gap-based Adaptive-K and Fixed Top-$10$ on dev subsets of BEIR
+SciFact \cite{thakur2021beir,wadden2020scifact}, BEIR FiQA
+\cite{thakur2021beir}, and MS MARCO. \emph{Iteration}: FiQA was
+the first clear single-hop negative result and triggered a position
+study, which in turn produced a rerank-plus-fixed-threshold
+workaround that recovered most of the lost recall and precision
+(Section~\ref{sec:failure}). \\
+9   & \textbf{CrossEntityQA construction.} \emph{Change in
+direction}: rather than continue tuning HC against off-the-shelf
+benchmarks, we built a purpose-designed sparse-relevance benchmark
+to surface the regime HC theory targets --- SPARQL-driven Wikidata
+entity clusters $\to$ Wikipedia passages $\to$ LLM-generated queries
+that are answerable only by aggregating multiple passages, with
+$\sim$2\% relevance and a controllable $K$. \\
+10  & \textbf{Negative result on CrossEntityQA + BM25.} First
+CrossEntityQA evaluation went through Adaptive-RAG with BM25 as the
+retriever and HC \emph{lost} to fixed Top-$5$. Root cause: BM25
+score magnitude encodes lexical match, not the temporal /
+categorical / geographic constraints these queries impose, so HC's
+test was fed a misaligned signal --- it over-selected on
+entity-saturated queries and under-selected on generic constraint
+queries. \emph{Change in direction}: dropped BM25 for
+CrossEntityQA and committed to a dense retriever for the final
+runs. \\
+11  & \textbf{Final head-to-head.} Re-ran HC vs.\ Top-K on
+CrossEntityQA with the dense pipeline --- HC lifted EM by $\sim$50\%
+relative (Table~\ref{tab:topk}) --- and replicated the multi-hop
+failure mode on MuSiQue \cite{trivedi2022musique}, closing the
+loop on the ``when HC wins / when HC loses'' picture used in this
+report. \\
+\hline
+\end{tabular}
+\end{center}
+
+\end{document}

@@ -1,0 +1,107 @@
+\begin{thebibliography}{10}
+
+\bibitem{benjamini1995fdr}
+Yoav Benjamini and Yosef Hochberg.
+\newblock Controlling the false discovery rate: A practical and powerful
+  approach to multiple testing.
+\newblock {\em Journal of the Royal Statistical Society. Series B
+  (Methodological)}, 57(1):289--300, 1995.
+
+\bibitem{berkjones1979}
+Robert~H. Berk and Douglas~H. Jones.
+\newblock Goodness-of-fit test statistics that dominate the {K}olmogorov
+  statistics.
+\newblock {\em Zeitschrift f{\"u}r Wahrscheinlichkeitstheorie und Verwandte
+  Gebiete}, 47(1):47--59, 1979.
+
+\bibitem{donohojin2004hc}
+David Donoho and Jiashun Jin.
+\newblock Higher criticism for detecting sparse heterogeneous mixtures.
+\newblock {\em The Annals of Statistics}, 32(3):962--994, 2004.
+
+\bibitem{bonferroni1961dunn}
+Olive~Jean Dunn.
+\newblock Multiple comparisons among means.
+\newblock {\em Journal of the American Statistical Association},
+  56(293):52--64, 1961.
+
+\bibitem{jeong2024adaptiverag}
+Soyeong Jeong, Jinheon Baek, Sukmin Cho, Sung~Ju Hwang, and Jong~C. Park.
+\newblock Adaptive-rag: Learning to adapt retrieval-augmented large language
+  models through question complexity.
+\newblock In {\em Proceedings of NAACL}, 2024.
+
+\bibitem{jin2025flashrag}
+Jiajie Jin, Yutao Zhu, Xinyu Yang, Chenghao Zhang, and Zhicheng Dou.
+\newblock Flashrag: A modular toolkit for efficient retrieval-augmented
+  generation research.
+\newblock In {\em Proceedings of the ACM Web Conference (WWW)}, 2025.
+
+\bibitem{johnson2019faiss}
+Jeff Johnson, Matthijs Douze, and Herv{\'e} J{\'e}gou.
+\newblock Billion-scale similarity search with {GPU}s.
+\newblock {\em IEEE Transactions on Big Data}, 2019.
+
+\bibitem{lewis2020rag}
+Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir
+  Karpukhin, Naman Goyal, Heinrich K{\"u}ttler, Mike Lewis, Wen-tau Yih, Tim
+  Rockt{\"a}schel, Sebastian Riedel, and Douwe Kiela.
+\newblock Retrieval-augmented generation for knowledge-intensive {NLP} tasks.
+\newblock In {\em Proceedings of NeurIPS}, 2020.
+
+\bibitem{maekawa2024holobench}
+Seiji Maekawa et~al.
+\newblock Holobench: A benchmark for holistic long-context reasoning over text.
+\newblock In {\em Proceedings of NeurIPS Datasets and Benchmarks}, 2024.
+
+\bibitem{crag2024}
+{Meta AI}.
+\newblock {CRAG}: Comprehensive {RAG} benchmark.
+\newblock \url{https://github.com/facebookresearch/CRAG}, 2024.
+
+\bibitem{adaptivek2025}
+Chihiro Taguchi, Seiji Maekawa, and Nikita Bhutani.
+\newblock Efficient context selection for long-context {QA}: No tuning, no
+  iteration, just adaptive-k.
+\newblock In {\em Proceedings of EMNLP}, 2025.
+\newblock Megagon Labs.
+
+\bibitem{thakur2021beir}
+Nandan Thakur, Nils Reimers, Andreas R{\"u}ckl{\'e}, Abhishek Srivastava, and
+  Iryna Gurevych.
+\newblock {BEIR}: A heterogeneous benchmark for zero-shot evaluation of
+  information retrieval models.
+\newblock In {\em Proceedings of NeurIPS Datasets and Benchmarks}, 2021.
+
+\bibitem{trivedi2022musique}
+Harsh Trivedi, Niranjan Balasubramanian, Tushar Khot, and Ashish Sabharwal.
+\newblock Musique: Multihop questions via single-hop question composition.
+\newblock {\em Transactions of the Association for Computational Linguistics},
+  10:539--554, 2022.
+
+\bibitem{wadden2020scifact}
+David Wadden, Shanchuan Lin, Kyle Lo, Lucy~Lu Wang, Madeleine van Zuylen, Arman
+  Cohan, and Hannaneh Hajishirzi.
+\newblock Fact or fiction: Verifying scientific claims.
+\newblock {\em Proceedings of EMNLP}, 2020.
+
+\bibitem{bgeembeddings2023}
+Shitao Xiao, Zheng Liu, Peitian Zhang, and Niklas Muennighoff.
+\newblock {C-Pack}: Packaged resources to advance general chinese embedding.
+\newblock \url{https://huggingface.co/BAAI/bge-base-en-v1.5}, 2023.
+
+\bibitem{xu2025car}
+Yifan Xu, Vipul Gupta, Rohit Aggarwal, Varsha Mahadevan, and Bhaskar
+  Krishnamachari.
+\newblock Cluster-based adaptive retrieval: Dynamic context selection for {RAG}
+  applications.
+\newblock arXiv:2511.14769, 2025.
+
+\bibitem{yang2018hotpotqa}
+Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William~W. Cohen, Ruslan
+  Salakhutdinov, and Christopher~D. Manning.
+\newblock Hotpotqa: A dataset for diverse, explainable multi-hop question
+  answering.
+\newblock In {\em Proceedings of EMNLP}, 2018.
+
+\end{thebibliography}

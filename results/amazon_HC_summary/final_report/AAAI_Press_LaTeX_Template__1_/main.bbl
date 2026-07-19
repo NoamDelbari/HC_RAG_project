@@ -1,0 +1,130 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citeauthoryear{Benjamini and
+  Hochberg}{1995}]{benjamini1995fdr}
+Benjamini, Y., and Hochberg, Y.
+\newblock 1995.
+\newblock Controlling the false discovery rate: A practical and powerful
+  approach to multiple testing.
+\newblock {\em Journal of the Royal Statistical Society. Series B
+  (Methodological)} 57(1):289--300.
+
+\bibitem[\protect\citeauthoryear{Berk and Jones}{1979}]{berkjones1979}
+Berk, R.~H., and Jones, D.~H.
+\newblock 1979.
+\newblock Goodness-of-fit test statistics that dominate the {K}olmogorov
+  statistics.
+\newblock {\em Zeitschrift f{\"u}r Wahrscheinlichkeitstheorie und Verwandte
+  Gebiete} 47(1):47--59.
+
+\bibitem[\protect\citeauthoryear{Donoho and Jin}{2004}]{donohojin2004hc}
+Donoho, D., and Jin, J.
+\newblock 2004.
+\newblock Higher criticism for detecting sparse heterogeneous mixtures.
+\newblock {\em The Annals of Statistics} 32(3):962--994.
+
+\bibitem[\protect\citeauthoryear{Dunn}{1961}]{bonferroni1961dunn}
+Dunn, O.~J.
+\newblock 1961.
+\newblock Multiple comparisons among means.
+\newblock {\em Journal of the American Statistical Association} 56(293):52--64.
+
+\bibitem[\protect\citeauthoryear{Jeong \bgroup et al\mbox.\egroup
+  }{2024}]{jeong2024adaptiverag}
+Jeong, S.; Baek, J.; Cho, S.; Hwang, S.~J.; and Park, J.~C.
+\newblock 2024.
+\newblock Adaptive-rag: Learning to adapt retrieval-augmented large language
+  models through question complexity.
+\newblock In {\em Proceedings of NAACL}.
+
+\bibitem[\protect\citeauthoryear{Jin \bgroup et al\mbox.\egroup
+  }{2025}]{jin2025flashrag}
+Jin, J.; Zhu, Y.; Yang, X.; Zhang, C.; and Dou, Z.
+\newblock 2025.
+\newblock Flashrag: A modular toolkit for efficient retrieval-augmented
+  generation research.
+\newblock In {\em Proceedings of the ACM Web Conference (WWW)}.
+
+\bibitem[\protect\citeauthoryear{Johnson, Douze, and
+  J{\'e}gou}{2019}]{johnson2019faiss}
+Johnson, J.; Douze, M.; and J{\'e}gou, H.
+\newblock 2019.
+\newblock Billion-scale similarity search with {GPU}s.
+\newblock {\em IEEE Transactions on Big Data}.
+
+\bibitem[\protect\citeauthoryear{Labs}{2025}]{adaptivek2025}
+Labs, M.
+\newblock 2025.
+\newblock Adaptive-k retrieval for long-context question answering.
+\newblock In {\em Proceedings of EMNLP}.
+
+\bibitem[\protect\citeauthoryear{Lewis \bgroup et al\mbox.\egroup
+  }{2020}]{lewis2020rag}
+Lewis, P.; Perez, E.; Piktus, A.; Petroni, F.; Karpukhin, V.; Goyal, N.;
+  K{\"u}ttler, H.; Lewis, M.; Yih, W.-t.; Rockt{\"a}schel, T.; Riedel, S.; and
+  Kiela, D.
+\newblock 2020.
+\newblock Retrieval-augmented generation for knowledge-intensive {NLP} tasks.
+\newblock In {\em Proceedings of NeurIPS}.
+
+\bibitem[\protect\citeauthoryear{Maekawa and
+  others}{2024}]{maekawa2024holobench}
+Maekawa, S., et~al.
+\newblock 2024.
+\newblock Holobench: A benchmark for holistic long-context reasoning over text.
+\newblock In {\em Proceedings of NeurIPS Datasets and Benchmarks}.
+
+\bibitem[\protect\citeauthoryear{{Meta AI}}{2024}]{crag2024}
+{Meta AI}.
+\newblock 2024.
+\newblock {CRAG}: Comprehensive {RAG} benchmark.
+\newblock \url{https://github.com/facebookresearch/CRAG}.
+
+\bibitem[\protect\citeauthoryear{Thakur \bgroup et al\mbox.\egroup
+  }{2021}]{thakur2021beir}
+Thakur, N.; Reimers, N.; R{\"u}ckl{\'e}, A.; Srivastava, A.; and Gurevych, I.
+\newblock 2021.
+\newblock {BEIR}: A heterogeneous benchmark for zero-shot evaluation of
+  information retrieval models.
+\newblock In {\em Proceedings of NeurIPS Datasets and Benchmarks}.
+
+\bibitem[\protect\citeauthoryear{Trivedi \bgroup et al\mbox.\egroup
+  }{2022}]{trivedi2022musique}
+Trivedi, H.; Balasubramanian, N.; Khot, T.; and Sabharwal, A.
+\newblock 2022.
+\newblock Musique: Multihop questions via single-hop question composition.
+\newblock {\em Transactions of the Association for Computational Linguistics}
+  10:539--554.
+
+\bibitem[\protect\citeauthoryear{Wadden \bgroup et al\mbox.\egroup
+  }{2020}]{wadden2020scifact}
+Wadden, D.; Lin, S.; Lo, K.; Wang, L.~L.; van Zuylen, M.; Cohan, A.; and
+  Hajishirzi, H.
+\newblock 2020.
+\newblock Fact or fiction: Verifying scientific claims.
+\newblock {\em Proceedings of EMNLP}.
+
+\bibitem[\protect\citeauthoryear{Xiao \bgroup et al\mbox.\egroup
+  }{2023}]{bgeembeddings2023}
+Xiao, S.; Liu, Z.; Zhang, P.; and Muennighoff, N.
+\newblock 2023.
+\newblock {C-Pack}: Packaged resources to advance general chinese embedding.
+\newblock \url{https://huggingface.co/BAAI/bge-base-en-v1.5}.
+
+\bibitem[\protect\citeauthoryear{Xu \bgroup et al\mbox.\egroup
+  }{2025}]{xu2025car}
+Xu, Y.; Gupta, A.; Aggarwal, C.; Mahadevan, S.; and Krishnamachari, B.
+\newblock 2025.
+\newblock Cluster-adaptive retrieval ({CAR}) for adaptive-$k$ selection.
+\newblock arXiv:2511.14769.
+
+\bibitem[\protect\citeauthoryear{Yang \bgroup et al\mbox.\egroup
+  }{2018}]{yang2018hotpotqa}
+Yang, Z.; Qi, P.; Zhang, S.; Bengio, Y.; Cohen, W.~W.; Salakhutdinov, R.; and
+  Manning, C.~D.
+\newblock 2018.
+\newblock Hotpotqa: A dataset for diverse, explainable multi-hop question
+  answering.
+\newblock In {\em Proceedings of EMNLP}.
+
+\end{thebibliography}
