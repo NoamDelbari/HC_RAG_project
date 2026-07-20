@@ -80,27 +80,23 @@
 Retrieval-Augmented Generation (RAG) typically retrieves a fixed number
 of passages per query, wasting context on easy questions and
 under-serving hard ones. Higher Criticism (HC), a goodness-of-fit test
-for rare and weak signals, offers a principled alternative: cosine
-similarities become $p$-values under a calibrated null of irrelevant
-query--document pairs, and HC keeps only the documents whose scores are
-too extreme to be background noise. We evaluate HC as a drop-in cutoff
-in three existing RAG pipelines and in a controlled study designed to
-expose its failure modes. On multi-hop QA it raises context precision
-more than tenfold over gap-based Adaptive-K and improves answer Exact
-Match by 23\% (relative), while reading an order of magnitude fewer
-tokens. Deployment, however, forces a harder setting: a real retriever
-must calibrate one global null offline and reuse it on every unseen
-query. On a controlled 80K-document product-retrieval benchmark, this
-shared null makes HC retrieve nothing on over 40\% of queries. We trace
-the failure to a per-query scale mismatch between the global null and
-each query's non-relevant scores, and correct it with a label-free
-recalibration that rescales $z$-scores from observable pool statistics
-while keeping one global null. The fix recovers nearly all affected
-queries whose answers exist in the pool, and HC attains the best
-retrieval F1 of eight competing cutoff rules, 12\% (relative) above the
-strongest fixed Top-$k$. The advantage carries through to end-to-end
-generation, improving answer token-F1 by 15\% over a fixed Top-20, and
-holds at corpus scales up to 100{,}000 documents.
+for rare, weak signals, offers a principled alternative: cosine
+similarities become $p$-values under a null calibrated on irrelevant
+query--document pairs, and HC keeps only documents too extreme to be
+noise. We evaluate HC as a drop-in cutoff in three RAG pipelines and in
+a controlled study of its failure modes. On multi-hop QA it raises
+context precision more than tenfold over gap-based Adaptive-K while
+reading an order of magnitude fewer tokens. Deployment is harder: one
+global null must be calibrated offline and reused on every unseen
+query. On an 80K-document product-retrieval benchmark, this shared null
+makes HC retrieve nothing on over 40\% of queries. We trace the failure
+to a per-query scale mismatch with the null and correct it with a
+label-free recalibration that rescales $z$-scores from observable pool
+statistics. The fix recovers nearly all answerable failures; HC then
+attains the best retrieval F1 of eight cutoff rules, 12\% (relative)
+above the strongest fixed Top-$k$, and improves end-to-end answer
+token-F1 by 15\% over a fixed Top-20 at scales up to 100{,}000
+documents.
 \end{abstract}
 
 %====================================================================
