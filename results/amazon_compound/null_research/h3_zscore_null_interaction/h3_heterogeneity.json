@@ -1,0 +1,147 @@
+{
+  "config": {
+    "dataset": "amazon_compound",
+    "pool_sizes": [
+      1000,
+      2000,
+      3000,
+      4000,
+      5000,
+      6000,
+      7000,
+      8000,
+      9000,
+      10000
+    ],
+    "z_score_fractions": [
+      0.5,
+      0.6,
+      0.7,
+      0.8
+    ],
+    "max_relevant": 43,
+    "n_queries": 135
+  },
+  "by_pool_size": {
+    "1000": {
+      "n_queries": 135,
+      "cross_query_variance_of_std": 0.1951134799996009,
+      "cross_query_variance_of_skewness": 0.33716455592361244,
+      "cross_query_variance_of_kurtosis": 11.588123598451663,
+      "cross_query_variance_of_sigma_est": 3.465909358448398e-05,
+      "mean_std": 2.129004074054641,
+      "mean_skewness": 1.528024204069935,
+      "mean_kurtosis": 3.093929923291836,
+      "mean_sigma_est": 0.015048446242083319,
+      "std_of_sigma_est": 0.005887197430397929
+    },
+    "2000": {
+      "n_queries": 135,
+      "cross_query_variance_of_std": 0.2362585625853788,
+      "cross_query_variance_of_skewness": 0.33078723966979556,
+      "cross_query_variance_of_kurtosis": 12.571457761667503,
+      "cross_query_variance_of_sigma_est": 2.9094443206401338e-05,
+      "mean_std": 2.1894717113633755,
+      "mean_skewness": 1.6188941566926658,
+      "mean_kurtosis": 3.585677205356548,
+      "mean_sigma_est": 0.015492846856684776,
+      "std_of_sigma_est": 0.00539392651103084
+    },
+    "3000": {
+      "n_queries": 135,
+      "cross_query_variance_of_std": 0.23412482046533323,
+      "cross_query_variance_of_skewness": 0.3307530966458548,
+      "cross_query_variance_of_kurtosis": 12.807171640993733,
+      "cross_query_variance_of_sigma_est": 3.0658417608303864e-05,
+      "mean_std": 2.2085132947444657,
+      "mean_skewness": 1.6659724861430472,
+      "mean_kurtosis": 3.859152733777968,
+      "mean_sigma_est": 0.015833185740575184,
+      "std_of_sigma_est": 0.00553700438940623
+    },
+    "4000": {
+      "n_queries": 135,
+      "cross_query_variance_of_std": 0.2258528634250128,
+      "cross_query_variance_of_skewness": 0.33259043917925235,
+      "cross_query_variance_of_kurtosis": 13.031730138294298,
+      "cross_query_variance_of_sigma_est": 3.227131603672224e-05,
+      "mean_std": 2.2156660580625496,
+      "mean_skewness": 1.6942719045817378,
+      "mean_kurtosis": 4.0384719866038505,
+      "mean_sigma_est": 0.016093568026571973,
+      "std_of_sigma_est": 0.005680784808168872
+    },
+    "5000": {
+      "n_queries": 135,
+      "cross_query_variance_of_std": 0.21103053803403943,
+      "cross_query_variance_of_skewness": 0.33619496804992177,
+      "cross_query_variance_of_kurtosis": 13.298090259561596,
+      "cross_query_variance_of_sigma_est": 3.302221965928174e-05,
+      "mean_std": 2.215088975128694,
+      "mean_skewness": 1.7126490245087884,
+      "mean_kurtosis": 4.1667537988127235,
+      "mean_sigma_est": 0.0163202172926319,
+      "std_of_sigma_est": 0.005746496294202385
+    },
+    "6000": {
+      "n_queries": 135,
+      "cross_query_variance_of_std": 0.19269109357059191,
+      "cross_query_variance_of_skewness": 0.33632689277228817,
+      "cross_query_variance_of_kurtosis": 13.545023525213164,
+      "cross_query_variance_of_sigma_est": 3.311974863341309e-05,
+      "mean_std": 2.211261782907069,
+      "mean_skewness": 1.7259360233258176,
+      "mean_kurtosis": 4.261834752640664,
+      "mean_sigma_est": 0.016504776598384605,
+      "std_of_sigma_est": 0.005754975988951917
+    },
+    "7000": {
+      "n_queries": 135,
+      "cross_query_variance_of_std": 0.17593690588428715,
+      "cross_query_variance_of_skewness": 0.33353097628080736,
+      "cross_query_variance_of_kurtosis": 13.760677244820455,
+      "cross_query_variance_of_sigma_est": 3.2712536432047485e-05,
+      "mean_std": 2.2070154275126916,
+      "mean_skewness": 1.7359364316408472,
+      "mean_kurtosis": 4.334156978037117,
+      "mean_sigma_est": 0.016651149211874574,
+      "std_of_sigma_est": 0.005719487427387832
+    },
+    "8000": {
+      "n_queries": 135,
+      "cross_query_variance_of_std": 0.1607208506812853,
+      "cross_query_variance_of_skewness": 0.32949318162474817,
+      "cross_query_variance_of_kurtosis": 13.94578870369808,
+      "cross_query_variance_of_sigma_est": 3.203769692987167e-05,
+      "mean_std": 2.2024216396319884,
+      "mean_skewness": 1.743027227032483,
+      "mean_kurtosis": 4.389180259804514,
+      "mean_sigma_est": 0.016776567249232703,
+      "std_of_sigma_est": 0.0056601852381235425
+    },
+    "9000": {
+      "n_queries": 135,
+      "cross_query_variance_of_std": 0.14684359404984368,
+      "cross_query_variance_of_skewness": 0.324841142952728,
+      "cross_query_variance_of_kurtosis": 14.111484676753728,
+      "cross_query_variance_of_sigma_est": 3.120573167250195e-05,
+      "mean_std": 2.1977821698324362,
+      "mean_skewness": 1.7481596870787195,
+      "mean_kurtosis": 4.432133412391994,
+      "mean_sigma_est": 0.01688624282805231,
+      "std_of_sigma_est": 0.005586209060937654
+    },
+    "10000": {
+      "n_queries": 135,
+      "cross_query_variance_of_std": 0.13439503270111935,
+      "cross_query_variance_of_skewness": 0.3197101455992504,
+      "cross_query_variance_of_kurtosis": 14.236171456766495,
+      "cross_query_variance_of_sigma_est": 3.0326155891175024e-05,
+      "mean_std": 2.1926719005111384,
+      "mean_skewness": 1.75142577888533,
+      "mean_kurtosis": 4.464113233181797,
+      "mean_sigma_est": 0.016990622846828903,
+      "std_of_sigma_est": 0.005506918910895186
+    }
+  }
+}

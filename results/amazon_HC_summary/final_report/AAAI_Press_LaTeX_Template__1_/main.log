@@ -1,0 +1,276 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.2.25)  7 JUN 2026 18:09
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**./main.tex
+(main.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2025-12-24>
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/base\size10.clo
+File: size10.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count275
+\c@section=\count276
+\c@subsection=\count277
+\c@subsubsection=\count278
+\c@paragraph=\count279
+\c@subparagraph=\count280
+\c@figure=\count281
+\c@table=\count282
+\abovecaptionskip=\skip49
+\belowcaptionskip=\skip50
+\bibindent=\dimen148
+)
+(aaai.sty
+Conference Style for AAAI for LaTeX 2e -- version of 1 December 2013
+\titlebox=\skip51
+) (C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\times.sty
+Package: times 2020/03/25 PSNFSS-v9.3 (SPQR) 
+)
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\helvet.sty
+Package: helvet 2020/03/25 PSNFSS-v9.3 (WaS) 
+
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks17
+))
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\courier.sty
+Package: courier 2020/03/25 PSNFSS-v9.3 (WaS) 
+)
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
+
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
+
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
+Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
+)
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 106.
+
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen149
+\Gin@req@width=\dimen150
+) (C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 1
+31.
+
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
+tex.def
+File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count283
+) (main.aux)
+\openout1 = `main.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 131.
+LaTeX Font Info:    ... okay on input line 131.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 131.
+LaTeX Font Info:    ... okay on input line 131.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 131.
+LaTeX Font Info:    ... okay on input line 131.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 131.
+LaTeX Font Info:    ... okay on input line 131.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 131.
+LaTeX Font Info:    ... okay on input line 131.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 131.
+LaTeX Font Info:    ... okay on input line 131.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 131.
+LaTeX Font Info:    ... okay on input line 131.
+
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
+ii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count284
+\scratchdimen=\dimen151
+\scratchbox=\box53
+\nofMPsegments=\count285
+\nofMParguments=\count286
+\everyMPshowfont=\toks18
+\MPscratchCnt=\count287
+\MPscratchDim=\dimen152
+\MPnumerator=\count288
+\makeMPintoPDFobject=\count289
+\everyMPtoPDFconversion=\toks19
+)
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
+ase.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.c
+fg
+File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
+))
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 132.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 132.
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 1
+32.
+ (C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
+32.
+
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
+File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
+)
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 151.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 151.
+
+Underfull \hbox (badness 1953) in paragraph at lines 170--183
+\OT1/ptm/m/n/10 Retrieval-Augmented Gen-er-a-tion (RAG), in-tro-duced by
+ []
+
+LaTeX Font Info:    Trying to load font information for OMS+ptm on input line 1
+89.
+(C:\Users\noham\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omsptm.fd
+File: omsptm.fd 
+)
+LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 189.
+
+Underfull \hbox (badness 2970) in paragraph at lines 195--205
+\OT1/ptm/m/it/10 Higher Crit-i-cism \OT1/ptm/m/n/10 (HC) ( Donoho and Jin 2004)
+ is a
+ []
+
+[1{C:/Users/noham/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/no
+ham/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
+
+
+
+]
+Underfull \hbox (badness 2744) in paragraph at lines 273--281
+\OT1/ptm/b/n/10 Bon-fer-roni \OT1/ptm/m/n/10 ( Dunn 1961) FWER con-trol; \OT1/p
+tm/b/n/10 Benjamini--
+ []
+
+
+Underfull \hbox (badness 2790) in paragraph at lines 316--325
+\OT1/ptm/b/n/10 Multi-Department \OT1/ptm/m/n/10 (80K docs, 135 subcategory$\OT
+1/cmr/m/n/10 +$\OT1/ptm/m/n/10 price
+ []
+
+
+Underfull \hbox (badness 1253) in paragraph at lines 327--336
+\OT1/ptm/m/n/10 and J[]egou 2019). Gen-er-a-tion uses \OT1/pcr/m/n/10 gpt-4o-mi
+ni \OT1/ptm/m/n/10 via
+ []
+
+
+Underfull \hbox (badness 1337) in paragraph at lines 349--351
+[]\OT1/ptm/b/n/10 HC pipeline in-te-gra-tions \OT1/ptm/m/n/10 --- Drop-in HC cu
+t-off in
+ []
+
+[2]
+Underfull \hbox (badness 3019) in paragraph at lines 419--426
+\OT1/ptm/m/n/10 Against the multi-step Adaptive-RAG router on Hot-
+ []
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 489.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 489.
+[3]
+Underfull \hbox (badness 1314) in paragraph at lines 565--570
+ \OT1/ptm/b/n/10 When HC wins. \OT1/ptm/m/n/10 Sparse-relevance cor-pora with w
+ell-
+ []
+
+
+Underfull \hbox (badness 3098) in paragraph at lines 565--570
+\OT1/ptm/m/n/10 separated em-bed-dings and clus-tered rel-e-vant pas-sages
+ []
+
+
+Underfull \hbox (badness 1137) in paragraph at lines 571--576
+ \OT1/ptm/b/n/10 When HC loses. \OT1/ptm/m/n/10 Two regimes. (i) \OT1/ptm/m/it/
+10 Dependency-heavy
+ []
+
+
+Underfull \hbox (badness 2126) in paragraph at lines 571--576
+\OT1/ptm/m/it/10 multi-hop \OT1/ptm/m/n/10 ques-tions (MuSiQue, Hot-potQA vs. I
+R-CoT)
+ []
+
+(main.bbl [4]
+Underfull \hbox (badness 2318) in paragraph at lines 42--47
+[]\OT1/ptm/m/n/10 Jin, J.; Zhu, Y.; Yang, X.; Zhang, C.; and Dou, Z.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 78--82
+\OT1/pcr/m/n/10 https : / / github . com / facebookresearch /
+ []
+
+
+Underfull \hbox (badness 4132) in paragraph at lines 109--113
+\OT1/ptm/m/n/10 C-Pack: Pack-aged re-sources to ad-vance gen-eral chi-
+ []
+
+) [5
+
+] [6
+
+
+] (main.aux)
+ ***********
+LaTeX2e <2025-11-01>
+L3 programming layer <2025-12-24>
+ ***********
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 1754 strings out of 467871
+ 29016 string characters out of 5418376
+ 458733 words of memory out of 5000000
+ 30624 multiletter control sequences out of 15000+600000
+ 648671 words of font info for 78 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 57i,11n,65p,199b,303s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/Users/noham/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
+cmex10.pfb><C:/Users/noham/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
+fonts/cm/cmmi10.pfb><C:/Users/noham/AppData/Local/Programs/MiKTeX/fonts/type1/p
+ublic/amsfonts/cm/cmmi7.pfb><C:/Users/noham/AppData/Local/Programs/MiKTeX/fonts
+/type1/public/amsfonts/cm/cmmi9.pfb><C:/Users/noham/AppData/Local/Programs/MiKT
+eX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/noham/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/noham/AppData/Loca
+l/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/noham/AppDa
+ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/no
+ham/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/
+Users/noham/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.
+pfb><C:/Users/noham/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8
+a.pfb><C:/Users/noham/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8
+a.pfb><C:/Users/noham/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8
+a.pfb><C:/Users/noham/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri
+8a.pfb>
+Output written on main.pdf (6 pages, 203765 bytes).
+PDF statistics:
+ 92 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+

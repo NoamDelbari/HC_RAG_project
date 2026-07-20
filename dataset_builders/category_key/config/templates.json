@@ -1,0 +1,33 @@
+{
+  "description": "Templates for generating documents and queries. Multiple templates per type to avoid identical embeddings.",
+  "document_templates": [
+    "{city} is a city in {country}. It is known for being an important urban center in the region.",
+    "{city} is located in {country}. It serves as a significant hub for commerce and culture.",
+    "The city of {city} can be found in {country}. It is home to a diverse population.",
+    "{city} is one of the notable cities in {country}. The city has a rich historical background.",
+    "In {country}, the city of {city} stands as a prominent settlement with deep cultural roots.",
+    "{city}, situated in {country}, is recognized for its contributions to the national economy.",
+    "Among the cities of {country}, {city} is distinguished by its unique character and heritage.",
+    "The urban area of {city} in {country} has developed significantly over the decades.",
+    "{city} is an established city within {country}, playing a vital role in regional development.",
+    "{city} belongs to {country} and is considered one of its important metropolitan areas."
+  ],
+  "capital_suffix_templates": [
+    " It is the capital city.",
+    " It serves as the national capital.",
+    " The city functions as the capital of the country.",
+    " It holds the distinction of being the capital."
+  ],
+  "large_city_suffix_templates": [
+    " It is one of the largest cities in the country by population.",
+    " The city ranks among the most populous in the nation.",
+    " It is a major population center within the country."
+  ],
+  "query_templates": [
+    "What cities are in {country}?",
+    "Which cities can be found in {country}?",
+    "Name the cities located in {country}.",
+    "List the major cities of {country}.",
+    "What are the urban centers in {country}?"
+  ]
+}

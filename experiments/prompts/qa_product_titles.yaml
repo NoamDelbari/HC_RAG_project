@@ -1,0 +1,11 @@
+name: qa_product_titles
+description: QA prompt for product title extraction (V2)
+system: |
+  You are a helpful assistant. Answer the user's query using only the provided documents. Return the titles of products that match the query. If no products match, return an empty list.
+user: |
+  Query: {query}
+
+  {documents}
+
+  Based on the documents above, answer the query. Return the titles of matching products.
+schema: schemas/qa_product_titles.json

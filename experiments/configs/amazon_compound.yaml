@@ -1,0 +1,33 @@
+dataset:
+  name: amazon_compound
+  data_dir: datasets/amazon_compound
+  artifacts_dir: artifacts/amazon_compound
+  results_dir: results/amazon_compound
+
+embedding:
+  model: text-embedding-3-small
+
+null:
+  z_score_fraction: 0.8
+
+hc:
+  gamma: 0.1
+  pool_size: 1000
+
+methods:
+  - name: baseline_k20
+    type: baseline
+    k: 20
+  - name: baseline_k50
+    type: baseline
+    k: 50
+  - name: hc_g0.1_p1000
+    type: hc
+
+eval:
+  qa_model: gpt-4o-mini
+  judge_model: gpt-4o
+  qa_prompt: qa_product_titles
+  judge_prompt: judge_default
+  title_truncate: 100
+  delay: 0.3

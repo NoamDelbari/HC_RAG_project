@@ -1,0 +1,155 @@
+{
+  "config": {
+    "dataset": "amazon_compound",
+    "pool_sizes": [
+      1000,
+      2000,
+      3000,
+      4000,
+      5000,
+      6000,
+      7000,
+      8000,
+      9000,
+      10000
+    ],
+    "z_score_fractions": [
+      0.5,
+      0.6,
+      0.7,
+      0.8
+    ],
+    "max_relevant": 43,
+    "n_queries": 135
+  },
+  "grid": {
+    "0.5": {
+      "zscore_global_null": {
+        "label": "zscore_global_null",
+        "uniformity_pass_rate": 0.5407407407407407,
+        "signal_detection_rate": 0.397196261682243,
+        "mean_hc_stat": 2.3351825688784777,
+        "n_negative_hc": 57,
+        "mean_k": 17.94814814814815,
+        "mean_f1": 0.1403454206327171,
+        "n_queries": 135
+      },
+      "raw_global_null": {
+        "label": "raw_global_null",
+        "uniformity_pass_rate": 0.0,
+        "signal_detection_rate": 0.3058950395398993,
+        "mean_hc_stat": 0.2322755356065504,
+        "n_negative_hc": 84,
+        "mean_k": 12.444444444444445,
+        "mean_f1": 0.06816757996308148,
+        "n_queries": 135
+      },
+      "zscore_per_query_null": {
+        "label": "zscore_per_query_null",
+        "uniformity_pass_rate": 1.0,
+        "signal_detection_rate": 0.3788641265276779,
+        "mean_hc_stat": 1.4215042544835241,
+        "n_negative_hc": 45,
+        "mean_k": 19.177777777777777,
+        "mean_f1": 0.21704797564380657,
+        "n_queries": 135
+      }
+    },
+    "0.6": {
+      "zscore_global_null": {
+        "label": "zscore_global_null",
+        "uniformity_pass_rate": 0.6148148148148148,
+        "signal_detection_rate": 0.396117900790798,
+        "mean_hc_stat": 2.559251810247939,
+        "n_negative_hc": 54,
+        "mean_k": 18.40740740740741,
+        "mean_f1": 0.1447596027212201,
+        "n_queries": 135
+      },
+      "raw_global_null": {
+        "label": "raw_global_null",
+        "uniformity_pass_rate": 0.0,
+        "signal_detection_rate": 0.3058950395398993,
+        "mean_hc_stat": 0.2322755356065504,
+        "n_negative_hc": 84,
+        "mean_k": 12.444444444444445,
+        "mean_f1": 0.06816757996308148,
+        "n_queries": 135
+      },
+      "zscore_per_query_null": {
+        "label": "zscore_per_query_null",
+        "uniformity_pass_rate": 1.0,
+        "signal_detection_rate": 0.3788641265276779,
+        "mean_hc_stat": 1.4215042544835241,
+        "n_negative_hc": 45,
+        "mean_k": 19.177777777777777,
+        "mean_f1": 0.21704797564380657,
+        "n_queries": 135
+      }
+    },
+    "0.7": {
+      "zscore_global_null": {
+        "label": "zscore_global_null",
+        "uniformity_pass_rate": 0.674074074074074,
+        "signal_detection_rate": 0.39575844716031633,
+        "mean_hc_stat": 2.7962050401400944,
+        "n_negative_hc": 52,
+        "mean_k": 18.022222222222222,
+        "mean_f1": 0.14798830408962982,
+        "n_queries": 135
+      },
+      "raw_global_null": {
+        "label": "raw_global_null",
+        "uniformity_pass_rate": 0.0,
+        "signal_detection_rate": 0.3058950395398993,
+        "mean_hc_stat": 0.2322755356065504,
+        "n_negative_hc": 84,
+        "mean_k": 12.444444444444445,
+        "mean_f1": 0.06816757996308148,
+        "n_queries": 135
+      },
+      "zscore_per_query_null": {
+        "label": "zscore_per_query_null",
+        "uniformity_pass_rate": 1.0,
+        "signal_detection_rate": 0.3788641265276779,
+        "mean_hc_stat": 1.4215042544835241,
+        "n_negative_hc": 45,
+        "mean_k": 19.177777777777777,
+        "mean_f1": 0.21704797564380657,
+        "n_queries": 135
+      }
+    },
+    "0.8": {
+      "zscore_global_null": {
+        "label": "zscore_global_null",
+        "uniformity_pass_rate": 0.6888888888888889,
+        "signal_detection_rate": 0.38461538461538464,
+        "mean_hc_stat": 3.0453395799468823,
+        "n_negative_hc": 55,
+        "mean_k": 16.88888888888889,
+        "mean_f1": 0.144005185412637,
+        "n_queries": 135
+      },
+      "raw_global_null": {
+        "label": "raw_global_null",
+        "uniformity_pass_rate": 0.0,
+        "signal_detection_rate": 0.3058950395398993,
+        "mean_hc_stat": 0.2322755356065504,
+        "n_negative_hc": 84,
+        "mean_k": 12.444444444444445,
+        "mean_f1": 0.06816757996308148,
+        "n_queries": 135
+      },
+      "zscore_per_query_null": {
+        "label": "zscore_per_query_null",
+        "uniformity_pass_rate": 1.0,
+        "signal_detection_rate": 0.3788641265276779,
+        "mean_hc_stat": 1.4215042544835241,
+        "n_negative_hc": 45,
+        "mean_k": 19.177777777777777,
+        "mean_f1": 0.21704797564380657,
+        "n_queries": 135
+      }
+    }
+  }
+}

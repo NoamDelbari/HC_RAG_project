@@ -1,0 +1,19 @@
+{
+  "type": "json_schema",
+  "json_schema": {
+    "name": "product_titles",
+    "strict": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "titles": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Titles of products matching the query constraints"
+        }
+      },
+      "required": ["titles"],
+      "additionalProperties": false
+    }
+  }
+}

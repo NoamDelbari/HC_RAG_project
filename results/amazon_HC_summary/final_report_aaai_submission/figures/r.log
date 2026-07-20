@@ -1,0 +1,14 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+! I can't find file `main.tex'.
+<*> main.tex
+            
+(Press Enter to retry, or Control-C to exit)
+Please type another input file name
+! Emergency stop.
+<*> main.tex
+            
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on texput.log.
+pdflatex: major issue: So far, you have not checked for MiKTeX updates.
