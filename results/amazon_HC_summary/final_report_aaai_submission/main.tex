@@ -22,6 +22,8 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{enumitem}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 
 % Keep the \pdfinfo as shown here. There's no need
 % for you to add the /Title and /Author tags.
@@ -114,9 +116,9 @@ documents without labeled retrieval data.
 \end{abstract}
 
 %====================================================================
-% === Background and Motivation ===
+% === Introduction ===
 %====================================================================
-\section{Background and Motivation}
+\section{Introduction}
 Retrieval-Augmented Generation (RAG) \citep{lewis2020rag} grounds a large
 language model (LLM) in passages pulled from an external corpus by an
 approximate-nearest-neighbour search. The dominant interface is
@@ -130,6 +132,19 @@ once: too small a value discards evidence, while too large a value floods
 the prompt with distractors, inflating cost and degrading answers. What
 the retriever needs is not a better fixed $k$ but a per-query rule that
 decides, from the scores themselves, where the relevant passages stop.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_system_overview.png}
+\caption{Overview of the HC-based retrieval cutoff. \emph{Offline}, a single
+\emph{global null} is calibrated from the similarity scores of irrelevant
+query--document pairs. \emph{Online}, a query and corpus yield a candidate
+pool of sorted similarities; the Higher Criticism cutoff maps these scores to
+$p$-values under the null and selects the $k^\star=\arg\max_i \mathrm{HC}_i$
+top passages, which the generator then reads. Only the cutoff box changes
+across the pipelines we evaluate.}
+\label{fig:overview}
+\end{figure}
 
 \subsection{Retrieval as Sparse Signal Detection}
 \label{sec:sparse}
@@ -211,10 +226,77 @@ come from? Section~\ref{sec:amazon} answers the first question in a
 controlled setting, and the uniformity diagnostic is verified in the
 supplement.
 
+\subsection{Our Contributions}
+\begin{enumerate}[leftmargin=1.4em,itemsep=3pt,topsep=1pt]
+\item \textbf{HC pipeline integrations.} We replace fixed Top-$k$ with an
+HC-determined cutoff and integrate it, with no architectural change, into
+three established pipelines: the Adaptive-RAG router
+\citep{jeong2024adaptiverag}; the dense long-context Adaptive-K setting
+\citep{adaptivek2025}, hosted in FlashRAG \citep{jin2025flashrag}; and an
+end-to-end pipeline judged by an LLM on financial question answering
+\citep{thakur2021beir}.
+
+\item \textbf{CrossEntityQA, a new sparse-relevance benchmark.} A
+purpose-built multi-entity retrieval benchmark from Wikidata and
+Wikipedia, with a controllable and widely varying number of relevant
+passages per query ($K{=}2$--20) and only about 2\% relevance, designed
+to stress-test adaptive-$k$ methods in the regime HC targets
+(construction details in the supplement).
+
+\item \textbf{Head-to-head evaluation, with a diagnosed and repaired
+failure.} Across five datasets and a panel of fixed and adaptive
+baselines we report retrieval and generation quality together with cost.
+In a controlled product-retrieval setting this evaluation pinpoints
+\emph{how} a single global null makes HC collapse on hard queries, and a
+label-free per-query recalibration recovers it, giving HC the best
+retrieval F1 of the methods compared while preserving one global null.
+\end{enumerate}
+
 %====================================================================
-% === Methodology ===
+% === Related Work ===
 %====================================================================
-\section{Methodology}
+\section{Related Work}
+\paragraph{Adaptive retrieval cutoffs.} The default RAG interface
+\citep{lewis2020rag} passes a fixed Top-$k$ set to the generator regardless of
+the score distribution. Several methods instead set the cutoff from the
+retrieved scores themselves. Gap-based Adaptive-K \citep{adaptivek2025} cuts at
+the largest gap between consecutive sorted scores; the clustering rule CAR
+\citep{xu2025car} places the boundary at a cluster edge; and Adaptive-RAG
+\citep{jeong2024adaptiverag} routes each query to a retrieval strategy by a
+predicted complexity class. These geometric and routing rules read the shape of
+the score curve or a query-level classifier rather than testing the scores
+against a calibrated background of irrelevant matches, which is the gap our
+detection view targets.
+
+\paragraph{Multiple testing and goodness-of-fit.} Casting the cutoff as
+deciding which top scores are too extreme to have come from an irrelevant-score
+null connects retrieval to multiple hypothesis testing. Bonferroni
+\citep{bonferroni1961dunn} controls the family-wise error rate and
+Benjamini--Hochberg \citep{benjamini1995fdr} the false discovery rate by
+thresholding individual $p$-values, whereas Berk--Jones \citep{berkjones1979}
+and Higher Criticism \citep{donohojin2004hc} aggregate the whole ordered set of
+$p$-values into a goodness-of-fit deviation from uniformity. Higher Criticism
+was introduced for detecting a few weak signals sparsely mixed into a large
+null \citep{donohojin2004hc}, the regime we argue matches sparse-relevance
+retrieval; we adopt it as a per-query cutoff and compare it against these
+alternatives on a shared $p$-value construction.
+
+\paragraph{Retrievers, frameworks, and benchmarks.} Our dense pipelines build
+on BGE embeddings \citep{bgeembeddings2023} indexed for
+approximate-nearest-neighbour search with FAISS \citep{johnson2019faiss}, and
+register the HC cutoff as a post-processing stage in the FlashRAG toolkit
+\citep{jin2025flashrag}. We evaluate across established retrieval and QA
+benchmarks---BEIR and its FiQA financial-QA task \citep{thakur2021beir}, the
+multi-hop HotpotQA \citep{yang2018hotpotqa} and MuSiQue
+\citep{trivedi2022musique}, and the long-context aggregation benchmark
+HoloBench \citep{maekawa2024holobench}---and, to probe the sparse,
+variable-$K$ regime directly, our own CrossEntityQA benchmark (construction in
+the supplement).
+
+%====================================================================
+% === Methods ===
+%====================================================================
+\section{Methods}
 
 \subsection{HC Retrieval Algorithm}
 The HC cutoff has two parts: an offline calibration of the null and an
@@ -235,6 +317,33 @@ Section~\ref{sec:amazon} traces essentially all of HC's failures to this
 object and repairs them without abandoning the global null. The cutoff is
 a drop-in stage, so every pipeline we evaluate differs only in this box;
 the full offline/online pipeline is diagrammed in the supplement.
+Algorithm~\ref{alg:hct} states the procedure step by step.
+
+\begin{algorithm}[tb]
+\caption{HCT-Ret: Higher-Criticism retrieval cutoff}
+\label{alg:hct}
+\textbf{Offline (once):} sample random (query, non-relevant passage) pairs;
+standardise their similarities to $z$-scores; fit the empirical CDF
+$\widehat{F}_0$ of this global null.\\
+\textbf{Input}: query $q$, candidate-pool size $N$\\
+\textbf{Parameter}: guardrail fraction $\gamma$\\
+\textbf{Output}: selected passages
+\begin{algorithmic}[1]
+\STATE retrieve the top-$N$ passages for $q$ with scores $s_1\ge\cdots\ge s_N$
+\STATE map each score to a $z$-score $z_i$
+\STATE \textit{(optional, deployed setting)}\; $z_i \gets z_i\cdot
+\sigma_{\mathrm{null}}/\hat{\sigma}_q$ with $\hat{\sigma}_q=\mathrm{std}\!
+\left(z_{(\gamma+1:N)}\right)$ \COMMENT{label-free per-query recalibration
+(Sec.~\ref{sec:amazon})}
+\STATE $p_i \gets 1-\widehat{F}_0(z_i)$ \COMMENT{tail mass under the null}
+\STATE sort $p_{(1)}\le\cdots\le p_{(N)}$
+\FOR{$i=1$ to $\lfloor\gamma N\rfloor$}
+\STATE $\mathrm{HC}_i \gets \sqrt{N}\,(i/N-p_{(i)})/\sqrt{p_{(i)}(1-p_{(i)})}$
+\ENDFOR
+\STATE $k^\star \gets \arg\max_{i\le\gamma N}\mathrm{HC}_i$
+\STATE \textbf{return} the top-$k^\star$ passages
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Methods and Pipelines}
 We treat HC as one selection rule among a family that turns a candidate
@@ -253,6 +362,11 @@ aggregate the whole ordered set into a goodness-of-fit deviation from the
 uniform null. Holding the pool and the $p$-value machinery fixed isolates
 the selection rule as the axis of comparison; the full method-by-method
 table is in the supplement.
+
+%====================================================================
+% === Experiments ===
+%====================================================================
+\section{Experiments}
 
 \subsection{Datasets and Setup}
 The study runs in two phases that serve different purposes
@@ -316,38 +430,9 @@ they cannot encode.}
 \end{table}
 
 %====================================================================
-% === Contributions ===
-%====================================================================
-\section{Contributions}
-\begin{enumerate}[leftmargin=1.4em,itemsep=3pt,topsep=1pt]
-\item \textbf{HC pipeline integrations.} We replace fixed Top-$k$ with an
-HC-determined cutoff and integrate it, with no architectural change, into
-three established pipelines: the Adaptive-RAG router
-\citep{jeong2024adaptiverag}; the dense long-context Adaptive-K setting
-\citep{adaptivek2025}, hosted in FlashRAG \citep{jin2025flashrag}; and an
-end-to-end pipeline judged by an LLM on financial question answering
-\citep{thakur2021beir}.
-
-\item \textbf{CrossEntityQA, a new sparse-relevance benchmark.} A
-purpose-built multi-entity retrieval benchmark from Wikidata and
-Wikipedia, with a controllable and widely varying number of relevant
-passages per query ($K{=}2$--20) and only about 2\% relevance, designed
-to stress-test adaptive-$k$ methods in the regime HC targets
-(construction details in the supplement).
-
-\item \textbf{Head-to-head evaluation, with a diagnosed and repaired
-failure.} Across five datasets and a panel of fixed and adaptive
-baselines we report retrieval and generation quality together with cost.
-In a controlled product-retrieval setting this evaluation pinpoints
-\emph{how} a single global null makes HC collapse on hard queries, and a
-label-free per-query recalibration recovers it, giving HC the best
-retrieval F1 of the methods compared while preserving one global null.
-\end{enumerate}
-
-%====================================================================
 % === Phase 1 ===
 %====================================================================
-\section{Integrating HC across Retrieval Pipelines}
+\subsection{Integrating HC across Retrieval Pipelines}
 \label{sec:phase1}
 HC supplies a cutoff rule, not a retriever, so the first question is
 whether it transfers across the heterogeneous parts a real RAG system is
@@ -359,7 +444,7 @@ pipeline reports the metrics that matter for it. Throughout, we adopt
 each pipeline's stored null as given, because a single global null is a
 calibration choice we introduce only in Phase~2.
 
-\subsection{Where adaptivity pays: sparse, variable-$K$ retrieval}
+\subsubsection{Where adaptivity pays: sparse, variable-$K$ retrieval}
 
 \begin{table}[t]
 \centering\small
@@ -404,7 +489,7 @@ retrieval and trailing the more expensive iterative router only slightly.
 The contrast is the point: HC's benefit tracks how much the right $k$
 actually moves from query to query.
 
-\subsection{Same answer quality, far less context}
+\subsubsection{Same answer quality, far less context}
 
 \begin{table}[t]
 \centering\small
@@ -446,7 +531,7 @@ cases the generation quality is matched or better while the retrieved set
 is smaller and cleaner, exactly the liberal-but-precise behaviour the
 theory predicts when the null is faithful.
 
-\subsection{When relevance is scattered: FiQA}
+\subsubsection{When relevance is scattered: FiQA}
 
 \begin{table}[t]
 \centering\small
@@ -484,7 +569,7 @@ is built to detect (see supplement).
 %====================================================================
 % === Phase 2 ===
 %====================================================================
-\section{A Controlled Study on Amazon}
+\subsection{A Controlled Study on Amazon}
 \label{sec:amazon}
 Phase~1 showed that the null distribution decides HC's behaviour, but the
 borrowed pipelines did not expose which queries failed or let us measure
@@ -494,7 +579,7 @@ construction, with one controllable dimension of difficulty. With ground
 truth in hand, each outcome can be attributed to a mechanism. We read off the
 per-setting results in the tables below.
 
-\subsection{Proof of concept: the city benchmark}
+\subsubsection{Proof of concept: the city benchmark}
 The city benchmark is the regime built to satisfy HC's assumptions: 44
 ``largest cities in [country]'' queries over 726 passages, with the
 number of relevant documents varying widely so adaptivity is necessary.
@@ -525,7 +610,7 @@ comparable recall.}
 \label{tab:p2city}
 \end{table}
 
-\subsection{A controlled difficulty: category-and-price queries}
+\subsubsection{A controlled difficulty: category-and-price queries}
 To make HC's statistical selection necessary rather than optional, the
 product queries combine a category with a price constraint. A dense
 embedder captures the category but cannot reason about a numeric
@@ -544,7 +629,7 @@ HC statistic and return $k{=}0$}, retrieving nothing. Because relevance
 and true $K$ are known, we can ask exactly which queries collapse and
 why.
 
-\subsection{Diagnosis: three mechanisms}
+\subsubsection{Diagnosis: three mechanisms}
 Partitioning the 135 queries by their known structure assigns each
 collapse to one of three mechanisms. First, an \textbf{embedding
 limitation} accounts for $\AmIrrN$ ``irreducible'' queries: the price
@@ -565,7 +650,7 @@ miscalibration is a direct consequence of sharing one global null across
 queries of different scale. The fix must therefore recalibrate per query
 without giving up the global null.
 
-\subsection{The fix and what it recovers}
+\subsubsection{The fix and what it recovers}
 The repair rescales each query's $z$-scores onto the null's scale before
 the lookup. We estimate a robust per-query spread $\hat{\sigma}_q$ from
 the pool after dropping the top $\gamma$ ranks (where any relevant
@@ -599,7 +684,7 @@ to a high recall but near-zero precision, and the family-wise-error
 \label{fig:methodcompare}
 \end{figure}
 
-\subsection{Best in class, and it generalizes}
+\subsubsection{Best in class, and it generalizes}
 
 \begin{table}[t]
 \centering\small
