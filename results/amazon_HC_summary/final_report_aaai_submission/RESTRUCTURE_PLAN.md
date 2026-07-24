@@ -222,6 +222,53 @@ allowed to continue onto pp. 8–9. I will keep the new prose tight and, if it
 crosses 7 content pages, first tighten wording (not delete results) and flag it
 to you before moving anything to the supplement.
 
+## Supplement verification (`supplement.tex`) — DONE
+Cross-checked end-to-end against the current `main.tex` and the wider project:
+- **All 8 "(see supplement)" pointers in `main.tex` resolve** — pipeline diagram
+  (§2), full method table (§3), CrossEntityQA construction (§4, referenced 3×),
+  null/uniformity diagnostics (§5, referenced 3×). No dangling refs; no stale
+  "Section N" cross-references back to the main paper.
+- **Compiles clean** (`supp_check` jobname): exit 0, **3 pages**, no undefined
+  refs/citations, all 3 figures present.
+- **Fixed a pre-existing layout bug** (not introduced by us): the Comparison
+  Methods table was **133 pt too wide** (overfull hbox), overflowing into the
+  right column and overlapping Fig 3's caption + the References. Fix = made that
+  one table full-width (`table` → `table*`). This is the only edit to
+  `supplement.tex`.
+- **`Full-context` and `Self-route` rows verified as REAL project methods** —
+  evaluated on HotpotQA (300 samples each), documented in
+  `results/amazon_HC_summary/HC_RESULTS_REPORT.md` (with result JSONs under
+  `RAG_results/hotpotqa/.../{full-context,self-route}/`). They were omitted from
+  the main paper's headline table (only 300 vs 987 samples) but legitimately
+  belong in the supplement's method catalog → **kept**. Roadmap historical items
+  (CRAG, MS MARCO, SciFact, RRF, uncertainty filtering) are genuine process
+  history → kept.
+- ⚠️ The on-disk `supplement.pdf` is now **stale** vs. the edited
+  `supplement.tex`; recompile before uploading (user owns PDF generation).
+
+### Supplement §2 (HC-RAG Pipeline diagram) removed
+The detailed `rag_pipeline.png` diagram overlapped the main paper's new general
+system diagram (Figure 1) and carried dataset/library labels ("CRAG Dataset",
+"Faiss Index") for a corpus (CRAG) that isn't a main-paper benchmark. Per user
+decision it was **removed** from the supplement. Coordinated edits:
+- `supplement.tex`: deleted the "HC-RAG Pipeline" section + figure; dropped it
+  from the abstract's material list; renumbered the appendix comment labels
+  (Comparison Methods B, CrossEntityQA C, Diagnostics D).
+- `main.tex`: repointed "the full offline/online pipeline is diagrammed in the
+  supplement" → "summarized in Figure~\ref{fig:overview}" (the general diagram).
+- Verified: no dangling `fig:pipeline`/`app:pipeline`/`rag_pipeline` refs; both
+  docs recompile clean (main 7 pp, supplement 3 pp, no undefined refs).
+- `figures/rag_pipeline.png` is left on disk (now unused by these two docs;
+  still referenced by other report versions) — not deleted.
+
+### Supplement compile warnings fixed (Roadmap reflow)
+The Roadmap was a single rigid `tabular` that couldn't break across columns,
+producing an **Overfull \vbox (~44pt)** (content past the page bottom) plus
+overfull/underfull `\hbox` warnings from its fixed `p{}` columns. Converted it
+to **flowing bold-headed paragraphs** ("\textbf{Wk N --- Title.} …", same text)
+so it breaks naturally. Result: `supplement.tex` compiles with **zero
+over/underfull warnings**, no undefined refs, 3 pages.
+
 ## Verification (after edits)
 > **`main.pdf` is owned by the user.** They compile/produce the final
 > `main.pdf` themselves. To verify my edits build, I compile under a **separate
